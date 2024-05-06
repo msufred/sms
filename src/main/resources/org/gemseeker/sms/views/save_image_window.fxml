@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" pannable="true" prefHeight="200.0" prefWidth="200.0" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+         <content>
+            <StackPane alignment="TOP_LEFT" style="-fx-background-color: -col-silver;">
+               <children>
+                  <StackPane fx:id="contentPane" alignment="TOP_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="paper" />
+                  <ProgressIndicator fx:id="progress" maxHeight="200.0" maxWidth="200.0" StackPane.alignment="CENTER" />
+               </children>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
+            </StackPane>
+         </content></ScrollPane>
+      <HBox alignment="CENTER_RIGHT" spacing="4.0">
+         <children>
+            <Label text="Zoom" />
+            <Slider fx:id="zoomSlider" majorTickUnit="2.0" max="1.0" minorTickCount="1" value="0.244" HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnSave" defaultButton="true" mnemonicParsing="false" styleClass="form-button-positve" text="Save Image">
+               <HBox.margin>
+                  <Insets left="32.0" />
+               </HBox.margin>
+            </Button>
+            <Label fx:id="lblZoom" />
+            <Button fx:id="btnCancel" cancelButton="true" mnemonicParsing="false" styleClass="form-button-regular" text="Cancel" />
+         </children>
+         <padding>
+            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+         </padding>
+      </HBox>
+   </children>
+   <stylesheets>
+      <URL value="@styles.css" />
+      <URL value="@icons_styles.css" />
+   </stylesheets>
+</VBox>

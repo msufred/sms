@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+preferences.xml is copied everytime tha application starts. Any changes on the
+main xml file will be reflected to the application upon restart.
+-->
+<root>
+    <preferences>
+        <categories id="account">
+            <category>Home</category>
+            <category>Business</category>
+            <category>Enterprise</category>
+            <category>Purchase</category>
+            <category>Service</category>
+        </categories>
+
+        <categories id="expenses">
+            <category>All</category>
+            <category>Electricity</category>
+            <category>Water</category>
+            <category>Education</category>
+            <category>Food or Grocery</category>
+            <category>Transportation</category>
+            <category>Ground Rental</category>
+            <category>Repair and Maintenance</category>
+            <category>Computer Peripherals</category>
+            <category>Internet</category>
+            <category>Other</category>
+        </categories>
+        
+        <statuses id="account">
+            <status>Active</status>
+            <status>Inactive</status>
+            <status>Deactivated</status>
+        </statuses>
+        
+        <statuses id="hotspot">
+            <status>Active</status>
+            <status>Pulled Out</status>
+            <status>Under Repair</status>
+        </statuses>
+        
+        <statuses id="billing">
+            <status>For Payment</status>
+            <status>Paid</status>
+            <status>Overdue</status>
+        </statuses>
+        
+        <statuses id="balance">
+            <status>Paid</status>
+            <status>Not Paid</status>
+        </statuses>
+        
+        <list-items id="bandwidth">
+            <item>5 MBPS</item>
+            <item>10 MBPS</item>
+            <item>15 MBPS</item>
+            <item>30 MBPS</item>
+            <item>100 MBPS</item>
+            <item>Unlimited</item>
+        </list-items>
+    </preferences>
+</root>

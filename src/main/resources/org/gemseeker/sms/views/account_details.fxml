@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.web.WebView?>
+
+<VBox prefHeight="400.0" prefWidth="600.0" styleClass="content-pane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox prefWidth="200.0" spacing="8.0">
+         <children>
+            <Label fx:id="lblStatus" alignment="CENTER" minWidth="80.0" text="Status">
+               <styleClass>
+                  <String fx:value="form-label" />
+                  <String fx:value="status-active" />
+               </styleClass></Label>
+            <Label fx:id="lblName" styleClass="form-label" text="Name" />
+         </children>
+         <padding>
+            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+         </padding>
+      </HBox>
+      <Separator prefWidth="200.0" />
+      <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <tabs>
+            <Tab text="Account Info">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                           <children>
+                              <Label minWidth="80.0" text="Account No." />
+                              <Label fx:id="lblAccountNo" text="#####" />
+                           </children>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                           <children>
+                              <Label minWidth="80.0" text="Name" />
+                              <TextField fx:id="tfName" editable="false" minWidth="250.0" />
+                              <Button fx:id="btnUpdateName" mnemonicParsing="false" />
+                           </children>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                           <children>
+                              <Label minWidth="80.0" text="Address" />
+                              <TextField fx:id="tfAddress" editable="false" minWidth="250.0" />
+                              <Button fx:id="btnUpdateAddress" mnemonicParsing="false" />
+                           </children>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                           <children>
+                              <Label minWidth="80.0" text="Email" />
+                              <TextField fx:id="tfEmail" editable="false" minWidth="250.0" />
+                              <Button fx:id="btnUpdateEmail" mnemonicParsing="false" />
+                           </children>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                           <children>
+                              <Label minWidth="80.0" text="Phone" />
+                              <TextField fx:id="tfPhone" editable="false" minWidth="250.0" />
+                              <Button fx:id="btnUpdatePhone" mnemonicParsing="false" />
+                           </children>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                           <children>
+                              <Label minWidth="80.0" text="Status" />
+                              <TextField fx:id="tfStatus" editable="false" minWidth="250.0" />
+                              <Button fx:id="btnUpdateStatus" mnemonicParsing="false" />
+                           </children>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </HBox>
+                        <ProgressBar fx:id="progressBar" prefWidth="200.0" visible="false">
+                           <VBox.margin>
+                              <Insets left="8.0" top="16.0" />
+                           </VBox.margin>
+                        </ProgressBar>
+                     </children>
+                     <padding>
+                        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                     </padding>
+                  </VBox>
+               </content>
+            </Tab>
+          <Tab text="Subscription">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                           <children>
+                              <Label minWidth="80.0" text="Data Plan" />
+                              <TextField fx:id="tfDataPlan" editable="false" minWidth="250.0" />
+                           </children>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                           <children>
+                              <Label minWidth="80.0" text="Bandwith" />
+                              <TextField fx:id="tfBandwidth" editable="false" minWidth="250.0" />
+                           </children>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                           <children>
+                              <Label minWidth="80.0" text="Amount" />
+                              <TextField fx:id="tfAmount" editable="false" minWidth="250.0" />
+                           </children>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                           <children>
+                              <Label minWidth="80.0" text="IP Address" />
+                              <TextField fx:id="tfIpAddress" editable="false" minWidth="250.0" />
+                              <Button fx:id="btnUpdateIpAddress" mnemonicParsing="false" />
+                           </children>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                           <children>
+                              <Label minWidth="80.0" text="Duration" />
+                              <TextField fx:id="tfDuration" editable="false" minWidth="250.0" />
+                           </children>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </HBox>
+                        <Label text="Note: Some Subscription details cannot be change until the end of the subscription contract.">
+                           <VBox.margin>
+                              <Insets left="8.0" top="8.0" />
+                           </VBox.margin>
+                        </Label>
+                        <ProgressBar fx:id="progressBar1" prefWidth="200.0" visible="false">
+                           <VBox.margin>
+                              <Insets top="16.0" />
+                           </VBox.margin>
+                        </ProgressBar>
+                     </children>
+                     <padding>
+                        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                     </padding>
+                  </VBox>
+               </content></Tab>
+            <Tab text="Tower Info">
+               <content>
+                  <HBox>
+                     <children>
+                        <VBox minWidth="320.0" prefHeight="300.0" prefWidth="100.0">
+                           <children>
+                              <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                 <children>
+                                    <Label minWidth="100.0" text="Tower Height (m)" />
+                                    <TextField fx:id="tfTowerHeight" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" />
+                                    <Button fx:id="btnUpdateTowerHeight" mnemonicParsing="false" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                 </padding>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                 <children>
+                                    <Label minWidth="100.0" text="Latitude" />
+                                    <TextField fx:id="tfLatitude" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" />
+                                    <Button fx:id="btnUpdateLatitude" mnemonicParsing="false" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                 </padding>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                 <children>
+                                    <Label minWidth="100.0" text="Longitude" />
+                                    <TextField fx:id="tfLongitude" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" />
+                                    <Button fx:id="btnUpdateLongitude" mnemonicParsing="false" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                 </padding>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                 <children>
+                                    <Label minWidth="100.0" text="Elevation" />
+                                    <TextField fx:id="tfElevation" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" />
+                                    <Button fx:id="btnUpdateElevation" mnemonicParsing="false" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                 </padding>
+                              </HBox>
+                              <ProgressBar fx:id="progressBar2" prefHeight="18.0" prefWidth="210.0" visible="false">
+                                 <VBox.margin>
+                                    <Insets left="8.0" top="16.0" />
+                                 </VBox.margin>
+                              </ProgressBar>
+                           </children>
+                           <padding>
+                              <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                           </padding>
+                        </VBox>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <WebView fx:id="webView" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                     </children>
+                  </HBox>
+               </content>
+            </Tab>
+          <Tab text="Billing Payments">
+               <content>
+                  <TableView fx:id="billingsTable" prefHeight="200.0" prefWidth="200.0">
+                    <columns>
+                      <TableColumn fx:id="colBillingStatus" prefWidth="75.0" styleClass="table-cell-center-align" text="Status" />
+                      <TableColumn fx:id="colFrom" prefWidth="75.0" styleClass="table-cell-center-align" text="From" />
+                        <TableColumn fx:id="colTo" prefWidth="75.0" styleClass="table-cell-center-align" text="To" />
+                        <TableColumn fx:id="colDue" prefWidth="75.0" styleClass="table-cell-center-align" text="Due Date" />
+                        <TableColumn fx:id="colAmountDue" prefWidth="103.0" styleClass="table-cell-center-align" text="Amount Due" />
+                        <TableColumn fx:id="colAmountPaid" prefWidth="92.0" styleClass="table-cell-center-align" text="Amount Paid" />
+                        <TableColumn fx:id="colBalance" prefWidth="70.0" styleClass="table-cell-center-align" text="Balance" />
+                    </columns>
+                  </TableView>
+               </content></Tab>
+            <Tab text="Balances">
+               <content>
+                  <TableView fx:id="balanceTable" prefHeight="200.0" prefWidth="200.0">
+                    <columns>
+                      <TableColumn fx:id="colDate" prefWidth="75.0" styleClass="table-cell-center-align" text="Date" />
+                      <TableColumn fx:id="colAmount" prefWidth="75.0" styleClass="table-cell-center-align" text="Amount" />
+                        <TableColumn fx:id="colStatus" prefWidth="75.0" styleClass="table-cell-center-align" text="Status" />
+                    </columns>
+                  </TableView>
+               </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+   <stylesheets>
+      <URL value="@styles.css" />
+      <URL value="@icons_styles.css" />
+   </stylesheets>
+</VBox>

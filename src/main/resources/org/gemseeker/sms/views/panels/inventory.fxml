@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label styleClass="panel-title" text="Products &amp; Services">
+         <VBox.margin>
+            <Insets left="8.0" top="8.0" />
+         </VBox.margin>
+      </Label>
+      <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <tabs>
+          <Tab fx:id="tabProducts" text="Products">
+               <content>
+                  <VBox>
+                     <children>
+                        <HBox alignment="CENTER_LEFT" spacing="4.0">
+                           <children>
+                              <Button fx:id="btnAddProduct" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnEditProduct" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnDeleteProduct" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnRefreshProducts" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnPrintList" mnemonicParsing="false" styleClass="btn" />
+                              <Label fx:id="lblFilter" text="Filter">
+                                 <HBox.margin>
+                                    <Insets left="32.0" />
+                                 </HBox.margin></Label>
+                              <ComboBox fx:id="cbFilterProducts" prefWidth="150.0" />
+                              <Region HBox.hgrow="ALWAYS" />
+                              <Label fx:id="lblSearch" />
+                              <TextField fx:id="tfSearch" minWidth="200.0" promptText="Search Product" />
+                           </children>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </HBox>
+                        <SplitPane fx:id="splitPane" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                           <items>
+                              <TableView fx:id="productsTable" prefHeight="200.0" prefWidth="200.0">
+                                <columns>
+                                    <TableColumn fx:id="colProductTag" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" style="-fx-alignment: center;" />
+                                  <TableColumn fx:id="colProductId" prefWidth="75.0" styleClass="table-cell-center-align" text="ID" />
+                                  <TableColumn fx:id="colProductName" prefWidth="150.0" text="Name" />
+                                    <TableColumn fx:id="colProductPrice" prefWidth="75.0" styleClass="table-cell-right-align" text="Price (PHP)" />
+                                    <TableColumn fx:id="colStocks" prefWidth="75.0" styleClass="table-cell-center-align" text="Stocks" />
+                                </columns>
+                              </TableView>
+                           </items>
+                        </SplitPane>
+                     </children>
+                  </VBox>
+               </content>
+          </Tab>
+          <Tab fx:id="tabServices" text="Services">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <HBox spacing="4.0">
+                           <children>
+                              <Button fx:id="btnAddService" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnEditService" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnDeleteService" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnRefreshServices" mnemonicParsing="false" styleClass="btn" />
+                           </children>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </HBox>
+                        <TableView fx:id="servicesTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                          <columns>
+                              <TableColumn fx:id="colServiceTag" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" style="-fx-alignment: center;" />
+                            <TableColumn fx:id="colServiceId" prefWidth="75.0" styleClass="table-cell-center-align" text="ID" />
+                            <TableColumn fx:id="colServiceName" prefWidth="100.0" text="Name" />
+                              <TableColumn fx:id="colServicePrice" prefWidth="75.0" styleClass="table-cell-right-align" text="Price (PHP)" />
+                              <TableColumn fx:id="colDescription" prefWidth="250.0" text="Description" />
+                          </columns>
+                        </TableView>
+                     </children>
+                  </VBox>
+               </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+   <stylesheets>
+      <URL value="@../styles.css" />
+      <URL value="@../icons_styles.css" />
+   </stylesheets>
+</VBox>

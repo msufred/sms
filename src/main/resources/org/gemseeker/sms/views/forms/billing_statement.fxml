@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1772.0" prefWidth="2421.0" stylesheets="@statement.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ImageView fx:id="tempBg" fitHeight="1772.0" fitWidth="2421.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@billing_statement_bg.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="1772.0" fitWidth="2421.0" pickOnBounds="true" preserveRatio="true" style="-fx-opacity: 0.5;">
+         <image>
+            <Image url="@../watermark.png" />
+         </image>
+      </ImageView>
+      <VBox prefHeight="200.0" prefWidth="100.0">
+         <children>
+            <HBox alignment="BOTTOM_LEFT">
+               <VBox.margin>
+                  <Insets top="475.0" />
+               </VBox.margin>
+               <children>
+                  <VBox minWidth="1500.0">
+                     <children>
+                        <Label fx:id="lblAccountName" text="John Dela Cruz">
+                           <font>
+                              <Font name="System Bold" size="48.0" />
+                           </font>
+                           <styleClass>
+                              <String fx:value="text-12pt" />
+                              <String fx:value="text-bold" />
+                           </styleClass>
+                        </Label>
+                        <Label fx:id="lblAddress" styleClass="text-8pt" text="Surallah, South Cotabato" />
+                        <Label fx:id="lblContact" styleClass="text-8pt" text="0910000000" />
+                     </children>
+                     <HBox.margin>
+                        <Insets left="200.0" />
+                     </HBox.margin>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label fx:id="lblStatementDate" styleClass="text-8pt" text="January 01, 2022">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </Label>
+                        <Label fx:id="lblContractPeriod" styleClass="text-8pt" text="May 01 - Jun 01">
+                           <VBox.margin>
+                              <Insets top="-5.0" />
+                           </VBox.margin>
+                        </Label>
+                        <Label fx:id="lblPlanType" styleClass="text-8pt" text="Home">
+                           <VBox.margin>
+                              <Insets top="-5.0" />
+                           </VBox.margin>
+                        </Label>
+                        <Label fx:id="lblBandwidth" styleClass="text-8pt" text="5mpbs">
+                           <VBox.margin>
+                              <Insets top="-5.0" />
+                           </VBox.margin>
+                        </Label>
+                     </children>
+                     <HBox.margin>
+                        <Insets top="35.0" />
+                     </HBox.margin>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER">
+               <children>
+                  <Label fx:id="lblDuration" text="May 01 - Jun 01, 2022">
+                     <styleClass>
+                        <String fx:value="text-12pt" />
+                        <String fx:value="text-bold" />
+                     </styleClass>
+                  </Label>
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </HBox>
+            <Label fx:id="lblPrevBalance" alignment="CENTER_RIGHT" minWidth="300.0" styleClass="text-10pt" text="0.00">
+               <VBox.margin>
+                  <Insets left="1670.0" top="60.0" />
+               </VBox.margin>
+            </Label>
+            <Label fx:id="lblCurrentCharges" alignment="CENTER_RIGHT" minWidth="300.0" styleClass="text-10pt" text="0.00">
+               <VBox.margin>
+                  <Insets left="1670.0" top="70.0" />
+               </VBox.margin>
+            </Label>
+            <Label fx:id="lblVat" alignment="CENTER_RIGHT" minWidth="300.0" styleClass="text-10pt" text="0.00">
+               <VBox.margin>
+                  <Insets left="1670.0" top="-5.0" />
+               </VBox.margin>
+            </Label>
+            <Label fx:id="lblTotalCharges" alignment="CENTER_RIGHT" minWidth="300.0" styleClass="text-10pt" text="0.00">
+               <VBox.margin>
+                  <Insets left="1670.0" top="-5.0" />
+               </VBox.margin>
+            </Label>
+            <HBox alignment="CENTER_LEFT">
+               <VBox.margin>
+                  <Insets left="330.0" top="70.0" />
+               </VBox.margin>
+               <children>
+                  <Label fx:id="lblDueDate" minWidth="200.0" text="May 01, 2022">
+                     <styleClass>
+                        <String fx:value="text-10pt" />
+                        <String fx:value="text-red" />
+                     </styleClass>
+                  </Label>
+                  <VBox>
+                     <children>
+                        <Label fx:id="lblAmountPrev" alignment="CENTER_RIGHT" minWidth="300.0" text="0.00">
+                           <styleClass>
+                              <String fx:value="text-10pt" />
+                              <String fx:value="text-bold" />
+                           </styleClass>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </Label>
+                        <Label fx:id="lblAmountCurrent" alignment="CENTER_RIGHT" minWidth="300.0" text="0.00">
+                           <styleClass>
+                              <String fx:value="text-10pt" />
+                              <String fx:value="text-bold" />
+                           </styleClass>
+                        </Label>
+                     </children>
+                     <HBox.margin>
+                        <Insets left="1070.0" />
+                     </HBox.margin>
+                  </VBox>
+               </children>
+            </HBox>
+            <Label fx:id="lblTotal" alignment="CENTER_RIGHT" minWidth="300.0" text="0.00">
+               <VBox.margin>
+                  <Insets left="1670.0" top="50.0" />
+               </VBox.margin>
+               <styleClass>
+                  <String fx:value="text-12pt" />
+                  <String fx:value="text-bold" />
+               </styleClass>
+            </Label>
+            <HBox>
+               <children>
+                  <Label fx:id="lblPreparedBy" minWidth="450.0" styleClass="text-10pt">
+                     <HBox.margin>
+                        <Insets left="320.0" />
+                     </HBox.margin>
+                  </Label>
+                  <Label fx:id="lblDesignation" minWidth="300.0" styleClass="text-10pt">
+                     <HBox.margin>
+                        <Insets left="250.0" />
+                     </HBox.margin>
+                  </Label>
+                  <Label fx:id="lblReceivedBy" minWidth="350.0" styleClass="text-10pt">
+                     <HBox.margin>
+                        <Insets left="230.0" />
+                     </HBox.margin>
+                  </Label>
+               </children>
+               <VBox.margin>
+                  <Insets left="40.0" top="80.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</StackPane>

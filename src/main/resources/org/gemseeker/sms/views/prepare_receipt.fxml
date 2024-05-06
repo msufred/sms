@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="8.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label styleClass="form-title" text="Prepare Receipt" />
+      <HBox alignment="CENTER_LEFT" layoutX="26.0" layoutY="59.0" spacing="8.0">
+         <children>
+            <Label alignment="CENTER_RIGHT" minWidth="88.0" styleClass="form-label" text="OR No." />
+            <TextField fx:id="tfOrNo" minWidth="400.0" promptText="Official Receipt No. (Optional)" styleClass="form-field" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER_LEFT" spacing="8.0">
+         <children>
+            <Label alignment="CENTER_RIGHT" minWidth="88.0" styleClass="form-label" text="Prepared By" />
+            <TextField fx:id="tfName" minWidth="400.0" promptText="Cashier/Authorized Person (Required)" styleClass="form-field" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" spacing="8.0">
+         <children>
+            <Label alignment="CENTER_RIGHT" minWidth="88.0" styleClass="form-label" text="Position" />
+            <TextField fx:id="tfPosition" minWidth="400.0" promptText="Position (Optional)" styleClass="form-field" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER_RIGHT">
+         <children>
+            <Button fx:id="btnProceed" mnemonicParsing="false" styleClass="form-button-positve" text="Proceed" />
+         </children>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+   </padding>
+   <stylesheets>
+      <URL value="@styles.css" />
+      <URL value="@icons_styles.css" />
+   </stylesheets>
+</VBox>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label styleClass="panel-title" text="Dashboard">
+         <VBox.margin>
+            <Insets left="8.0" top="8.0" />
+         </VBox.margin>
+      </Label>
+      <Separator prefWidth="200.0" />
+      <HBox spacing="8.0">
+         <children>
+            <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label styleClass="summary-title" text="Cash Forwarded" />
+                  <Label fx:id="lblForwarded" styleClass="summary-number" text="0.00" />
+               </children>
+               <padding>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </padding>
+            </VBox>
+            <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label styleClass="summary-title" text="Revenues" />
+                  <Label fx:id="lblRevenues" styleClass="summary-number" text="0.00" />
+               </children>
+               <padding>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </padding>
+            </VBox>
+            <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label styleClass="summary-title" text="Expenses" />
+                  <Label fx:id="lblExpenses" styleClass="summary-number" text="0.00" />
+               </children>
+               <padding>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </padding>
+            </VBox>
+            <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label styleClass="summary-title" text="Cash Balance" />
+                  <Label fx:id="lblBalances" styleClass="summary-number" text="0.00" />
+               </children>
+               <padding>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </padding>
+            </VBox>
+         </children>
+         <padding>
+            <Insets left="8.0" right="8.0" />
+         </padding>
+      </HBox>
+      <Separator prefWidth="200.0" />
+      <ToolBar prefHeight="40.0" prefWidth="200.0">
+         <items>
+            <ToggleButton fx:id="toggleRecent" mnemonicParsing="false" selected="true" text="Recent Sales" />
+            <ToggleButton fx:id="toggleSales" mnemonicParsing="false" text="Sales Projections" />
+            <ToggleButton fx:id="toggleRevenues" mnemonicParsing="false" text="Revenues" />
+            <ToggleButton fx:id="toggleExpenses" mnemonicParsing="false" text="Expenses" />
+            <Separator orientation="VERTICAL" />
+            <MenuButton fx:id="printMenuButton" mnemonicParsing="false" text="Print Report">
+              <items>
+                <MenuItem fx:id="miDaily" mnemonicParsing="false" text="Daily Report" />
+                <MenuItem fx:id="miWeekly" mnemonicParsing="false" text="Weekly Report" />
+                  <MenuItem fx:id="miMonthly" mnemonicParsing="false" text="Monthly Report" />
+              </items>
+            </MenuButton>
+         </items>
+      </ToolBar>
+      <StackPane fx:id="stackpane" VBox.vgrow="ALWAYS" />
+   </children>
+   <stylesheets>
+      <URL value="@../styles.css" />
+      <URL value="@../icons_styles.css" />
+   </stylesheets>
+</VBox>

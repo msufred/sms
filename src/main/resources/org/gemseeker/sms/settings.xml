@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+    <system>
+        <theme />
+        <maximized>false</maximized>
+    </system>
+    <database>
+        <type />
+        <host />
+        <port />
+        <name />
+        <user />
+        <password />
+        <url />
+    </database>
+    <accounting>
+        <name />
+        <position />
+    </accounting>
+</root>

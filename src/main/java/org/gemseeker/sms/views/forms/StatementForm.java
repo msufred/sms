@@ -1,0 +1,149 @@
+package org.gemseeker.sms.views.forms;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import org.gemseeker.sms.data.Account;
+import org.gemseeker.sms.data.Billing;
+import org.gemseeker.sms.data.BillingStatement;
+import org.gemseeker.sms.data.Subscription;
+import org.gemseeker.sms.views.ViewUtils;
+import org.gemseeker.sms.views.panels.AbstractPanel;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class StatementForm extends AbstractPanel {
+
+    @FXML private Label lblAccountName;
+    @FXML private Label lblAddress;
+    @FXML private Label lblContact;
+    @FXML private Label lblStatementDate;
+    @FXML private Label lblContractPeriod;
+    @FXML private Label lblPlanType;
+    @FXML private Label lblBandwidth;
+    @FXML private Label lblDuration;
+    @FXML private Label lblPrevBalance;
+    @FXML private Label lblCurrentCharges;
+    @FXML private Label lblVat;
+    @FXML private Label lblTotalCharges;
+    @FXML private Label lblDueDate;
+    @FXML private Label lblAmountPrev;
+    @FXML private Label lblAmountCurrent;
+    @FXML private Label lblTotal;
+    @FXML private Label lblPreparedBy;
+    @FXML private Label lblDesignation;
+    @FXML private Label lblReceivedBy;
+    @FXML private ImageView tempBg;
+
+    private Account mAccount;
+    private Subscription mSubscription;
+    private Billing mBilling;
+    private BillingStatement mBillingStatement;
+
+    public StatementForm() {
+        super(StatementForm.class.getResource("billing_statement.fxml"));
+    }
+
+    @Override
+    protected void onFxmlLoaded() {
+        lblAccountName.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+    }
+
+    public void setData(Account account, Subscription subscription, Billing billing, BillingStatement billingStatement) {
+        mAccount = account;
+        mSubscription = subscription;
+        mBilling = billing;
+        mBillingStatement = billingStatement;
+    }
+
+    @Override
+    public void onResume() {
+        if (mAccount == null || mSubscription == null || mBilling == null || mBillingStatement == null) return;
+        clearFields();
+        fillUpFields();
+    }
+
+    private void fillUpFields() {
+        // account info
+        lblAccountName.setText(mAccount.getName());
+        lblAddress.setText(mAccount.getAddress());
+        lblContact.setText(mAccount.getPhone());
+
+        // billing info
+        lblStatementDate.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
+        lblContractPeriod.setText(ViewUtils.getDateDuration(mSubscription.getStartDate(), mSubscription.getEndDate()));
+        lblPlanType.setText(mSubscription.getPlanType());
+        lblBandwidth.setText(mSubscription.getSpeed() + " MBPS");
+
+        lblDuration.setText(String.format("%s - %s",
+                mBilling.getFromDate().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")),
+                mBilling.getToDate().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy"))));
+
+        double balance = mBillingStatement.getPrevBalance();
+        double fee = mBillingStatement.getMonthlyFee();
+        double discountPercent = mBillingStatement.getDiscount();
+        double penalty = mBillingStatement.getPenalty();
+        double vat = mBillingStatement.getVat();
+        double currentCharge = (fee - (fee * (discountPercent / 100))) + penalty; // current charges will be the total of (monthlyFee - discount) + penalty
+        double currentChargeWithVat = currentCharge + vat;
+
+        // charges info
+        lblPrevBalance.setText(String.format("%.2f", balance));
+        lblCurrentCharges.setText(String.format("%.2f", currentCharge));
+        lblVat.setText(String.format("%.2f", vat));
+        lblTotalCharges.setText(String.format("%.2f", currentChargeWithVat));
+        lblAmountPrev.setText(String.format("%.2f", balance));
+        lblAmountCurrent.setText(String.format("%.2f", currentChargeWithVat));
+        lblTotal.setText(String.format("%.2f", balance + currentChargeWithVat));
+
+        // other info
+        lblDueDate.setText(mBilling.getDueDate().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
+        lblPreparedBy.setText(mBillingStatement.getPreparedBy());
+        lblDesignation.setText(mBillingStatement.getDesignation());
+        lblReceivedBy.setText(mBillingStatement.getReceivedBy());
+    }
+
+    public void showTempBg(boolean show) {
+        tempBg.setVisible(show);
+    }
+
+    @Override
+    public void onPause() {
+        clearFields();
+    }
+
+    private void clearFields() {
+        lblDuration.setText("");
+        lblAccountName.setText("");
+        lblAddress.setText("");
+        lblContact.setText("");
+        lblStatementDate.setText("");
+        lblContractPeriod.setText("");
+        lblPlanType.setText("");
+        lblBandwidth.setText("");
+
+        lblPrevBalance.setText("0.00");
+        lblCurrentCharges.setText("0.00");
+        lblVat.setText("0.00");
+        lblTotalCharges.setText("0.00");
+
+        lblAmountCurrent.setText("0.00");
+        lblAmountPrev.setText("0.00");
+        lblTotal.setText("0.00");
+        lblDueDate.setText("");
+
+        lblPreparedBy.setText("");
+        lblDesignation.setText("");
+        lblReceivedBy.setText("");
+
+        showTempBg(true);
+    }
+
+    @Override
+    public void onDispose() {
+        // empty
+    }
+}

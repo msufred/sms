@@ -1,0 +1,534 @@
+/*********************************************************************************
+ *
+ * Fonts
+ *
+ ********************************************************************************/
+@font-face {
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Montserrat'), url('fonts/Montserrat-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Montserrat-Light';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Montserrat-Light'), url("fonts/Montserrat-Light.ttf") format('truetype');
+}
+
+@font-face {
+    font-family: 'Montserrat-Bold';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Montserrat-Bold'), url("fonts/Montserrat-Bold.ttf") format('truetype');
+}
+
+/*******************************************************************************
+ *                                                                             *
+ *      Tag Colors                                                             *
+ *                                                                             *
+ ******************************************************************************/
+
+* {
+    -col-normal: #95a5a6;
+    -col-turquoise: #1abc9c;
+    -col-greensea: #047857;
+    -col-sunflower: #f1c40f;
+    -col-orange: #f39c12;
+    -col-emerald: #2ecc71;
+    -col-nephritis: #27ae60;
+    -col-carrot: #e67e22;
+    -col-pumpkin: #d35400;
+    -col-peterriver: #3498db;
+    -col-belizehole: #2980b9;
+    -col-alizarin: #e74c3c;
+    -col-pomegranate: #c0392b;
+    -col-amethyst: #9b59b6;
+    -col-wisteria: #8e44ad;
+    -col-midnight: #2c3e50;
+    -col-silver: #bdc3c7;
+}
+
+/* Tag Icons */
+.tag-normal {
+    -fx-background-color: -col-normal;
+}
+.tag-turquoise {
+    -fx-background-color: -col-turquoise;
+}
+.tag-greensea {
+    -fx-background-color: -col-greensea;
+}
+.tag-sunflower {
+    -fx-background-color: -col-sunflower;
+}
+.tag-orange {
+    -fx-background-color: -col-orange;
+}
+.tag-emerald {
+    -fx-background-color: -col-emerald;
+}
+.tag-nephritis {
+    -fx-background-color: -col-nephritis;
+}
+.tag-carrot {
+    -fx-background-color: -col-carrot;
+}
+.tag-pumpkin {
+    -fx-background-color: -col-pumpkin;
+}
+.tag-peterriver {
+    -fx-background-color: -col-peterriver;
+}
+.tag-belizehole {
+    -fx-background-color: -col-belizehole;
+}
+.tag-alizarin {
+    -fx-background-color: -col-alizarin;
+}
+.tag-pomegranate {
+    -fx-background-color: -col-pomegranate;
+}
+.tag-amethyst {
+    -fx-background-color: -col-amethyst;
+}
+.tag-wisteria {
+    -fx-background-color: -col-wisteria;
+}
+.tag-midnight {
+    -fx-background-color: -col-midnight;
+}
+.tag-silver {
+    -fx-background-color: -col-silver;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Preset colours for the theme                                                *
+ *                                                                             *
+ ******************************************************************************/
+
+.theme-presets {
+    -col-base: rgb(147, 147, 147);
+    -col-base-dark: derive(-col-base, -25%);
+    
+    -col-content-text: derive(-col-base, -50%);
+    -col-content-text-dimmed: derive(-col-base, -20%);
+    -col-content-detail: derive(-col-base, -25%);
+    -col-content-background: derive(-col-base, 98%);
+    
+    -col-title-container: derive(-col-base, 95%);
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * General Style                                                               *
+ *                                                                             *
+ ******************************************************************************/
+.root {
+    -fx-background-color: #ECEFF1;
+}
+
+.btn {
+    -fx-background-color: transparent;
+}
+.btn:hover {
+    -fx-background-color: #e5e7eb;
+}
+.btn:pressed {
+    -fx-background-color: #d1d5db;
+}
+.btn .plus-icon {
+    -fx-background-color: #f59e0b;
+}
+.btn .edit2-icon {
+    -fx-background-color: #f97316;
+}
+.btn .trash-icon {
+    -fx-background-color: #dc2626;
+}
+
+.label-error {
+    -fx-text-color: #dc2626;
+}
+.label-error .feather-icon {
+    -fx-background-color: #dc2626;
+}
+
+.label-success {
+    -fx-text-color: #16a34a;
+}
+.label-success .feather-icon {
+    -fx-background-color: #16a34a;
+}
+
+.title-container {
+    /*-fx-background-color: -col-title-container;*/
+}
+
+.chart-pane {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 4;
+}
+
+
+.sample1 {
+    -fx-background-color: -col-content-background;
+}
+.sample2 {
+    -fx-background-color: -col-base-dark;
+}
+
+.content-pane {
+    -fx-background-color: #ffffff;
+}
+
+.main-toggle {
+    -fx-background-radius: 0;
+    -fx-font-size: 14px;
+    -fx-text-fill: #ffffff;
+}
+.main-toggle .material-icon {
+    -fx-background-color: #ffffff;
+}
+.main-toggle:selected {
+    -fx-background-color: #cccccc;
+    -fx-text-fill: #000000;
+}
+.main-toggle:selected .material-icon {
+    -fx-background-color: #000000;
+}
+.main-toggle-v1 {
+    -fx-background-color: #15807e;
+}
+.main-toggle-v2 {
+    -fx-background-color: #199487;
+}
+.main-toggle-v3 {
+    -fx-background-color: #1da381;
+}
+.main-toggle-v4 {
+    -fx-background-color: #50b88e;
+}
+
+.text-title {
+    -fx-font-size: 32px;
+    -fx-text-fill: #333333;
+}
+
+.panel-title {
+    -fx-font-size: 18;
+    -fx-text-fill: #1da381;
+    -fx-font-weight: bold;
+}
+
+.panel-sub-title {
+    -fx-font-size: 16;
+}
+
+/*
+============================= FORMS ==================================
+*/
+.form-content-grey {
+    -fx-background-color: #e1e1e1;
+    -fx-background-radius: 10;
+}
+
+.form-title {
+    -fx-font-size: 16;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1da381;
+}
+
+.form-label {
+    -fx-font-size: 14;
+}
+
+.form-label-value {
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
+}
+
+.form-label-error {
+    -fx-font-size: 14;
+    -fx-text-fill: red;
+}
+
+.form-field {
+    -fx-font-size: 14;
+}
+
+.form-textarea {
+    -fx-font-size: 14;
+}
+
+.form-datepicker:editable .date-picker-display-node {
+    -fx-font-size: 14;
+}
+
+.form-combobox {
+    -fx-font-size: 14;
+}
+
+.form-radio-button {
+    -fx-font-size: 14;
+}
+
+.form-button-positve {
+    -fx-background-color: #50b88e;
+    -fx-font-size: 14;
+    -fx-text-fill: white;
+}
+
+.form-button-positve:pressed {
+    -fx-background-color: #1da381;
+}
+
+.form-button-regular {
+    -fx-background-color: #cccccc;
+    -fx-font-size: 14;
+    -fx-text-fill: black;
+}
+
+.form-button-regular:pressed {
+    -fx-background-color: #999999;
+}
+
+/*
+============================ Status Table Cell ================================
+*/
+.status-active {
+    -fx-background-color: #6ab04c;
+    -fx-background-radius: 8;
+    -fx-text-fill: white;
+}
+
+.status-inactive {
+    -fx-background-color: #999999;
+    -fx-background-radius: 8;
+    -fx-text-fill: white;
+}
+
+.status-deactivated {
+    -fx-background-color: #ff3333;
+    -fx-background-radius: 8;
+    -fx-text-fill: white;
+}
+
+.status-paid {
+    -fx-background-color: #6ab04c;
+    -fx-background-radius: 8;
+    -fx-text-fill: white;
+}
+
+.status-overdue {
+    -fx-background-color: #ff3333;
+    -fx-background-radius: 8;
+    -fx-text-fill: white;
+}
+
+/*
+============================ Dashboard Styles ================================
+*/
+.summary-title {
+    -fx-text-fill: #535c68;
+}
+
+.summary-number {
+    -fx-font-family: 'Montserrat';
+    -fx-font-weight: bold;
+    -fx-font-size: 28;
+}
+
+/*
+============================ Date Selection Group Styles ======================
+*/
+.date-selector-label {
+	-fx-background-color: #50b88e, #f4f4f4;
+	-fx-background-insets: 0, 1;
+}
+
+.date-selector-button-left {
+	-fx-background-color: #50b88e;
+	-fx-background-radius: 8 0 0 8;
+}
+.date-selector-button-left:pressed {
+	-fx-background-color: #1da381;
+}
+
+.date-selector-button-right {
+	-fx-background-color: #50b88e;
+	-fx-background-radius: 0 8 8 0;
+}
+.date-selector-button-right:pressed {
+	-fx-background-color: #1da381;
+}
+
+/*
+    General Table Styles
+*/
+.data-table {
+/*    -fx-background-color: #cccccc, #ffffff;
+    -fx-background-insets: 0 0 0 0, 1 1 1 1;*/
+    /*-fx-background-color: #ffffff;*/
+}
+.data-table .column-header, .filler {
+/*    -fx-background-color: #95afc0, #ffffff;
+    -fx-background-insets: 0, 0 0 1 0;*/
+    /*-fx-background-color: #ffffff;*/
+}
+.data-table .column-header .label {
+    -fx-padding: 8;
+    /*-fx-text-fill: #535c68;*/
+}
+.data-table .placeholder .label {
+    -fx-text-fill: #535c68;
+}
+
+.table-cell-right-align {
+    -fx-alignment: CENTER-RIGHT;
+}
+.table-cell-center-align {
+    -fx-alignment: CENTER;
+}
+
+
+
+/*
+    Dialogs
+*/
+.dialog-header-text {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+.dialog-content-text {
+    -fx-font-size: 14px;
+}
+.dialog-button-group {
+    -fx-background-color: #e1e1e1;
+}
+
+/*
+    List Cell Style
+*/
+.list-column-1 {
+    -fx-background-color: #ffffff;
+}
+
+.list-column-2 {
+    -fx-background-color: #e1e1e1;
+}
+
+/*
+    Summary/Sales
+*/
+.summary-box {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8px;
+    /*-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);*/
+}
+
+.text-percentage-up {
+    -fx-text-fill: #50b88e;
+    -fx-font-weight: bold;
+}
+
+.text-label {
+    -fx-text-fill: #999999;
+}
+
+.paper {
+    -fx-background-color: #ffffff;
+    /*-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);*/
+}
+
+
+
+
+/* Summary Pane Style */
+.summary-card-pane {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);
+}
+
+.summary-card-title {
+    -fx-text-fill: #535c68;
+    -fx-font-size: 13px;
+}
+
+.summary-card-title2 {
+    -fx-text-fill: #535c68;
+    -fx-font-size: 11px;
+}
+
+.summary-card-count {
+    -fx-text-fill: #535c68;
+    -fx-font-size: 28px;
+}
+
+.summary-card-count2 {
+    -fx-text-fill: #95afc0;
+    -fx-font-size: 24px;
+}
+
+.text-status-active {
+    -fx-text-fill: #6ab04c;
+}
+
+.text-status-disconnected {
+    -fx-text-fill: #95afc0;
+}
+
+.text-status-terminated {
+    -fx-text-fill: #eb4d4b;
+}
+
+.text-schedule-on-going {
+    -fx-background-color: #199487;
+    -fx-background-radius: 20;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.text-schedule-outdated {
+    -fx-background-color: #eb4d4b;
+    -fx-background-radius: 20;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.row-odd {
+    -fx-background-color: #eeeeee;
+}
+
+/* Accept Payment Styles */
+#amount-due {
+    -fx-font-size: 32;
+    -fx-font-weight: bold;
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+}
+
+#amount-payment {
+    -fx-font-size: 32;
+    -fx-padding: 0;
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-font-weight: bold;
+}
+
+#button-accept-payment {
+    -fx-background-color: #2196F3;
+    -fx-background-radius: 20;
+    -fx-text-fill: white;
+    -fx-padding: 8 16 8 16;
+    -fx-font-weight: bold;
+}
+#button-accept-payment:hover {
+    -fx-background-color: #42A5F5;
+}
+#button-accept-payment:pressed {
+    -fx-background-color: #1E88E5;
+}

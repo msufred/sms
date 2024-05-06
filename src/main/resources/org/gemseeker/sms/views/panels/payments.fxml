@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="600.0" prefWidth="1050.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <Label styleClass="panel-title" text="Payments">
+            <VBox.margin>
+                <Insets left="8.0" top="8.0" />
+            </VBox.margin>
+        </Label>
+        <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+            <tabs>
+                <Tab fx:id="tabBillings" text="Billing Payments">
+                    <content>
+                        <VBox prefHeight="200.0" prefWidth="100.0">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="4.0">
+                                    <children>
+                                        <Button fx:id="btnAdd" mnemonicParsing="false" styleClass="btn" />
+                                        <Button fx:id="btnEdit" mnemonicParsing="false" styleClass="btn" />
+                                        <Button fx:id="btnDelete" mnemonicParsing="false" styleClass="btn" />
+                                        <Button fx:id="btnRefresh" mnemonicParsing="false" styleClass="btn" />
+                                        <Button fx:id="btnAutomate" mnemonicParsing="false" styleClass="btn" text="Automate" />
+                                        <Label fx:id="lblAccounts" text="Account">
+                                            <HBox.margin>
+                                                <Insets left="8.0" />
+                                            </HBox.margin>
+                                        </Label>
+                                        <ComboBox fx:id="cbAccounts" />
+                                        <Label fx:id="lblStatus" text="Status">
+                                            <HBox.margin>
+                                                <Insets left="8.0" />
+                                            </HBox.margin>
+                                        </Label>
+                                        <ComboBox fx:id="cbStatus" promptText="By Status" />
+                                        <Label fx:id="lblMonth" text="Month">
+                                            <HBox.margin>
+                                                <Insets left="8.0" />
+                                            </HBox.margin>
+                                        </Label>
+                                        <ComboBox fx:id="cbMonths" promptText="By Month" />
+                                        <Label fx:id="lblYear" text="Year">
+                                            <HBox.margin>
+                                                <Insets left="8.0" />
+                                            </HBox.margin>
+                                        </Label>
+                                        <ComboBox fx:id="cbYears" promptText="By Year" />
+                                        <MenuButton mnemonicParsing="false" text="Print Options">
+                                            <items>
+                                                <MenuItem mnemonicParsing="false" text="All" />
+                                                <MenuItem mnemonicParsing="false" text="Paid Billings" />
+                                                <MenuItem mnemonicParsing="false" text="For Payment Billings" />
+                                                <MenuItem mnemonicParsing="false" text="Overdue Billings" />
+                                                <MenuItem mnemonicParsing="false" text="By Account" />
+                                            </items>
+                                        </MenuButton>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                    </padding>
+                                </HBox>
+                                <TableView fx:id="billingsTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="colStatus" prefWidth="84.0" styleClass="table-cell-center-align" text="Status" />
+                                        <TableColumn fx:id="colBillingNo" prefWidth="96.0" styleClass="table-cell-center-align" text="Billing No" />
+                                        <TableColumn fx:id="colName" prefWidth="199.0" text="Account Name" />
+                                        <TableColumn fx:id="colFrom" prefWidth="105.0" styleClass="table-cell-center-align" text="From" />
+                                        <TableColumn fx:id="colTo" prefWidth="91.0" styleClass="table-cell-center-align" text="To" />
+                                        <TableColumn fx:id="colDueDate" prefWidth="103.0" styleClass="table-cell-center-align" text="Due Date" />
+                                        <TableColumn fx:id="colAmountDue" prefWidth="108.0" styleClass="table-cell-right-align" text="Amount Due" />
+                                        <TableColumn fx:id="colAmountPaid" prefWidth="113.0" styleClass="table-cell-right-align" text="Amount Paid" />
+                                        <TableColumn fx:id="colDatePaid" prefWidth="75.0" text="Date Paid" />
+                                        <TableColumn fx:id="colBalance" prefWidth="92.0" styleClass="table-cell-right-align" text="Balance" />
+                                    </columns>
+                                </TableView>
+                            </children>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab fx:id="tabOtherPayments" text="Product &amp; Services Payments">
+                    <content>
+                        <VBox prefHeight="200.0" prefWidth="100.0">
+                            <children>
+                                <HBox prefWidth="200.0" spacing="4.0">
+                                    <children>
+                                        <Button fx:id="btnAddPurchase" mnemonicParsing="false" text="Add" />
+                                        <Button fx:id="btnDeletePurchase" disable="true" mnemonicParsing="false" text="Delete" />
+                                        <Button fx:id="btnRefreshPurchaseList" mnemonicParsing="false" text="Refresh" />
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                    </padding>
+                                </HBox>
+                                <TableView fx:id="paymentsTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="colPurchaseDate" prefWidth="105.0" text="Date" />
+                                        <TableColumn fx:id="colPurchaseType" prefWidth="103.0" text="Type" />
+                                        <TableColumn fx:id="colClientName" prefWidth="280.0" text="Name" />
+                                        <TableColumn fx:id="colIsWalkIn" prefWidth="121.0" styleClass="table-cell-center-align" text="Walk-In Client" />
+                                        <TableColumn fx:id="colPurchaseTotal" prefWidth="127.0" styleClass="table-cell-right-align" text="Total Amount" />
+                                    </columns>
+                                </TableView>
+                            </children>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab fx:id="tabBillingStatements" text="Billing Statements">
+                    <content>
+                        <VBox prefHeight="200.0" prefWidth="100.0">
+                            <children>
+                                <TableView fx:id="billingStatementsTable" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="colStatementTag" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" styleClass="table-cell-center-align" text="" />
+                                        <TableColumn fx:id="colStatementBillingNo" style="-fx-alignment: center;" text="Billing No" />
+                                        <TableColumn fx:id="colStatementIncludeBalance" style="-fx-alignment: center;" text="Include Balance" />
+                                        <TableColumn fx:id="colStatementBalance" styleClass="table-cell-right-align" text="Balance" />
+                                        <TableColumn fx:id="colStatementMonthlyFee" styleClass="table-cell-right-align" text="Monthly Fee" />
+                                        <TableColumn fx:id="colStatementDiscount" styleClass="table-cell-right-align" text="Discount %" />
+                                        <TableColumn fx:id="colStatementPenalty" styleClass="table-cell-right-align" text="Penalty" />
+                                        <TableColumn fx:id="colStatementVat" styleClass="table-cell-right-align" text="Vat" />
+                                        <TableColumn fx:id="colStatementTotal" styleClass="table-cell-right-align" text="Total" />
+                                        <TableColumn fx:id="colStatementDatePrinted" prefWidth="75.0" text="Date Printed" />
+                                        <TableColumn fx:id="colStatementCreatedAt" prefWidth="75.0" text="Created at" />
+                                        <TableColumn fx:id="colStatementUpdatedAt" prefWidth="75.0" text="Updated at" />
+                              <TableColumn fx:id="colPreparedBy" prefWidth="75.0" text="Prepared By" />
+                              <TableColumn fx:id="colDesignation" prefWidth="75.0" text="Designation" />
+                              <TableColumn fx:id="colReceivedBy" prefWidth="75.0" text="Received By" />
+                                    </columns>
+                                </TableView>
+                            </children>
+                        </VBox>
+                    </content>
+                </Tab>
+            <Tab text="Receipts">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0" />
+               </content>
+            </Tab>
+            </tabs>
+        </TabPane>
+    </children>
+    <stylesheets>
+        <URL value="@../styles.css" />
+        <URL value="@../icons_styles.css" />
+    </stylesheets>
+</VBox>

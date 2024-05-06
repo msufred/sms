@@ -1,0 +1,56 @@
+.text-8pt {
+    -fx-font-size: 32;
+}
+
+.text-10pt {
+    -fx-font-size: 42;
+}
+
+.text-12pt {
+    -fx-font-size: 48;
+}
+
+.text-16pt {
+    -fx-font-size: 60;
+}
+
+.text-18pt {
+    -fx-font-size: 72;
+}
+
+.text-bold {
+    -fx-font-weight: bold;
+}
+.text-bold .label {
+    -fx-font-weight: bold;
+}
+
+.text-white {
+    -fx-text-fill: white;
+}
+
+.text-red {
+    -fx-text-fill: red;
+}
+
+.bottom-outline {
+    -fx-border-style: hidden hidden solid hidden;
+    -fx-border-width: 2;
+    -fx-border-color: #1e1e1e;
+}
+
+#logo-frame {
+    -fx-background-color: white;
+    -fx-background-radius: 24;
+}
+
+#round-box-outlined {
+    -fx-background-color: #1e1e1e, white;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 24;
+}
+
+#round-top-box {
+    -fx-background-color: #1e1e1e;
+    -fx-background-radius: 24 24 0 0;
+}

@@ -1,0 +1,28 @@
+.text-8pt {
+    -fx-font-size: 32;
+    -fx-text-wrap: true;
+}
+
+.text-10pt {
+    -fx-font-size: 42;
+}
+
+.text-12pt {
+    -fx-font-size: 48;
+}
+
+.text-18pt {
+    -fx-font-size: 72;
+}
+
+.text-bold {
+    -fx-font-weight: bold;
+}
+
+.bottom-outline {
+    -fx-border-style: hidden hidden solid hidden;
+    -fx-border-width: 2;
+    -fx-border-color: #1e1e1e;
+/*    -fx-background-color: #1e1e1e, white;
+    -fx-background-insets: 0, 0 0 3 0;*/
+}

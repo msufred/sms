@@ -1,0 +1,208 @@
+CREATE TABLE IF NOT EXISTS users (
+id INT NOT NULL AUTO_INCREMENT,
+username VARCHAR(255) NOT NULL,
+password VARCHAR(255) NOT NULL,
+role VARCHAR(5) NOT NULL,
+PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS accounts (
+account_no VARCHAR(32) NOT NULL,
+name VARCHAR(255) NOT NULL,
+address VARCHAR(255) NOT NULL,
+email VARCHAR(255),
+phone VARCHAR(12),
+status VARCHAR(16) DEFAULT 'Active',
+PRIMARY KEY (account_no)
+);
+
+CREATE TABLE IF NOT EXISTS data_plans (
+id INT NOT NULL AUTO_INCREMENT,
+name VARCHAR(255) NOT NULL,
+bandwidth INT DEFAULT '0',
+amount DOUBLE,
+PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS wifi_hotspots (
+id INT NOT NULL AUTO_INCREMENT,
+name VARCHAR(255) NOT NULL,
+ip_address VARCHAR(15),
+status VARCHAR(16),
+PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS revenues (
+id INT NOT NULL AUTO_INCREMENT,
+type VARCHAR(16) NOT NULL,
+amount DOUBLE,
+mdate DATE NOT NULL,
+remarks VARCHAR(255),
+PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS expenses (
+id INT NOT NULL AUTO_INCREMENT,
+type VARCHAR(255) NOT NULL,
+amount DOUBLE,
+mdate DATE NOT NULL,
+remarks VARCHAR(255),
+PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS products (
+id INT NOT NULL AUTO_INCREMENT,
+name VARCHAR(255) NOT NULL,
+price DOUBLE,
+stock INT,
+serial_no VARCHAR(255),
+PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS services (
+id INT NOT NULL AUTO_INCREMENT,
+name VARCHAR(255) NOT NULL,
+price DOUBLE,
+description VARCHAR(255),
+PRIMARY KEY (id)
+);
+
+
+CREATE TABLE IF NOT EXISTS subscriptions (
+account_no VARCHAR(32) NOT NULL,
+date_start DATE NOT NULL,
+date_end DATE NOT NULL,
+plan_id INT NOT NULL,
+status VARCHAR(16) DEFAULT 'Active',
+ip_address VARCHAR(15),
+PRIMARY KEY (account_no),
+CONSTRAINT acct1 FOREIGN KEY (account_no)
+    REFERENCES accounts (account_no)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+CONSTRAINT data_plan1 FOREIGN KEY (plan_id)
+    REFERENCES data_plans (id)
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS balances (
+id INT NOT NULL AUTO_INCREMENT,
+account_no VARCHAR(32) NOT NULL,
+mdate DATE NOT NULL,
+amount DOUBLE,
+status VARCHAR(16),
+billing_id INT NOT NULL,
+PRIMARY KEY (id),
+CONSTRAINT acct2 FOREIGN KEY (account_no)
+    REFERENCES accounts (account_no)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+CONSTRAINT billing2 FOREIGN KEY (billing_id)
+    REFERENCES billings (id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS tower_infos (
+account_no VARCHAR(32) NOT NULL,
+latitude FLOAT,
+longitude FLOAT,
+elevation FLOAT,
+tower_height DOUBLE,
+PRIMARY KEY (account_no),
+CONSTRAINT acct3 FOREIGN KEY (account_no)
+    REFERENCES accounts (account_no)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS hotspot_revenues (
+hotspot_id INT NOT NULL,
+revenue_id INT NOT NULL,
+PRIMARY KEY (revenue_id),
+CONSTRAINT hotspot1 FOREIGN KEY (hotspot_id)
+    REFERENCES wifi_hotspots (id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+CONSTRAINT revenue1 FOREIGN KEY (revenue_id)
+    REFERENCES revenues (id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS billings (
+id INT NOT NULL AUTO_INCREMENT,
+account_no VARCHAR(32) NOT NULL,
+date_from DATE,
+date_to DATE,
+date_due DATE,
+amount DOUBLE,
+status VARCHAR(16),
+PRIMARY KEY (id),
+CONSTRAINT acct4 FOREIGN KEY (account_no)
+    REFERENCES accounts (account_no)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS billing_payments (
+billing_id INT NOT NULL,
+date_paid DATE NOT NULL,
+amount DOUBLE,
+discount DOUBLE,
+penalty DOUBLE,
+prev_balance DOUBLE DEFAULT '0',
+PRIMARY KEY (billing_id),
+CONSTRAINT billing1 FOREIGN KEY (billing_id)
+    REFERENCES billings (id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS payments (
+id INT NOT NULL AUTO_INCREMENT,
+type VARCHAR(16) NOT NULL,
+total_amount DOUBLE,
+client_name VARCHAR(255) NOT NULL,
+walkin BOOLEAN DEFAULT 'false',
+mdate DATE NOT NULL,
+PRIMARY KEY (id),
+CONSTRAINT product1 FOREIGN KEY (product_id)
+    REFERENCES products (id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+CONSTRAINT service1 FOREIGN KEY (service_id)
+    REFERENCES services (id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS payment_items (
+id INT NOT NULL AUTO_INCREMENT,
+payment_id INT NOT NULL,
+product_id INT NOT NULL,
+quantity INT,
+amount_each DOUBLE,
+total_amount DOUBLE,
+PRIMARY KEY (id),
+CONSTRAINT payment1 FOREIGN KEY (payment_id)
+    REFERENCES payments (id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS histories (
+id INT NOT NULL AUTO_INCREMENT,
+mdate TIMESTAMP NOT NULL,
+title VARCHAR(255) NOT NULL,
+description VARCHAR NOT NULL,
+PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS schedules (
+id INT NOT NULL AUTO_INCREMENT,
+mdate DATE NOT NULL,
+description VARCHAR(255) NOT NULL,
+status VARCHAR(32) DEFAULT "On Going",
+PRIMARY KEY (id)
+);

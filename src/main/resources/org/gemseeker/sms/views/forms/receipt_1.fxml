@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1772.0" prefWidth="2421.0" style="-fx-background-color: white;" stylesheets="@receipt.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <StackPane VBox.vgrow="ALWAYS">
+         <children>
+            <VBox prefHeight="200.0" prefWidth="100.0" spacing="8.0">
+               <children>
+                  <HBox>
+                     <children>
+                        <HBox minWidth="1500.0" spacing="8.0">
+                           <children>
+                              <Label styleClass="text-10pt" text="Received from" visible="false" />
+                              <VBox HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label fx:id="lblAccountName" text="Frederick Dimaisip">
+                                       <styleClass>
+                                          <String fx:value="text-10pt" />
+                                          <String fx:value="text-bold" />
+                                       </styleClass>
+                                    </Label>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                        <HBox spacing="8.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label styleClass="text-10pt" text="Date" visible="false" />
+                              <VBox HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label fx:id="lblDate" text="August 24, 2020">
+                                       <styleClass>
+                                          <String fx:value="text-10pt" />
+                                          <String fx:value="text-bold" />
+                                       </styleClass>
+                                    </Label>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets left="144.0" right="144.0" />
+                     </padding>
+                     <VBox.margin>
+                        <Insets bottom="2.0" top="540.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox>
+                     <children>
+                        <HBox minWidth="1500.0" spacing="8.0">
+                           <children>
+                              <Label styleClass="text-10pt" text="Address" visible="false" />
+                              <VBox HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label fx:id="lblAddress" text="Centrala">
+                                       <styleClass>
+                                          <String fx:value="text-10pt" />
+                                          <String fx:value="text-bold" />
+                                       </styleClass>
+                                    </Label>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                        <HBox spacing="8.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label styleClass="text-10pt" text="TIN" visible="false" />
+                              <VBox HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label fx:id="lblTin">
+                                       <styleClass>
+                                          <String fx:value="text-10pt" />
+                                          <String fx:value="text-bold" />
+                                       </styleClass>
+                                    </Label>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets left="144.0" right="144.0" />
+                     </padding>
+                     <VBox.margin>
+                        <Insets bottom="2.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox alignment="CENTER" prefWidth="2480.0" spacing="2.0">
+                     <children>
+                        <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="8.0" style="-fx-background-color: white;" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label text="Item Name" visible="false">
+                                 <styleClass>
+                                    <String fx:value="text-8pt" />
+                                    <String fx:value="text-bold" />
+                                 </styleClass>
+                              </Label>
+                              <Region prefHeight="2.0" prefWidth="200.0" style="-fx-background-color: #1e1e1e;" visible="false" />
+                              <Label fx:id="lblItem1A" styleClass="text-8pt" wrapText="true">
+                                 <VBox.margin>
+                                    <Insets left="16.0" right="16.0" top="16.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <Label fx:id="lblItem2A" styleClass="text-8pt" wrapText="true">
+                                 <VBox.margin>
+                                    <Insets left="16.0" right="16.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <Label fx:id="lblItem3A" styleClass="text-8pt" wrapText="true">
+                                 <VBox.margin>
+                                    <Insets left="16.0" right="16.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <Label fx:id="lblItem4A" styleClass="text-8pt" wrapText="true">
+                                 <VBox.margin>
+                                    <Insets left="16.0" right="16.0" />
+                                 </VBox.margin>
+                              </Label>
+                           </children>
+                        </VBox>
+                        <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="8.0" style="-fx-background-color: white;" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label text="Amount" visible="false">
+                                 <styleClass>
+                                    <String fx:value="text-8pt" />
+                                    <String fx:value="text-bold" />
+                                 </styleClass>
+                              </Label>
+                              <Region prefHeight="2.0" prefWidth="200.0" style="-fx-background-color: #1e1e1e;" visible="false" />
+                              <Label fx:id="lblItem1B" styleClass="text-8pt" wrapText="true">
+                                 <VBox.margin>
+                                    <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <Label fx:id="lblItem2B" styleClass="text-8pt" wrapText="true" />
+                              <Label fx:id="lblItem3B" styleClass="text-8pt" wrapText="true" />
+                              <Label fx:id="lblItem4B" styleClass="text-8pt" wrapText="true" />
+                           </children>
+                        </VBox>
+                        <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="8.0" style="-fx-background-color: white;" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label text="Others" visible="false">
+                                 <styleClass>
+                                    <String fx:value="text-8pt" />
+                                    <String fx:value="text-bold" />
+                                 </styleClass>
+                              </Label>
+                              <Region prefHeight="2.0" prefWidth="200.0" style="-fx-background-color: #1e1e1e;" visible="false" />
+                              <Label fx:id="lblItem1C" styleClass="text-8pt" wrapText="true">
+                                 <VBox.margin>
+                                    <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <Label fx:id="lblItem2C" styleClass="text-8pt" wrapText="true" />
+                              <Label fx:id="lblItem3C" styleClass="text-8pt" wrapText="true" />
+                              <Label fx:id="lblItem4C" styleClass="text-8pt" wrapText="true" />
+                           </children>
+                        </VBox>
+                        <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="8.0" style="-fx-background-color: white;" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label text="TOTAL AMOUNT" visible="false">
+                                 <styleClass>
+                                    <String fx:value="text-8pt" />
+                                    <String fx:value="text-bold" />
+                                 </styleClass>
+                              </Label>
+                              <Region prefHeight="2.0" prefWidth="200.0" style="-fx-background-color: #1e1e1e;" visible="false" />
+                              <Label fx:id="lblItem1D" styleClass="text-8pt" wrapText="true">
+                                 <VBox.margin>
+                                    <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <Label fx:id="lblItem2D" styleClass="text-8pt" wrapText="true" />
+                              <Label fx:id="lblItem3D" styleClass="text-8pt" wrapText="true" />
+                              <Label fx:id="lblItem4D" styleClass="text-8pt" wrapText="true" />
+                           </children>
+                        </VBox>
+                     </children>
+                     <VBox.margin>
+                        <Insets left="144.0" right="144.0" top="32.0" />
+                     </VBox.margin>
+                     <padding>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </padding>
+                  </HBox>
+                  <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <VBox>
+                           <children>
+                              <Region prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                              <HBox>
+                                 <children>
+                                    <Label styleClass="text-10pt" text="Prepared By:" visible="false" />
+                                    <VBox alignment="TOP_CENTER">
+                                       <children>
+                                          <Label fx:id="lblAuthorized" text="&lt;Authorized Person Name&gt;">
+                                             <styleClass>
+                                                <String fx:value="text-12pt" />
+                                                <String fx:value="text-bold" />
+                                             </styleClass>
+                                          </Label>
+                                       </children>
+                                       <HBox.margin>
+                                          <Insets left="16.0" />
+                                       </HBox.margin>
+                                    </VBox>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                        <VBox visible="false">
+                           <children>
+                              <Label minWidth="300.0" styleClass="text-10pt" text="Total Sales" />
+                              <Label minWidth="300.0" styleClass="text-10pt" text="Less:Discount" />
+                              <Label minWidth="300.0" styleClass="text-10pt" text="Surcharges" />
+                              <Label minWidth="300.0" text="PAYMENT DUE">
+                                 <styleClass>
+                                    <String fx:value="text-12pt" />
+                                    <String fx:value="text-bold" />
+                                 </styleClass>
+                              </Label>
+                              <Label minWidth="300.0" text="AMOUNT PAID">
+                                 <styleClass>
+                                    <String fx:value="text-12pt" />
+                                    <String fx:value="text-bold" />
+                                 </styleClass>
+                              </Label>
+                              <Label minWidth="300.0" styleClass="text-10pt" text="Balance" />
+                           </children>
+                        </VBox>
+                        <VBox prefHeight="200.0" prefWidth="100.0">
+                           <children>
+                              <Label fx:id="lblTotalSales" alignment="CENTER_RIGHT" minWidth="500.0" styleClass="text-10pt" text="0.00" />
+                              <Label fx:id="lblDiscount" alignment="CENTER_RIGHT" minWidth="500.0" styleClass="text-10pt" text="0.00" />
+                              <Label fx:id="lblPenalty" alignment="CENTER_RIGHT" minWidth="500.0" styleClass="text-10pt" text="0.00" />
+                              <Label fx:id="lblPaymentDue" alignment="CENTER_RIGHT" minWidth="500.0" text="0.00">
+                                 <styleClass>
+                                    <String fx:value="text-12pt" />
+                                    <String fx:value="text-bold" />
+                                 </styleClass>
+                              </Label>
+                              <Label fx:id="lblAmountPaid" alignment="CENTER_RIGHT" minWidth="500.0" text="0.00">
+                                 <styleClass>
+                                    <String fx:value="text-12pt" />
+                                    <String fx:value="text-bold" />
+                                 </styleClass>
+                              </Label>
+                              <Label fx:id="lblBalance" alignment="CENTER_RIGHT" minWidth="500.0" styleClass="text-10pt" text="0.00" />
+                           </children>
+                        </VBox>
+                     </children>
+                     <VBox.margin>
+                        <Insets left="144.0" right="144.0" />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+            </VBox>
+            <ImageView fitHeight="1772.0" fitWidth="2421.0" pickOnBounds="true" preserveRatio="true" style="-fx-opacity: 0.5;">
+               <image>
+                  <Image url="@../watermark.png" />
+               </image>
+            </ImageView>
+         </children>
+      </StackPane>
+   </children>
+</VBox>

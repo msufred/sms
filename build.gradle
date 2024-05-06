@@ -1,0 +1,86 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
+    id 'org.beryx.jlink' version '3.0.1'
+}
+
+group 'org.gemseeker'
+version '1.0.0'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+ext {
+    junitVersion = '5.9.2'
+}
+
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+application {
+    mainModule = 'org.gemseeker.sms'
+    mainClass = 'org.gemseeker.sms.AppMain'
+}
+
+javafx {
+    version = '21'
+    modules = [
+            'javafx.controls',
+            'javafx.fxml',
+            'javafx.graphics',
+            'javafx.web',
+            'javafx.media',
+            'javafx.swing'
+    ]
+}
+
+dependencies {
+    implementation("com.h2database:h2:2.2.222")
+    implementation("commons-io:commons-io:2.16.1")
+    implementation("org.reactivestreams:reactive-streams:1.0.4")
+    implementation("io.reactivex.rxjava2:rxjava:2.2.21")
+    implementation("io.reactivex.rxjava2:rxjavafx:2.2.2")
+    implementation("io.github.msufred:feathericons:1.0.0")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jlink {
+    imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    launcher {
+        name = 'smsapp'
+    }
+    addExtraDependencies('javafx')
+}
+
+jlinkZip {
+    group = 'distributions'
+}
+
+task dist {
+    dependsOn clean, jlinkZip
+    description "clean then jlinkZip [default]"
+}
+
+defaultTasks 'dist'
+
+tasks.jlink.doLast {
+    copy {
+        from 'res'
+        include 'res/**'
+        into "${buildDir}/jpackage/smsapp"
+    }
+}
