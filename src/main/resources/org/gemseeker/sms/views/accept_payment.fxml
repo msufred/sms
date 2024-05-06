@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -21,7 +22,11 @@
          <children>
             <HBox alignment="CENTER_LEFT" spacing="8.0">
                <children>
-                  <Label alignment="CENTER_RIGHT" prefWidth="120.0" styleClass="form-label" text="Basic Charges/Fee" />
+                  <Label alignment="CENTER_RIGHT" prefWidth="120.0" text="Basic Charges/Fee">
+                     <styleClass>
+                        <String fx:value="form-label" />
+                        <String fx:value="form-label-value" />
+                     </styleClass></Label>
                   <Region HBox.hgrow="ALWAYS" />
                   <Label fx:id="lblFee" alignment="CENTER_RIGHT" minWidth="140.0" styleClass="form-label" text="0.00">
                      <padding>
@@ -32,7 +37,11 @@
             </HBox>
             <HBox alignment="CENTER_LEFT" spacing="8.0">
                <children>
-                  <Label alignment="CENTER_RIGHT" prefWidth="120.0" styleClass="form-label" text="Prev. Balance" />
+                  <Label alignment="CENTER_RIGHT" prefWidth="120.0" text="Prev. Balance">
+                     <styleClass>
+                        <String fx:value="form-label" />
+                        <String fx:value="form-label-value" />
+                     </styleClass></Label>
                   <Region HBox.hgrow="ALWAYS" />
                   <Label fx:id="lblPrevBalance" alignment="CENTER_RIGHT" minWidth="140.0" styleClass="form-label" text="0.00">
                      <padding>
@@ -43,7 +52,11 @@
             </HBox>
             <HBox alignment="CENTER_LEFT" spacing="8.0">
                <children>
-                  <Label alignment="CENTER_RIGHT" prefWidth="120.0" styleClass="form-label" text="Discount (Less)" />
+                  <Label alignment="CENTER_RIGHT" prefWidth="120.0" text="Discount (Less)">
+                     <styleClass>
+                        <String fx:value="form-label" />
+                        <String fx:value="form-label-value" />
+                     </styleClass></Label>
                   <Region HBox.hgrow="ALWAYS" />
                   <Label fx:id="lblDiscount" alignment="CENTER_RIGHT" minWidth="140.0" styleClass="form-label" text="0.00">
                      <padding>
@@ -54,7 +67,11 @@
             </HBox>
             <HBox alignment="CENTER_LEFT" spacing="8.0">
                <children>
-                  <Label alignment="CENTER_RIGHT" prefWidth="120.0" styleClass="form-label" text="Penalty" />
+                  <Label alignment="CENTER_RIGHT" prefWidth="120.0" text="Penalty">
+                     <styleClass>
+                        <String fx:value="form-label" />
+                        <String fx:value="form-label-value" />
+                     </styleClass></Label>
                   <Region HBox.hgrow="ALWAYS" />
                   <Label fx:id="lblPenalty" alignment="CENTER_RIGHT" minWidth="140.0" styleClass="form-label" text="0.00">
                      <padding>
@@ -73,7 +90,11 @@
       </VBox>
       <HBox alignment="CENTER_RIGHT" spacing="8.0">
          <children>
-            <Label alignment="CENTER_RIGHT" prefWidth="120.0" styleClass="form-label" text="Total Amount Due" />
+            <Label alignment="CENTER_RIGHT" text="Total Amount Due">
+               <styleClass>
+                  <String fx:value="form-label" />
+                  <String fx:value="form-label-value" />
+               </styleClass></Label>
             <Label fx:id="lblTotalDue" alignment="CENTER_RIGHT" minWidth="150.0" styleClass="form-label-value" text="0.00">
                <padding>
                   <Insets right="9.0" />
@@ -86,7 +107,11 @@
       </HBox>
       <HBox alignment="CENTER_RIGHT" spacing="8.0">
          <children>
-            <Label alignment="CENTER_RIGHT" prefWidth="120.0" styleClass="form-label" text="Enter Amount" />
+            <Label alignment="CENTER_RIGHT" text="Amount Paid">
+               <styleClass>
+                  <String fx:value="form-label" />
+                  <String fx:value="form-label-value" />
+               </styleClass></Label>
             <TextField fx:id="tfAmount" alignment="CENTER_RIGHT" minWidth="150.0" prefWidth="150.0" style="-fx-font-weight: bold;" styleClass="form-field" text="0.00" />
          </children>
          <VBox.margin>
@@ -95,7 +120,11 @@
       </HBox>
       <HBox alignment="CENTER_RIGHT" spacing="8.0">
          <children>
-            <Label alignment="CENTER_RIGHT" prefWidth="120.0" styleClass="form-label" text="Change" />
+            <Label alignment="CENTER_RIGHT" text="Change">
+               <styleClass>
+                  <String fx:value="form-label" />
+                  <String fx:value="form-label-value" />
+               </styleClass></Label>
             <Label fx:id="lblChange" alignment="CENTER_RIGHT" minWidth="150.0" styleClass="form-label" text="0.00">
                <padding>
                   <Insets right="9.0" />
@@ -108,7 +137,11 @@
       </HBox>
       <HBox alignment="CENTER_RIGHT" spacing="8.0">
          <children>
-            <Label alignment="CENTER_RIGHT" prefWidth="120.0" styleClass="form-label" text="Balance" />
+            <Label alignment="CENTER_RIGHT" text="Balance">
+               <styleClass>
+                  <String fx:value="form-label" />
+                  <String fx:value="form-label-value" />
+               </styleClass></Label>
             <Label fx:id="lblBalance" alignment="CENTER_RIGHT" minWidth="150.0" style="-fx-text-fill: red;" styleClass="form-label" text="0.00">
                <padding>
                   <Insets right="9.0" />
@@ -130,7 +163,7 @@
       </HBox>
       <HBox alignment="CENTER_RIGHT" spacing="8.0">
          <children>
-            <ProgressBar prefWidth="200.0" />
+            <ProgressBar fx:id="progressBar" prefWidth="200.0" />
             <Region HBox.hgrow="ALWAYS" />
             <Button fx:id="btnConfirm" mnemonicParsing="false" styleClass="form-button-positve" text="Confirm &amp; Print" />
             <Button fx:id="btnCancel" mnemonicParsing="false" styleClass="form-button-regular" text="Cancel" />

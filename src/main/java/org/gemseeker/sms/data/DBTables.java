@@ -157,6 +157,7 @@ public final class DBTables {
                 "due_date DATE NOT NULL, " +
                 "to_pay DOUBLE DEFAULT '0.0', " +
                 "status VARCHAR(16) DEFAULT 'For Payment', " +
+                "payment_no VARCHAR(16), " +
                 "tag VARCHAR(16) DEFAULT 'normal', " +
                 "date_created TIMESTAMP, " +
                 "date_updated TIMESTAMP, " +

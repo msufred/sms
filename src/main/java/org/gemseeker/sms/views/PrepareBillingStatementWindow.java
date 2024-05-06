@@ -291,7 +291,7 @@ public class PrepareBillingStatementWindow extends AbstractWindow {
             progressBar.setVisible(false);
             if (!success) showWarningDialog("Failed", "Failed to add new Billing Statement.");
             if (printWindow == null) printWindow = new PrintWindow(database);
-            printWindow.showAndWait(PrintWindow.Type.RECEIPT, mBillingNo);
+            printWindow.showAndWait(PrintWindow.Type.STATEMENT, mBillingNo);
             close();
         }, err -> {
             progressBar.setVisible(false);

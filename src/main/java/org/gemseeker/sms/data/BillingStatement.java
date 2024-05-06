@@ -2,6 +2,9 @@ package org.gemseeker.sms.data;
 
 import java.time.LocalDateTime;
 
+/**
+ * BillingStatement entry represents the reflected amount the client should pay.
+ */
 public class BillingStatement {
 
     private int id;

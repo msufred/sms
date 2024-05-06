@@ -4,7 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.gemseeker.sms.data.Billing;
 import org.gemseeker.sms.data.Database;
-import org.gemseeker.sms.data.controllers.models.BillingBillingPayment;
+import org.gemseeker.sms.data.controllers.models.BillingPayment;
 
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -24,8 +24,8 @@ public class BillingController implements ModelController<Billing> {
     public boolean insert(Billing model) throws SQLException {
         String sql = String.format("INSERT INTO billings (billing_no, account_no, from_date, to_date, due_date, to_pay, " +
                 "status, payment_no, tag, date_created, date_updated) VALUES ('%s', '%s', '%s', '%s', '%s', '%f', '%s', " +
-                "'%s', '%s', '%s')", model.getBillingNo(), model.getAccountNo(), model.getFromDate(), model.getToDate(),
-                model.getDueDate(), model.getToPay(), model.getStatus(), model.getPaymentNo(), model.getTag(),
+                "'%s', '%s', '%s', '%s')", model.getBillingNo(), model.getAccountNo(), model.getFromDate(),
+                model.getToDate(), model.getDueDate(), model.getToPay(), model.getStatus(), model.getPaymentNo(), model.getTag(),
                 model.getDateCreated(), model.getDateUpdated());
         return database.executeQuery(sql);
     }
@@ -105,8 +105,7 @@ public class BillingController implements ModelController<Billing> {
         return billing;
     }
 
-    public ObservableList<BillingBillingPayment> getBillingsWithPaymentInfo() throws SQLException {
-        ObservableList<BillingBillingPayment> list = FXCollections.observableArrayList();
+    public ObservableList<BillingPayment> getAllBillingWithPayment() throws SQLException {
         String sql = "SELECT " +
                 "billings.id, " +
                 "billings.billing_no, " +
@@ -114,45 +113,39 @@ public class BillingController implements ModelController<Billing> {
                 "billings.from_date, " +
                 "billings.to_date, " +
                 "billings.due_date, " +
-                "billings.to_pay, " +
                 "billings.status, " +
                 "billings.payment_no, " +
-                "COALESCE(billing_payments.penalty, 0), " +
-                "COALESCE(billing_payments.discount, 0), " +
-                "COALESCE(billing_payments.amount_to_pay, 0), " +
-                "COALESCE(billing_payments.amount_paid, 0), " +
-                "COALESCE(billing_payments.balance, 0), " +
-                "billing_payments.date_paid, " +
+                "payments.amount_total, " +
+                "payments.amount_paid, " +
+                "payments.balance, " +
+                "payments.payment_date, " +
                 "accounts.name FROM billings " +
-                "LEFT OUTER JOIN billing_payments ON billing_payments.billing_id = billings.id " +
+                "LEFT OUTER JOIN payments ON payments.payment_no = billings.payment_no " +
                 "LEFT OUTER JOIN accounts ON accounts.account_no = billings.account_no " +
                 "WHERE billings.date_deleted IS NULL";
+        ObservableList<BillingPayment> list = FXCollections.observableArrayList();
         try (ResultSet rs = database.executeQueryWithResult(sql)) {
-            while (rs.next()) list.add(fetchBillingWithPaymentInfo(rs));
+            while (rs.next()) list.add(fetchBillingPayment(rs));
         }
         return list;
     }
 
-    private BillingBillingPayment fetchBillingWithPaymentInfo(ResultSet rs) throws SQLException {
-        BillingBillingPayment b = new BillingBillingPayment();
-        b.setId(rs.getInt(1));
-        b.setBillingNo(rs.getString(2));
-        b.setAccountNo(rs.getString(3));
-        b.setFromDate(rs.getDate(4).toLocalDate());
-        b.setToDate(rs.getDate(5).toLocalDate());
-        b.setDueDate(rs.getDate(6).toLocalDate());
-        b.setToPay(rs.getDouble(7));
-        b.setStatus(rs.getString(8));
-        b.setPaymentNo(rs.getString(9));
-
-        b.setPenalty(rs.getDouble(10));
-        b.setDiscount(rs.getDouble(11));
-        b.setAmountToPay(rs.getDouble(12));
-        b.setAmountPaid(rs.getDouble(13));
-        b.setBalance(rs.getDouble(14));
-        Date datePaid = rs.getDate(15);
-        if (datePaid != null) b.setDatePaid(datePaid.toLocalDate());
-        b.setAccountName(rs.getString(16));
-        return b;
+    private BillingPayment fetchBillingPayment(ResultSet rs) throws SQLException {
+        BillingPayment payment = new BillingPayment();
+        payment.setBillingId(rs.getInt(1));
+        payment.setBillingNo(rs.getString(2));
+        payment.setAccountNo(rs.getString(3));
+        payment.setFromDate(rs.getDate(4).toLocalDate());
+        payment.setToDate(rs.getDate(5).toLocalDate());
+        payment.setDueDate(rs.getDate(6).toLocalDate());
+        payment.setStatus(rs.getString(7));
+        payment.setPaymentNo(rs.getString(8));
+        payment.setAmountTotal(rs.getDouble(9));
+        payment.setAmountPaid(rs.getDouble(10));
+        payment.setBalance(rs.getDouble(11));
+        Date paymentDate = rs.getDate(12);
+        if (paymentDate != null) payment.setPaymentDate(paymentDate.toLocalDate());
+        payment.setAccountName(rs.getString(13));
+        return payment;
     }
 }

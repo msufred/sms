@@ -18,7 +18,7 @@ import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.controllers.AccountController;
 import org.gemseeker.sms.data.controllers.BillingController;
 import org.gemseeker.sms.data.controllers.BillingStatementController;
-import org.gemseeker.sms.data.controllers.models.BillingBillingPayment;
+import org.gemseeker.sms.data.controllers.models.BillingPayment;
 import org.gemseeker.sms.views.*;
 import org.gemseeker.sms.views.cells.DateTableCell;
 import org.gemseeker.sms.views.cells.DateTimeTableCell;
@@ -35,8 +35,9 @@ public class PaymentsPanel extends AbstractPanel {
 
     @FXML private TabPane tabPane;
     @FXML private Tab tabBillings;
-    @FXML private Tab tabBillingStatements;
     @FXML private Tab tabOtherPayments;
+    @FXML private Tab tabBillingStatements;
+    @FXML private Tab tabReceipts;
 
     // billing payments group
     @FXML private Button btnAdd;
@@ -52,17 +53,17 @@ public class PaymentsPanel extends AbstractPanel {
     @FXML private ComboBox<String> cbMonths;
     @FXML private Label lblYear;
     @FXML private ComboBox<String> cbYears;
-    @FXML private TableView<BillingBillingPayment> billingsTable;
-    @FXML private TableColumn<BillingBillingPayment, String> colStatus;
-    @FXML private TableColumn<BillingBillingPayment, String> colBillingNo;
-    @FXML private TableColumn<BillingBillingPayment, String> colName;
-    @FXML private TableColumn<BillingBillingPayment, LocalDate> colFrom;
-    @FXML private TableColumn<BillingBillingPayment, LocalDate> colTo;
-    @FXML private TableColumn<BillingBillingPayment, Double> colAmountDue;
-    @FXML private TableColumn<BillingBillingPayment, Double> colAmountPaid;
-    @FXML private TableColumn<BillingBillingPayment, LocalDate> colDatePaid;
-    @FXML private TableColumn<BillingBillingPayment, LocalDate> colDueDate;
-    @FXML private TableColumn<BillingBillingPayment, Double> colBalance;
+    @FXML private TableView<BillingPayment> billingsTable;
+    @FXML private TableColumn<BillingPayment, String> colStatus;
+    @FXML private TableColumn<BillingPayment, String> colBillingNo;
+    @FXML private TableColumn<BillingPayment, String> colName;
+    @FXML private TableColumn<BillingPayment, LocalDate> colFrom;
+    @FXML private TableColumn<BillingPayment, LocalDate> colTo;
+    @FXML private TableColumn<BillingPayment, Double> colAmountDue;
+    @FXML private TableColumn<BillingPayment, Double> colAmountPaid;
+    @FXML private TableColumn<BillingPayment, LocalDate> colDatePaid;
+    @FXML private TableColumn<BillingPayment, LocalDate> colDueDate;
+    @FXML private TableColumn<BillingPayment, Double> colBalance;
 
     // Billing Statement Group
     @FXML private TableView<BillingStatement> billingStatementsTable;
@@ -82,8 +83,8 @@ public class PaymentsPanel extends AbstractPanel {
     @FXML private TableColumn<BillingStatement, String> colDesignation;
     @FXML private TableColumn<BillingStatement, String> colReceivedBy;
 
-    private FilteredList<BillingBillingPayment> billingsList;
-    private final SimpleObjectProperty<BillingBillingPayment> selectedBilling = new SimpleObjectProperty<>();
+    private FilteredList<BillingPayment> billingsList;
+    private final SimpleObjectProperty<BillingPayment> selectedBilling = new SimpleObjectProperty<>();
 
     private FilteredList<BillingStatement> billingStatementList;
     private final SimpleObjectProperty<BillingStatement> selectedBillingStatement = new SimpleObjectProperty<>();
@@ -148,17 +149,18 @@ public class PaymentsPanel extends AbstractPanel {
 
         tabPane.getSelectionModel().selectedIndexProperty().addListener((o, oldVal, index) -> {
             switch (index.intValue()) {
-                case 1: refreshBillingStatements(); break;
-                case 2: refreshOtherBillings(); break;
-                default:refreshBillings();
+                case 1 -> refreshOtherBillings();
+                case 2 -> refreshBillingStatements();
+                case 3 -> refreshReceipts();
+                default -> refreshBillings();
             }
         });
     }
 
     @Override
     public void onResume() {
-        showProgress(-1, "Retrieving Account entries...");
-        disposables.add(Single.fromCallable(() -> accountController.getAll())
+        showProgress("Retrieving Account entries...");
+        disposables.add(Single.fromCallable(accountController::getAll)
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(accounts -> {
                     hideProgress();
                     Account all = new Account();
@@ -178,8 +180,8 @@ public class PaymentsPanel extends AbstractPanel {
     }
 
     private void refreshBillings() {
-        showProgress(-1, "Retrieving Billing entries...");
-        disposables.add(Single.fromCallable(() -> billingController.getBillingsWithPaymentInfo())
+        showProgress("Retrieving Billing entries...");
+        disposables.add(Single.fromCallable(billingController::getAllBillingWithPayment)
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
                     hideProgress();
                     billingsList = new FilteredList<>(list);
@@ -200,8 +202,8 @@ public class PaymentsPanel extends AbstractPanel {
     }
 
     private void refreshBillingStatements() {
-        showProgress(-1, "Retrieving Billing Statement entries...");
-        disposables.add(Single.fromCallable(() -> billingStatementController.getAll())
+        showProgress("Retrieving Billing Statement entries...");
+        disposables.add(Single.fromCallable(billingStatementController::getAll)
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
                     hideProgress();
                     billingStatementList = new FilteredList<>(list);
@@ -213,6 +215,10 @@ public class PaymentsPanel extends AbstractPanel {
     }
 
     private void refreshOtherBillings() {
+
+    }
+
+    private void refreshReceipts() {
 
     }
 
@@ -249,15 +255,20 @@ public class PaymentsPanel extends AbstractPanel {
         if (selectedBilling.get() == null) {
             showWarningDialog("Invalid", "No selected Billing entry. Try again.");
         } else {
-            showProgress(-1, "Save Billing as image...");
+            showProgress("Save Billing as image...");
             disposables.add(Single.fromCallable(() -> billingStatementController.hasBillingStatement(selectedBilling.get().getBillingNo()))
                     .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(hasBilling -> {
                         hideProgress();
-                        if (hasBilling) {
+                        if (!hasBilling) {
+                            // prepare billing
+                            if (prepareBillingStatementWindow == null) prepareBillingStatementWindow = new PrepareBillingStatementWindow(database);
+                            prepareBillingStatementWindow.showAndWait(selectedBilling.get().getBillingNo());
+                            refreshBillings();
+                            refreshBillingStatements();
+                        } else {
+                            // save biling as image
                             if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(database);
                             saveImageWindow.showAndWait(PrintWindow.Type.STATEMENT, selectedBilling.get().getBillingNo());
-                        } else {
-                            showWarningDialog("Invalid", "Billing Statement is missing for selected Billing entry.");
                         }
                     }, err -> {
                         hideProgress();
@@ -270,7 +281,7 @@ public class PaymentsPanel extends AbstractPanel {
         if (selectedBilling.get() == null) {
             showWarningDialog("Invalid", "No selected Billing entry. Try again.");
         } else {
-            showProgress(-1, "Print Billing...");
+            showProgress("Print Billing...");
             disposables.add(Single.fromCallable(() -> billingStatementController.hasBillingStatement(selectedBilling.get().getBillingNo()))
                     .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(hasBilling -> {
                         hideProgress();
@@ -312,13 +323,13 @@ public class PaymentsPanel extends AbstractPanel {
                     "Are you sure you want to delete this Billing entry?",
                     ButtonType.YES, ButtonType.NO);
             if (result.isPresent() && result.get() == ButtonType.YES) {
-                deleteBilling(selectedBilling.get().getId());
+                deleteBilling(selectedBilling.get().getBillingId());
             }
         }
     }
 
     private void deleteBilling(int id) {
-        showProgress(-1, "Deleting Billing entry...");
+        showProgress("Deleting Billing entry...");
         disposables.add(Single.fromCallable(() -> billingController.delete(id))
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
                     hideProgress();
@@ -354,7 +365,7 @@ public class PaymentsPanel extends AbstractPanel {
     }
 
     private void deleteBillingStatement(int id) {
-        showProgress(-1, "Deleting Billing Statement...");
+        showProgress("Deleting Billing Statement...");
         disposables.add(Single.fromCallable(() -> billingStatementController.delete(id))
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
                     hideProgress();
@@ -462,6 +473,8 @@ public class PaymentsPanel extends AbstractPanel {
         tabBillings.setGraphic(new PesoIcon(12));
         tabBillingStatements.setGraphic(new FileTextIcon(12));
         tabOtherPayments.setGraphic(new FileTextIcon(12));
+        tabReceipts.setGraphic(new FileTextIcon(12));
+
         btnAdd.setGraphic(new PlusIcon(14));
         btnEdit.setGraphic(new Edit2Icon(14));
         btnDelete.setGraphic(new TrashIcon(14));
@@ -484,7 +497,7 @@ public class PaymentsPanel extends AbstractPanel {
         colTo.setCellFactory(col -> new DateTableCell<>());
         colDueDate.setCellValueFactory(new PropertyValueFactory<>("dueDate"));
         colDueDate.setCellFactory(col -> new DateTableCell<>());
-        colAmountDue.setCellValueFactory(new PropertyValueFactory<>("toPay"));
+        colAmountDue.setCellValueFactory(new PropertyValueFactory<>("amountTotal"));
         colAmountPaid.setCellValueFactory(new PropertyValueFactory<>("amountPaid"));
         colBalance.setCellValueFactory(new PropertyValueFactory<>("balance"));
 
@@ -538,6 +551,17 @@ public class PaymentsPanel extends AbstractPanel {
         colStatementTag.setCellFactory(col -> new TagTableCell<>());
         colStatementBillingNo.setCellValueFactory(new PropertyValueFactory<>("billingNo"));
         colStatementIncludeBalance.setCellValueFactory(new PropertyValueFactory<>("includeBalance"));
+        colStatementIncludeBalance.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Boolean aBoolean, boolean isEmpty) {
+                if (isEmpty) {
+                    setText("");
+                    setGraphic(null);
+                } else {
+                    setText(aBoolean ? "Yes" : "No");
+                }
+            }
+        });
         colStatementBalance.setCellValueFactory(new PropertyValueFactory<>("prevBalance"));
         colStatementMonthlyFee.setCellValueFactory(new PropertyValueFactory<>("monthlyFee"));
         colStatementDiscount.setCellValueFactory(new PropertyValueFactory<>("discount"));
@@ -568,8 +592,8 @@ public class PaymentsPanel extends AbstractPanel {
         selectedBillingStatement.bind(billingStatementsTable.getSelectionModel().selectedItemProperty());
     }
 
-    private void showProgress(double progress, String text) {
-        mainWindow.showProgress(progress, text);
+    private void showProgress(String text) {
+        mainWindow.showProgress(-1, text);
     }
 
     private void hideProgress() {

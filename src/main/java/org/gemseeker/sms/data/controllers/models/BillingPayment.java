@@ -2,40 +2,37 @@ package org.gemseeker.sms.data.controllers.models;
 
 import java.time.LocalDate;
 
-public class BillingBillingPayment {
+/**
+ * Custom model for displaying Billing information together with its associated
+ * Payment information (if any).
+ */
+public class BillingPayment {
 
-    // from Billing
-    private int id;
+    // from Billing entry
+    private int billingId;
     private String billingNo;
     private String accountNo;
     private LocalDate fromDate;
     private LocalDate toDate;
     private LocalDate dueDate;
-    private double toPay;
     private String status; // For Payment, Paid, Overdue
-    private String paymentNo;
+    private String paymentNo; // if paid, payment_no is not null
 
-    // from BillingPayment
-    private double penalty;
-    private double discount;
-    private double amountToPay;
+    // from Payment entry (if any)
+    private double amountTotal;
     private double amountPaid;
     private double balance;
-    private LocalDate datePaid;
+    private LocalDate paymentDate;
 
-    // from Account
+    // from Account entry
     private String accountName;
 
-    public BillingBillingPayment() {
-
+    public int getBillingId() {
+        return billingId;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public void setBillingId(int billingId) {
+        this.billingId = billingId;
     }
 
     public String getBillingNo() {
@@ -78,14 +75,6 @@ public class BillingBillingPayment {
         this.dueDate = dueDate;
     }
 
-    public double getToPay() {
-        return toPay;
-    }
-
-    public void setToPay(double toPay) {
-        this.toPay = toPay;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -102,28 +91,12 @@ public class BillingBillingPayment {
         this.paymentNo = paymentNo;
     }
 
-    public double getPenalty() {
-        return penalty;
+    public double getAmountTotal() {
+        return amountTotal;
     }
 
-    public void setPenalty(double penalty) {
-        this.penalty = penalty;
-    }
-
-    public double getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(double discount) {
-        this.discount = discount;
-    }
-
-    public double getAmountToPay() {
-        return amountToPay;
-    }
-
-    public void setAmountToPay(double amountToPay) {
-        this.amountToPay = amountToPay;
+    public void setAmountTotal(double amountTotal) {
+        this.amountTotal = amountTotal;
     }
 
     public double getAmountPaid() {
@@ -142,12 +115,12 @@ public class BillingBillingPayment {
         this.balance = balance;
     }
 
-    public LocalDate getDatePaid() {
-        return datePaid;
+    public LocalDate getPaymentDate() {
+        return paymentDate;
     }
 
-    public void setDatePaid(LocalDate datePaid) {
-        this.datePaid = datePaid;
+    public void setPaymentDate(LocalDate paymentDate) {
+        this.paymentDate = paymentDate;
     }
 
     public String getAccountName() {

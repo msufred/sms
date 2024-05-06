@@ -125,28 +125,47 @@
                                     <columns>
                                         <TableColumn fx:id="colStatementTag" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" styleClass="table-cell-center-align" text="" />
                                         <TableColumn fx:id="colStatementBillingNo" style="-fx-alignment: center;" text="Billing No" />
-                                        <TableColumn fx:id="colStatementIncludeBalance" style="-fx-alignment: center;" text="Include Balance" />
+                                        <TableColumn fx:id="colStatementIncludeBalance" prefWidth="100.0" style="-fx-alignment: center;" text="Include Balance" />
                                         <TableColumn fx:id="colStatementBalance" styleClass="table-cell-right-align" text="Balance" />
                                         <TableColumn fx:id="colStatementMonthlyFee" styleClass="table-cell-right-align" text="Monthly Fee" />
                                         <TableColumn fx:id="colStatementDiscount" styleClass="table-cell-right-align" text="Discount %" />
                                         <TableColumn fx:id="colStatementPenalty" styleClass="table-cell-right-align" text="Penalty" />
                                         <TableColumn fx:id="colStatementVat" styleClass="table-cell-right-align" text="Vat" />
                                         <TableColumn fx:id="colStatementTotal" styleClass="table-cell-right-align" text="Total" />
-                                        <TableColumn fx:id="colStatementDatePrinted" prefWidth="75.0" text="Date Printed" />
-                                        <TableColumn fx:id="colStatementCreatedAt" prefWidth="75.0" text="Created at" />
-                                        <TableColumn fx:id="colStatementUpdatedAt" prefWidth="75.0" text="Updated at" />
-                              <TableColumn fx:id="colPreparedBy" prefWidth="75.0" text="Prepared By" />
-                              <TableColumn fx:id="colDesignation" prefWidth="75.0" text="Designation" />
-                              <TableColumn fx:id="colReceivedBy" prefWidth="75.0" text="Received By" />
+                                        <TableColumn fx:id="colStatementDatePrinted" prefWidth="100.0" text="Date Printed" />
+                                        <TableColumn fx:id="colStatementCreatedAt" prefWidth="100.0" text="Created at" />
+                                        <TableColumn fx:id="colStatementUpdatedAt" prefWidth="100.0" text="Updated at" />
+                              <TableColumn fx:id="colPreparedBy" prefWidth="100.0" text="Prepared By" />
+                              <TableColumn fx:id="colDesignation" prefWidth="100.0" text="Designation" />
+                              <TableColumn fx:id="colReceivedBy" prefWidth="100.0" text="Received By" />
                                     </columns>
                                 </TableView>
                             </children>
                         </VBox>
                     </content>
                 </Tab>
-            <Tab text="Receipts">
+            <Tab fx:id="tabReceipts" text="Receipts">
                <content>
-                  <VBox prefHeight="200.0" prefWidth="100.0" />
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <TableView prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+                          <columns>
+                            <TableColumn maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" />
+                            <TableColumn prefWidth="75.0" text="OR #" />
+                              <TableColumn prefWidth="75.0" text="Status" />
+                              <TableColumn prefWidth="150.0" text="Name" />
+                              <TableColumn prefWidth="100.0" text="Payment For" />
+                              <TableColumn prefWidth="100.0" text="To Pay" />
+                              <TableColumn prefWidth="100.0" text="Discount" />
+                              <TableColumn prefWidth="100.0" text="VAT" />
+                              <TableColumn prefWidth="100.0" text="Surcharges" />
+                              <TableColumn prefWidth="100.0" text="TOTAL" />
+                              <TableColumn prefWidth="100.0" text="Paid" />
+                              <TableColumn prefWidth="100.0" text="Balance" />
+                              <TableColumn prefWidth="100.0" text="Prepared By" />
+                          </columns>
+                        </TableView>
+                     </children></VBox>
                </content>
             </Tab>
             </tabs>

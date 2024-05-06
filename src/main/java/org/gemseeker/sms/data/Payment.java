@@ -3,6 +3,10 @@ package org.gemseeker.sms.data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Payment entry represents payment for billing, purchase or service. The extraInfo
+ * column represents one of the following; billing_no, purchase_no, or service_no.
+ */
 public class Payment {
 
     public static final String TYPE_BILLING = "Billing";
@@ -18,7 +22,7 @@ public class Payment {
     private double discount;        // percent
     private double vat;
     private double surcharges;      // penalty & others
-    private double amountTotal;     // amountToPay - discount + vat
+    private double amountTotal;     // amountToPay - discount + vat + surcharges
     private double amountPaid;
     private double balance;
     private LocalDate paymentDate;
