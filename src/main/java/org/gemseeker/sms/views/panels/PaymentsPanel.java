@@ -15,9 +15,11 @@ import org.gemseeker.sms.Settings;
 import org.gemseeker.sms.data.Account;
 import org.gemseeker.sms.data.BillingStatement;
 import org.gemseeker.sms.data.Database;
+import org.gemseeker.sms.data.Payment;
 import org.gemseeker.sms.data.controllers.AccountController;
 import org.gemseeker.sms.data.controllers.BillingController;
 import org.gemseeker.sms.data.controllers.BillingStatementController;
+import org.gemseeker.sms.data.controllers.PaymentController;
 import org.gemseeker.sms.data.controllers.models.BillingPayment;
 import org.gemseeker.sms.views.*;
 import org.gemseeker.sms.views.cells.DateTableCell;
@@ -26,10 +28,12 @@ import org.gemseeker.sms.views.cells.StatusTableCell;
 import org.gemseeker.sms.views.cells.TagTableCell;
 import org.gemseeker.sms.views.icons.PesoIcon;
 
+import javax.naming.Context;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 public class PaymentsPanel extends AbstractPanel {
 
@@ -55,13 +59,13 @@ public class PaymentsPanel extends AbstractPanel {
     @FXML private ComboBox<String> cbYears;
     @FXML private TableView<BillingPayment> billingsTable;
     @FXML private TableColumn<BillingPayment, String> colStatus;
+    @FXML private TableColumn<BillingPayment, String> colOrNo;
     @FXML private TableColumn<BillingPayment, String> colBillingNo;
     @FXML private TableColumn<BillingPayment, String> colName;
     @FXML private TableColumn<BillingPayment, LocalDate> colFrom;
     @FXML private TableColumn<BillingPayment, LocalDate> colTo;
     @FXML private TableColumn<BillingPayment, Double> colAmountDue;
     @FXML private TableColumn<BillingPayment, Double> colAmountPaid;
-    @FXML private TableColumn<BillingPayment, LocalDate> colDatePaid;
     @FXML private TableColumn<BillingPayment, LocalDate> colDueDate;
     @FXML private TableColumn<BillingPayment, Double> colBalance;
 
@@ -83,11 +87,31 @@ public class PaymentsPanel extends AbstractPanel {
     @FXML private TableColumn<BillingStatement, String> colDesignation;
     @FXML private TableColumn<BillingStatement, String> colReceivedBy;
 
+    // Payments Group
+    @FXML private TableView<Payment> paymentsTable;
+    @FXML private TableColumn<Payment, String> colPaymentTag;
+    @FXML private TableColumn<Payment, String> colPaymentNo;
+    @FXML private TableColumn<Payment, String> colPaymentStatus;
+    @FXML private TableColumn<Payment, LocalDate> colPaymentDate;
+    @FXML private TableColumn<Payment, String> colPaymentName;
+    @FXML private TableColumn<Payment, String> colPaymentFor;
+    @FXML private TableColumn<Payment, String> colPaymentToPay;
+    @FXML private TableColumn<Payment, String> colPaymentDiscount;
+    @FXML private TableColumn<Payment, String> colPaymentVat;
+    @FXML private TableColumn<Payment, String> colPaymentSurcharges;
+    @FXML private TableColumn<Payment, String> colPaymentTotal;
+    @FXML private TableColumn<Payment, String> colPaymentPaid;
+    @FXML private TableColumn<Payment, String> colPaymentBalance;
+    @FXML private TableColumn<Payment, String> colPaymentPreparedBy;
+
     private FilteredList<BillingPayment> billingsList;
     private final SimpleObjectProperty<BillingPayment> selectedBilling = new SimpleObjectProperty<>();
 
     private FilteredList<BillingStatement> billingStatementList;
     private final SimpleObjectProperty<BillingStatement> selectedBillingStatement = new SimpleObjectProperty<>();
+
+    private FilteredList<Payment> paymentList;
+    private final SimpleObjectProperty<Payment> selectedPayment = new SimpleObjectProperty<>();
 
     private final MainWindow mainWindow;
     private final Settings settings;
@@ -95,6 +119,7 @@ public class PaymentsPanel extends AbstractPanel {
     private final AccountController accountController;
     private final BillingController billingController;
     private final BillingStatementController billingStatementController;
+    private final PaymentController paymentController;
     private final CompositeDisposable disposables;
 
     // Windows
@@ -103,6 +128,7 @@ public class PaymentsPanel extends AbstractPanel {
     private PrepareBillingStatementWindow prepareBillingStatementWindow;
     private PrintWindow printWindow;
     private SaveImageWindow saveImageWindow;
+    private AcceptPaymentWindow acceptPaymentWindow;
 
     public PaymentsPanel(MainWindow mainWindow, Settings settings, Database database) {
         super(PaymentsPanel.class.getResource("payments.fxml"));
@@ -112,6 +138,7 @@ public class PaymentsPanel extends AbstractPanel {
         this.accountController = new AccountController(database);
         this.billingController = new BillingController(database);
         this.billingStatementController = new BillingStatementController(database);
+        this.paymentController = new PaymentController(database);
         this.disposables = new CompositeDisposable();
     }
 
@@ -120,6 +147,7 @@ public class PaymentsPanel extends AbstractPanel {
         setupIcons();
         setupBillingsTable();
         setupBillingStatementsTable();
+        setupPaymentsTable();
 
         btnAdd.setOnAction(evt -> addBilling());
         btnEdit.setOnAction(evt -> editSelectedBilling());
@@ -159,6 +187,10 @@ public class PaymentsPanel extends AbstractPanel {
 
     @Override
     public void onResume() {
+        // init some windows
+        if (printWindow == null) printWindow = new PrintWindow(database);
+        if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(database);
+
         showProgress("Retrieving Account entries...");
         disposables.add(Single.fromCallable(accountController::getAll)
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(accounts -> {
@@ -219,7 +251,16 @@ public class PaymentsPanel extends AbstractPanel {
     }
 
     private void refreshReceipts() {
-
+        showProgress("Retrieving receipt entries...");
+        disposables.add(Single.fromCallable(paymentController::getAll)
+                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
+                    hideProgress();
+                    paymentList = new FilteredList<>(list);
+                    paymentsTable.setItems(paymentList);
+                }, err -> {
+                    hideProgress();
+                    showErrorDialog("Database Error", "Error while retrieving Payment entries.\n" + err);
+                }));
     }
 
     @Override
@@ -244,10 +285,42 @@ public class PaymentsPanel extends AbstractPanel {
     }
 
     private void acceptBillingPayment() {
+        BillingPayment billing = selectedBilling.get();
+        if (billing == null) {
+            showWarningDialog("Invalid", "No selected Billing entry. Try again.");
+        } else if (billing.getPaymentNo() != null && !billing.getPaymentNo().equalsIgnoreCase("null")) {
+            showWarningDialog("Invalid", "Billing already paid.");
+        } else {
+            checkBillingStatementExists(billing.getBillingNo(), () -> {
+                if (acceptPaymentWindow == null) acceptPaymentWindow = new AcceptPaymentWindow(database, printWindow);
+                acceptPaymentWindow.showAndWait(selectedBilling.get().getBillingNo());
+                refreshBillings();
+                refreshReceipts();
+                return null;
+            }, () -> {
+                showInfoDialog("Invalid", "No Billing Statement issued for " +
+                        "this Billing entry.");
+                return null;
+            });
+        }
+    }
+
+    private void addBillingStatement() {
         if (selectedBilling.get() == null) {
             showWarningDialog("Invalid", "No selected Billing entry. Try again.");
         } else {
-            // TODO
+            checkBillingStatementExists(selectedBilling.get().getBillingNo(), () -> {
+                showWarningDialog("Billing Statement Exists", "A Billing Statement already exists " +
+                        "for this Billing entry.");
+                return null;
+            }, () -> {
+                if (prepareBillingStatementWindow == null) prepareBillingStatementWindow =
+                        new PrepareBillingStatementWindow(database);
+                prepareBillingStatementWindow.showAndWait(selectedBilling.get().getBillingNo());
+                refreshBillings();
+                refreshBillingStatements();
+                return null;
+            });
         }
     }
 
@@ -255,25 +328,16 @@ public class PaymentsPanel extends AbstractPanel {
         if (selectedBilling.get() == null) {
             showWarningDialog("Invalid", "No selected Billing entry. Try again.");
         } else {
-            showProgress("Save Billing as image...");
-            disposables.add(Single.fromCallable(() -> billingStatementController.hasBillingStatement(selectedBilling.get().getBillingNo()))
-                    .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(hasBilling -> {
-                        hideProgress();
-                        if (!hasBilling) {
-                            // prepare billing
-                            if (prepareBillingStatementWindow == null) prepareBillingStatementWindow = new PrepareBillingStatementWindow(database);
-                            prepareBillingStatementWindow.showAndWait(selectedBilling.get().getBillingNo());
-                            refreshBillings();
-                            refreshBillingStatements();
-                        } else {
-                            // save biling as image
-                            if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(database);
-                            saveImageWindow.showAndWait(PrintWindow.Type.STATEMENT, selectedBilling.get().getBillingNo());
-                        }
-                    }, err -> {
-                        hideProgress();
-                        showErrorDialog("Database Error", "Error while querying database.\n" + err);
-                    }));
+            checkBillingStatementExists(selectedBilling.get().getBillingNo(), () -> {
+                // save billing as image
+                if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(database);
+                saveImageWindow.showAndWait(PrintWindow.Type.STATEMENT, selectedBilling.get().getBillingNo());
+                return null;
+            }, () -> {
+                showWarningDialog("Invalid Action", "No Billing Statement issued for this Billing entry. " +
+                        "Use Billing Statement -> Create to create Billing Statement");
+                return null;
+            });
         }
     }
 
@@ -281,26 +345,38 @@ public class PaymentsPanel extends AbstractPanel {
         if (selectedBilling.get() == null) {
             showWarningDialog("Invalid", "No selected Billing entry. Try again.");
         } else {
-            showProgress("Print Billing...");
-            disposables.add(Single.fromCallable(() -> billingStatementController.hasBillingStatement(selectedBilling.get().getBillingNo()))
-                    .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(hasBilling -> {
-                        hideProgress();
-                        if (!hasBilling) {
-                            // prepare billing
-                            if (prepareBillingStatementWindow == null) prepareBillingStatementWindow = new PrepareBillingStatementWindow(database);
-                            prepareBillingStatementWindow.showAndWait(selectedBilling.get().getBillingNo());
-                            refreshBillings();
-                            refreshBillingStatements();
-                        } else {
-                            // print directly
-                            if (printWindow == null) printWindow = new PrintWindow(database);
-                            printWindow.showAndWait(PrintWindow.Type.STATEMENT, selectedBilling.get().getBillingNo());
-                        }
-                    }, err -> {
-                        hideProgress();
-                        showErrorDialog("Database Error", "Error while querying database.\n" + err);
-                    }));
+            checkBillingStatementExists(selectedBilling.get().getBillingNo(), () -> {
+                // print directly
+                if (printWindow == null) printWindow = new PrintWindow(database);
+                printWindow.showAndWait(PrintWindow.Type.STATEMENT, selectedBilling.get().getBillingNo());
+                return null;
+            }, () -> {
+                showWarningDialog("Invalid Action", "No Billing Statement issued for this Billing entry. " +
+                        "Use Billing Statement -> Create to create Billing Statement");
+                return null;
+            });
         }
+    }
+
+    /**
+     * Checks if BillingStatement entry for the given billing number exists.
+     * Executes Callable (by calling Callable.call()) objects according to the
+     * query result.
+     * @param billingNo String - billing number
+     * @param onExists  Callable - called if exists
+     * @param onNotExists Callable - called if not exists
+     */
+    private void checkBillingStatementExists(String billingNo, Callable<Void> onExists, Callable<Void> onNotExists) {
+        showProgress("Checking if Billing Statement exists...");
+        disposables.add(Single.fromCallable(() -> billingStatementController.hasBillingStatement(billingNo))
+                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(exists -> {
+                    hideProgress();
+                    if (exists) onExists.call();
+                    else onNotExists.call();
+                }, err -> {
+                    hideProgress();
+                    showErrorDialog("Database Error", "Error while checking Billing Statement entry.\n" + err);
+                }));
     }
 
     private void saveReceiptAsImage() {
@@ -489,6 +565,18 @@ public class PaymentsPanel extends AbstractPanel {
     private void setupBillingsTable() {
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colStatus.setCellFactory(col -> new StatusTableCell<>());
+        colOrNo.setCellValueFactory(new PropertyValueFactory<>("paymentNo"));
+        colOrNo.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String s, boolean empty) {
+                if (empty || s == null || s.equalsIgnoreCase("null")) {
+                    setText("");
+                    setGraphic(null);
+                } else {
+                    setText(s);
+                }
+            }
+        });
         colBillingNo.setCellValueFactory(new PropertyValueFactory<>("billingNo"));
         colName.setCellValueFactory(new PropertyValueFactory<>("accountName"));
         colFrom.setCellValueFactory(new PropertyValueFactory<>("fromDate"));
@@ -513,6 +601,10 @@ public class PaymentsPanel extends AbstractPanel {
         mAcceptPayment.setGraphic(new PesoIcon(12));
         mAcceptPayment.setOnAction(evt -> acceptBillingPayment());
 
+        MenuItem mAddStatement = new MenuItem("Create");
+        mAddStatement.setGraphic(new PlusIcon(12));
+        mAddStatement.setOnAction(evt -> addBillingStatement());
+
         MenuItem mSaveBilling = new MenuItem("Save As Image");
         mSaveBilling.setGraphic(new ImageIcon(12));
         mSaveBilling.setOnAction(evt -> saveBillingAsImage());
@@ -523,7 +615,7 @@ public class PaymentsPanel extends AbstractPanel {
 
         Menu mBilling = new Menu("Billing Statement");
         mBilling.setGraphic(new FileIcon(12));
-        mBilling.getItems().addAll(mSaveBilling, mPrintBilling);
+        mBilling.getItems().addAll(mAddStatement, mSaveBilling, mPrintBilling);
 
         MenuItem mSaveReceipt = new MenuItem("Save As Image");
         mSaveReceipt.setGraphic(new ImageIcon(12));
@@ -590,6 +682,38 @@ public class PaymentsPanel extends AbstractPanel {
         billingStatementsTable.setContextMenu(cm);
 
         selectedBillingStatement.bind(billingStatementsTable.getSelectionModel().selectedItemProperty());
+    }
+
+    private void setupPaymentsTable() {
+        colPaymentTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
+        colPaymentTag.setCellFactory(col -> new TagTableCell<>());
+        colPaymentNo.setCellValueFactory(new PropertyValueFactory<>("paymentNo"));
+        colPaymentStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        colPaymentDate.setCellValueFactory(new PropertyValueFactory<>("paymentDate"));
+        colPaymentDate.setCellFactory(col -> new DateTableCell<>());
+        colPaymentName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colPaymentFor.setCellValueFactory(new PropertyValueFactory<>("paymentFor"));
+        colPaymentToPay.setCellValueFactory(new PropertyValueFactory<>("amountToPay"));
+        colPaymentDiscount.setCellValueFactory(new PropertyValueFactory<>("discount"));
+        colPaymentVat.setCellValueFactory(new PropertyValueFactory<>("vat"));
+        colPaymentSurcharges.setCellValueFactory(new PropertyValueFactory<>("surcharges"));
+        colPaymentTotal.setCellValueFactory(new PropertyValueFactory<>("amountTotal"));
+        colPaymentPaid.setCellValueFactory(new PropertyValueFactory<>("amountPaid"));
+        colPaymentBalance.setCellValueFactory(new PropertyValueFactory<>("balance"));
+        colPaymentPreparedBy.setCellValueFactory(new PropertyValueFactory<>("preparedBy"));
+
+        MenuItem mEdit = new MenuItem("Edit");
+        mEdit.setGraphic(new Edit2Icon(12));
+        mEdit.setOnAction(evt -> showInfoDialog("Not Implemented", ""));
+
+        MenuItem mDelete = new MenuItem("Delete");
+        mDelete.setGraphic(new TrashIcon(12));
+        mDelete.setOnAction(evt -> showInfoDialog("Not Implemented", ""));
+
+        ContextMenu cm = new ContextMenu(mEdit, mDelete);
+        paymentsTable.setContextMenu(cm);
+
+        selectedPayment.bind(paymentsTable.getSelectionModel().selectedItemProperty());
     }
 
     private void showProgress(String text) {

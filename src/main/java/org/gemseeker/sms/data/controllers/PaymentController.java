@@ -93,9 +93,9 @@ public class PaymentController implements ModelController<Payment> {
         Payment payment = new Payment();
         payment.setId(rs.getInt(1));
         payment.setPaymentNo(rs.getString(2));
-        payment.setExtraInfo(rs.getString(3));
-        payment.setName(rs.getString(4));
-        payment.setPaymentFor(rs.getString(5));
+        payment.setName(rs.getString(3));
+        payment.setPaymentFor(rs.getString(4));
+        payment.setExtraInfo(rs.getString(5));
         payment.setAmountToPay(rs.getDouble(6));
         payment.setDiscount(rs.getDouble(7));
         payment.setVat(rs.getDouble(8));

@@ -1,5 +1,6 @@
 package org.gemseeker.sms.data;
 
+import java.awt.event.PaintEvent;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -16,6 +17,9 @@ import java.time.LocalDateTime;
  */
 public class Balance {
 
+    public static final String STATUS_PAID = "Paid";
+    public static final String STATUS_PENDING = "Pending";
+
     private int id;
     private String accountNo;
     private double amount;
@@ -29,7 +33,7 @@ public class Balance {
 
     public Balance() {
         amount = 0;
-        status = "Pending";
+        status = STATUS_PENDING;
         tag = "normal";
         dateCreated = dateUpdated = LocalDateTime.now();
     }

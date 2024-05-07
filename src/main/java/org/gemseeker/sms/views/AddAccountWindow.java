@@ -140,10 +140,10 @@ public class AddAccountWindow extends AbstractWindow {
 
     private void loadData() {
         progressBar.setVisible(true);
-        disposables.add(Single.fromCallable(() -> dataPlanController.getAll())
+        disposables.add(Single.fromCallable(dataPlanController::getAll)
                 .flatMap(plans -> {
                     Platform.runLater(() -> cbDataPlans.setItems(plans));
-                    return Single.fromCallable(() -> towerController.getAll());
+                    return Single.fromCallable(towerController::getAll);
                 }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(towers -> {
                     progressBar.setVisible(false);
                     cbParentTower.setItems(towers);
@@ -155,7 +155,7 @@ public class AddAccountWindow extends AbstractWindow {
 
     private void refreshDataPlans() {
         progressBar.setVisible(true);
-        disposables.add(Single.fromCallable(() -> dataPlanController.getAll())
+        disposables.add(Single.fromCallable(dataPlanController::getAll)
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
                     progressBar.setVisible(false);
                     cbDataPlans.setItems(list);

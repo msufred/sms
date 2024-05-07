@@ -16,6 +16,7 @@ module org.gemseeker.sms {
     requires rxjavafx;
 
     requires feathericons;
+    requires java.naming;
 
     opens org.gemseeker.sms.views to javafx.fxml;
     opens org.gemseeker.sms.views.panels to javafx.fxml;

@@ -73,7 +73,8 @@ public class BalanceController implements ModelController<Balance> {
     }
 
     public ObservableList<Balance> getUnpaidBalance(String accountNo) throws SQLException {
-        String sql = String.format("SELECT * FROM balances WHERE account_no='%s' AND status='Pending' AND date_deleted IS NULL", accountNo);
+        String sql = String.format("SELECT * FROM balances WHERE account_no='%s' AND status='%s' AND date_deleted IS" +
+                " NULL", accountNo, Balance.STATUS_PENDING);
         ObservableList<Balance> list = FXCollections.observableArrayList();
         try (ResultSet rs = database.executeQueryWithResult(sql)) {
             while (rs.next()) list.add(fetchInfo(rs));

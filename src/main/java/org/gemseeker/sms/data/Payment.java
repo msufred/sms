@@ -18,7 +18,7 @@ public class Payment {
     private String name;            // payee name
     private String paymentFor;      // Billing, Purchase, Service
     private String extraInfo;       // billing_no, purchase_no, or service_no
-    private double amountToPay;
+    private double amountToPay;     // for billing -> monthly_fee + prev_balance
     private double discount;        // percent
     private double vat;
     private double surcharges;      // penalty & others
