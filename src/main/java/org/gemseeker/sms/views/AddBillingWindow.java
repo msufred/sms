@@ -6,16 +6,15 @@ import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import io.reactivex.schedulers.Schedulers;
+import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import org.gemseeker.sms.data.Account;
-import org.gemseeker.sms.data.Billing;
-import org.gemseeker.sms.data.Database;
-import org.gemseeker.sms.data.Subscription;
-import org.gemseeker.sms.data.controllers.AccountController;
-import org.gemseeker.sms.data.controllers.BillingController;
-import org.gemseeker.sms.data.controllers.SubscriptionController;
+import javafx.scene.layout.HBox;
+import org.gemseeker.sms.data.*;
+import org.gemseeker.sms.data.controllers.*;
 
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.Callable;
 
 /**
@@ -24,50 +23,87 @@ import java.util.concurrent.Callable;
  */
 public class AddBillingWindow extends AbstractWindow {
 
+    private static final int BTN_SAVE_INDEX = 3;
+
     @FXML private TextField tfBillingNo;
     @FXML private Button btnCheck;
     @FXML private ComboBox<Account> cbAccounts;
-    @FXML private TextField tfPlanType;
-    @FXML private TextField tfBandwidth;
-    @FXML private TextField tfRate;
+    @FXML private Label lblName;
+    @FXML private Label lblDuration;
+    @FXML private Label lblPlanType;
+    @FXML private Label lblBandwidth;
     @FXML private DatePicker dpFrom;
     @FXML private DatePicker dpTo;
     @FXML private DatePicker dpDue;
 
+    @FXML private CheckBox cbIncludeBalance;
+    @FXML private TextField tfBalance;
+    @FXML private TextField tfMonthlyFee;
+    @FXML private TextField tfDiscount;
+    @FXML private TextField tfPenalty;
+    @FXML private TextField tfVat;
+    @FXML private TextField tfTotal;
+    @FXML private TextField tfPreparedBy;
+    @FXML private TextField tfDesignation;
+    @FXML private TextField tfReceivedBy;
+
     @FXML private Label lblErrBillingNo;
     @FXML private Label lblErrAccount;
-    @FXML private Label lblErrFromDate;
-    @FXML private Label lblErrToDate;
-    @FXML private Label lblErrDueDate;
-    
+    @FXML private Label lblErrFrom;
+    @FXML private Label lblErrTo;
+    @FXML private Label lblErrDue;
+
+    @FXML private HBox actionGroup;
     @FXML private ProgressBar progressBar;
-    @FXML private Button btnSave;
+    @FXML private Button btnPrint; // save and print
+    @FXML private Button btnSave; // save and export as image
+    @FXML private Button btnCancel;
 
     // billing number validation icons
     private final XCircleIcon xCircleIcon = new XCircleIcon(14);
     private final CheckCircleIcon checkCircleIcon = new CheckCircleIcon(14);
 
+    private final Database database;
     private final AccountController accountController;
     private final SubscriptionController subscriptionController;
     private final BillingController billingController;
+    private final BalanceController balanceController;
+    private final BillingStatementController billingStatementController;
     private final CompositeDisposable disposables;
 
+    private PrintWindow printWindow;
+    private SaveImageWindow saveImageWindow;
+
+    private Account mAccount;
     private Subscription mSubscription;
+    private ObservableList<Balance> mBalances;
+
+    private double monthlyFee = 0;
+    private double balance = 0;
+    private double discount = 0; // percent
+    private double penalty = 0;
+    private double vat = 0;
+    private double total = 0;
     private boolean mBillingValid = false;
 
-    public AddBillingWindow(Database database) {
-        super("Add Billing Payment", AddBillingWindow.class.getResource("add_billing.fxml"), null, null);
+    public AddBillingWindow(Database database, PrintWindow printWindow, SaveImageWindow saveImageWindow) {
+        super("Add Billing Payment", AddBillingWindow.class.getResource("add_billing_2.fxml"), null, null);
+        this.database = database;
+        this.printWindow = printWindow;
+        this.saveImageWindow = saveImageWindow;
         accountController = new AccountController(database);
         subscriptionController = new SubscriptionController(database);
         billingController = new BillingController(database);
+        balanceController = new BalanceController(database);
+        billingStatementController = new BillingStatementController(database);
         disposables = new CompositeDisposable();
     }
 
     @Override
     protected void onFxmlLoaded() {
         setupIcons();
-        btnSave.setText("Validate");
-        ViewUtils.setAsNumericalTextField(tfRate);
+
+        ViewUtils.setAsNumericalTextField(tfBalance, tfMonthlyFee, tfDiscount, tfPenalty, tfVat, tfTotal);
 
         btnCheck.setOnAction(evt -> checkBillingNo(null));
 
@@ -75,9 +111,25 @@ public class AddBillingWindow extends AbstractWindow {
             if (newVal != null) loadSubscriptionDetails(newVal);
         });
 
-        btnSave.setOnAction(evt -> {
-            if (validated()) saveAndClose();
+        cbIncludeBalance.selectedProperty().addListener((o, oldVal, newVal) -> {
+            tfBalance.setDisable(!newVal);
+            calculateTotal();
         });
+
+        tfMonthlyFee.textProperty().addListener(o -> calculateTotal());
+        tfDiscount.textProperty().addListener(o -> calculateTotal());
+        tfPenalty.textProperty().addListener(o -> calculateTotal());
+        tfVat.textProperty().addListener(o -> calculateTotal());
+
+        btnPrint.setOnAction(evt -> {
+            if (validated()) saveAndPrint();
+        });
+
+        btnSave.setOnAction(evt -> {
+            if (validated()) saveAndExport();
+        });
+
+        btnCancel.setOnAction(evt -> close());
     }
 
     @Override
@@ -105,33 +157,36 @@ public class AddBillingWindow extends AbstractWindow {
             return;
         }
 
+        disableActions(true);
         progressBar.setVisible(true);
         disposables.add(Single.fromCallable(() -> billingController.hasBilling(ViewUtils.normalize(tfBillingNo.getText())))
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(hasBilling -> {
                     progressBar.setVisible(false);
+                    disableActions(false);
                     lblErrBillingNo.getStyleClass().add(hasBilling ? "label-error" : "label-success");
                     lblErrBillingNo.setGraphic(hasBilling ? xCircleIcon : checkCircleIcon);
                     mBillingValid = !hasBilling;
                     if (task != null) task.call();
                 }, err -> {
                     progressBar.setVisible(false);
+                    disableActions(false);
                     showErrorDialog("Database Error", "Error while querying database.\n" + err);
                 }));
     }
 
     private void loadSubscriptionDetails(Account account) {
+        mAccount = account;
         disableActions(true);
         progressBar.setVisible(true);
         disposables.add(Single.fromCallable(() -> subscriptionController.getByAccountNo(account.getAccountNo()))
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(sub -> {
+                .flatMap(subscription -> {
+                    mSubscription = subscription;
+                    return Single.fromCallable(() -> balanceController.getUnpaidBalance(account.getAccountNo()));
+                }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(balances -> {
                     disableActions(false);
                     progressBar.setVisible(false);
-                    if (sub != null) {
-                        tfPlanType.setText(sub.getPlanType());
-                        tfBandwidth.setText(sub.getSpeed() + " MBPS");
-                        tfRate.setText(String.format("%.2f", sub.getMonthlyFee()));
-                    }
-                    mSubscription = sub;
+                    mBalances = balances;
+                    fillUpFields();
                 }, err -> {
                     disableActions(false);
                     progressBar.setVisible(false);
@@ -140,78 +195,180 @@ public class AddBillingWindow extends AbstractWindow {
                 }));
     }
 
+    private void fillUpFields() {
+        if (mAccount == null || mSubscription == null || mBalances == null) return;
+
+        lblName.setText(mAccount.getName());
+        lblDuration.setText(String.format("%s-%s",
+                mSubscription.getStartDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
+                mSubscription.getEndDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
+        ));
+        lblPlanType.setText(mSubscription.getPlanType());
+        lblBandwidth.setText(mSubscription.getSpeed() + " MBPS");
+
+        monthlyFee = mSubscription.getMonthlyFee();
+        tfMonthlyFee.setText(String.format("%.2f", monthlyFee));
+
+        double balance = 0;
+        for (Balance b : mBalances) balance += b.getAmount();
+        tfBalance.setText(String.format("%.2f", balance));
+
+        calculateTotal();
+    }
+
+    private void calculateTotal() {
+        String feeStr = tfMonthlyFee.getText();
+        monthlyFee = feeStr.isBlank() ? 0 : Double.parseDouble(feeStr.trim());
+
+        String balanceStr = tfBalance.getText();
+        balance = (balanceStr.isBlank() || !cbIncludeBalance.isSelected()) ? 0 : Double.parseDouble(balanceStr.trim());
+
+        String discountStr = tfDiscount.getText();
+        discount = discountStr.isBlank() ? 0 : Double.parseDouble(discountStr.trim());
+
+        String penaltyStr = tfPenalty.getText();
+        penalty = penaltyStr.isBlank() ? 0 : Double.parseDouble(penaltyStr.trim());
+
+        String vatStr = tfVat.getText();
+        vat = vatStr.isBlank() ? 0 : Double.parseDouble(vatStr.trim());
+
+        total = (monthlyFee - (monthlyFee * (discount / 100))) + balance + penalty + vat;
+        tfTotal.setText(String.format("%.2f", total));
+    }
+
     private boolean validated() {
+        // TODO fix
         checkBillingNo(() -> {
             lblErrAccount.setVisible(false);
-            lblErrFromDate.setVisible(false);
-            lblErrToDate.setVisible(false);
-            lblErrDueDate.setVisible(false);
+            lblErrFrom.setVisible(false);
+            lblErrTo.setVisible(false);
+            lblErrDue.setVisible(false);
 
             lblErrAccount.setVisible(cbAccounts.getValue() == null);
-            lblErrFromDate.setVisible(dpFrom.getValue() == null);
-            lblErrToDate.setVisible(dpTo.getValue() == null);
-            lblErrDueDate.setVisible(dpDue.getValue() == null);
+            lblErrFrom.setVisible(dpFrom.getValue() == null);
+            lblErrTo.setVisible(dpTo.getValue() == null);
+            lblErrDue.setVisible(dpDue.getValue() == null);
 
-            mBillingValid = cbAccounts.getValue() != null && dpFrom.getValue() != null && dpTo.getValue() != null &&
-                    dpDue.getValue() != null;
-            if (mBillingValid) btnSave.setText("Save Billing");
+            mBillingValid = !tfBillingNo.getText().isBlank() && cbAccounts.getValue() != null &&
+                    dpFrom.getValue() != null && dpTo.getValue() != null && dpDue.getValue() != null;
+            if (mBillingValid) {
+                btnPrint.setText("Save & Print");
+                actionGroup.getChildren().add(BTN_SAVE_INDEX, btnSave);
+            }
             return null;
         });
         return mBillingValid;
     }
 
-    private void saveAndClose() {
+    private void saveAndPrint() {
+        save(() -> {
+            if (printWindow == null) printWindow = new PrintWindow(database);
+            printWindow.showAndWait(PrintWindow.Type.STATEMENT, ViewUtils.normalize(tfBillingNo.getText()));
+            return null;
+        });
+    }
+
+    private void saveAndExport() {
+        save(() -> {
+            if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(database);
+            saveImageWindow.showAndWait(PrintWindow.Type.STATEMENT, ViewUtils.normalize(tfBillingNo.getText()));
+            return null;
+        });
+    }
+
+    private void save(Callable<Void> onSave) {
         progressBar.setVisible(true);
+        disableActions(true);
         disposables.add(Single.fromCallable(() -> {
+            // save billing
             Billing billing = new Billing();
             billing.setBillingNo(ViewUtils.normalize(tfBillingNo.getText()));
-            billing.setAccountNo(cbAccounts.getValue().getAccountNo());
+            billing.setAccountNo(mAccount.getAccountNo());
             billing.setToPay(mSubscription != null ? mSubscription.getMonthlyFee() : 0);
             billing.setFromDate(dpFrom.getValue());
             billing.setToDate(dpTo.getValue());
             billing.setDueDate(dpDue.getValue());
             return billingController.insert(billing);
-        }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
+        }).flatMap(success -> Single.fromCallable(() -> {
+            if (success) {
+                BillingStatement statement = new BillingStatement();
+                statement.setBillingNo(ViewUtils.normalize(tfBillingNo.getText()));
+                statement.setIncludeBalance(cbIncludeBalance.isSelected());
+                statement.setPrevBalance(balance);
+                statement.setMonthlyFee(monthlyFee);
+                statement.setDiscount(discount);
+                statement.setPenalty(penalty);
+                statement.setVat(vat);
+                statement.setTotal(total);
+                statement.setPreparedBy(ViewUtils.normalize(tfPreparedBy.getText()));
+                statement.setDesignation(ViewUtils.normalize(tfDesignation.getText()));
+                statement.setReceivedBy(ViewUtils.normalize(tfReceivedBy.getText()));
+                billingStatementController.insert(statement);
+            }
+            return success;
+        })).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
             progressBar.setVisible(false);
+            disableActions(false);
             if (!success) showWarningDialog("Failed", "Failed to add new Billing entry.");
-            close();
+            else {
+                if (onSave != null) onSave.call();
+            }
         }, err -> {
             progressBar.setVisible(false);
-            showErrorDialog("Database Error", "Error while adding new Billing entry.\n" + err);
+            disableActions(false);
+            showErrorDialog("Database Error", "Error while saving Billing entry.\n" + err);
         }));
     }
 
     private void disableActions(boolean disable) {
+        btnPrint.setDisable(disable);
         btnSave.setDisable(disable);
+        btnCancel.setDisable(disable);
     }
 
     private void setupIcons() {
         lblErrAccount.setGraphic(new XCircleIcon(14));
-        lblErrFromDate.setGraphic(new XCircleIcon(14));
-        lblErrToDate.setGraphic(new XCircleIcon(14));
-        lblErrDueDate.setGraphic(new XCircleIcon(14));
+        lblErrFrom.setGraphic(new XCircleIcon(14));
+        lblErrTo.setGraphic(new XCircleIcon(14));
+        lblErrDue.setGraphic(new XCircleIcon(14));
     }
 
     @Override
     protected void onClose() {
         clearFields();
+        mAccount = null;
         mSubscription = null;
+        mBalances = null;
     }
 
     private void clearFields() {
         cbAccounts.setItems(null);
-        tfBandwidth.clear();
-        tfPlanType.clear();
-        tfRate.clear();
+        lblName.setText("");
+        lblDuration.setText("");
+        lblPlanType.setText("");
+        lblBandwidth.setText("");
         dpFrom.setValue(null);
         dpTo.setValue(null);
         dpDue.setValue(null);
+        cbIncludeBalance.setSelected(false);
+        tfBalance.setText("0.0");
+        tfMonthlyFee.setText("0.0");
+        tfDiscount.setText("0.0");
+        tfPenalty.setText("0.0");
+        tfVat.setText("0.0");
+        tfTotal.setText("0.0");
+        tfPreparedBy.clear();
+        tfDesignation.clear();
+        tfReceivedBy.clear();
 
         lblErrBillingNo.setGraphic(null);
         lblErrAccount.setVisible(false);
-        lblErrFromDate.setVisible(false);
-        lblErrToDate.setVisible(false);
-        lblErrDueDate.setVisible(false);
+        lblErrFrom.setVisible(false);
+        lblErrTo.setVisible(false);
+        lblErrDue.setVisible(false);
+
+        btnPrint.setText("Validate");
+        actionGroup.getChildren().remove(btnSave);
     }
 
     public void dispose() {

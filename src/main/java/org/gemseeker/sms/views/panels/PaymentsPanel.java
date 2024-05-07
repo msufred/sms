@@ -269,7 +269,7 @@ public class PaymentsPanel extends AbstractPanel {
     }
 
     private void addBilling() {
-        if (addBillingWindow == null) addBillingWindow = new AddBillingWindow(database);
+        if (addBillingWindow == null) addBillingWindow = new AddBillingWindow(database, printWindow, saveImageWindow);
         addBillingWindow.showAndWait();
         refreshBillings();
     }
