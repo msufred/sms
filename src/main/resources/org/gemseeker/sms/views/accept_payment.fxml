@@ -18,6 +18,18 @@
    </stylesheets>
    <children>
       <Label styleClass="form-title" text="Accept Payment" />
+      <HBox alignment="CENTER_RIGHT" spacing="8.0">
+         <children>
+            <Label alignment="CENTER_RIGHT" text="OR NO">
+               <styleClass>
+                  <String fx:value="form-label" />
+                  <String fx:value="form-label-value" />
+               </styleClass>
+            </Label>
+            <Label fx:id="lblErrPaymentNo" />
+            <TextField fx:id="tfPaymentNo" promptText="Required" />
+         </children>
+      </HBox>
       <VBox spacing="8.0" styleClass="form-content-grey">
          <children>
             <HBox alignment="CENTER_LEFT" spacing="8.0">
@@ -155,7 +167,7 @@
       <HBox alignment="CENTER_LEFT" spacing="8.0">
          <children>
             <Label text="Cashier" />
-            <TextField promptText="Cashier/Owner Name" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="tfCashier" promptText="Cashier/Owner Name" HBox.hgrow="ALWAYS" />
          </children>
          <VBox.margin>
             <Insets top="48.0" />
@@ -163,9 +175,9 @@
       </HBox>
       <HBox alignment="CENTER_RIGHT" spacing="8.0">
          <children>
-            <ProgressBar fx:id="progressBar" prefWidth="200.0" />
+            <ProgressBar fx:id="progressBar" prefWidth="200.0" visible="false" />
             <Region HBox.hgrow="ALWAYS" />
-            <Button fx:id="btnConfirm" mnemonicParsing="false" styleClass="form-button-positve" text="Confirm &amp; Print" />
+            <Button fx:id="btnConfirm" mnemonicParsing="false" styleClass="form-button-positve" text="Validate" />
             <Button fx:id="btnCancel" mnemonicParsing="false" styleClass="form-button-regular" text="Cancel" />
          </children>
          <VBox.margin>
