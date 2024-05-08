@@ -6,6 +6,9 @@ import java.time.LocalDateTime;
 /**
  * Payment entry represents payment for billing, purchase or service. The extraInfo
  * column represents one of the following; billing_no, purchase_no, or service_no.
+ *
+ * If this payment is for the Billing, then all values except the "amountPaid" &
+ * "Balance" should reflect the values of the Billing's BillingStatement.
  */
 public class Payment {
 
@@ -18,10 +21,11 @@ public class Payment {
     private String name;            // payee name
     private String paymentFor;      // Billing, Purchase, Service
     private String extraInfo;       // billing_no, purchase_no, or service_no
-    private double amountToPay;     // for billing -> monthly_fee + prev_balance
-    private double discount;        // percent
+    private double prevBalance;
+    private double amountToPay;     // for billing -> monthlyFee
+    private double discount;        // actual discount amount (not percentage)
     private double vat;
-    private double surcharges;      // penalty & others
+    private double surcharges;      // for billing -> penalty
     private double amountTotal;     // amountToPay - discount + vat + surcharges
     private double amountPaid;
     private double balance;
@@ -36,7 +40,7 @@ public class Payment {
 
     public Payment() {
         paymentFor = TYPE_BILLING;
-        amountToPay = discount = vat = amountTotal = amountPaid = balance = 0;
+        prevBalance = amountToPay = discount = vat = amountTotal = amountPaid = balance = 0;
         status = "Valid";
         tag = "normal";
         dateCreated = dateUpdated = LocalDateTime.now();
@@ -80,6 +84,14 @@ public class Payment {
 
     public void setExtraInfo(String extraInfo) {
         this.extraInfo = extraInfo;
+    }
+
+    public double getPrevBalance() {
+        return prevBalance;
+    }
+
+    public void setPrevBalance(double prevBalance) {
+        this.prevBalance = prevBalance;
     }
 
     public double getAmountToPay() {

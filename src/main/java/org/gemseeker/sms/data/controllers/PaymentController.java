@@ -20,13 +20,15 @@ public class PaymentController implements ModelController<Payment> {
 
     @Override
     public boolean insert(Payment model) throws SQLException {
-        String sql = String.format("INSERT INTO payments (payment_no, name, payment_for, extra_info, amount_to_pay, " +
-                "discount, vat, surcharges, amount_total, amount_paid, balance, payment_date, prepared_by, " +
-                "status, tag, date_created, date_updated) VALUES ('%s', '%s', '%s', '%s', '%f', '%f', '%f', '%f', '%f', '%f', " +
-                "'%f', '%s', '%s', '%s', '%s', '%s', '%s')", model.getPaymentNo(), model.getName(), model.getPaymentFor(),
-                model.getExtraInfo(), model.getAmountToPay(), model.getDiscount(), model.getVat(), model.getSurcharges(),
-                model.getAmountTotal(), model.getAmountPaid(), model.getBalance(), model.getPaymentDate(),
-                model.getPreparedBy(), model.getStatus(), model.getTag(), model.getDateCreated(), model.getDateUpdated());
+        String sql = String.format("INSERT INTO payments (payment_no, name, payment_for, extra_info, prev_balance, " +
+                        " amount_to_pay, discount, vat, surcharges, amount_total, amount_paid, balance, payment_date, " +
+                        "prepared_by, status, tag, date_created, date_updated) VALUES " +
+                        "('%s', '%s', '%s', '%s', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%s', '%s', '%s', " +
+                        "'%s', '%s', '%s')", model.getPaymentNo(), model.getName(), model.getPaymentFor(),
+                model.getExtraInfo(), model.getPrevBalance(), model.getAmountToPay(), model.getDiscount(),
+                model.getVat(), model.getSurcharges(), model.getAmountTotal(), model.getAmountPaid(),
+                model.getBalance(), model.getPaymentDate(), model.getPreparedBy(), model.getStatus(), model.getTag(),
+                model.getDateCreated(), model.getDateUpdated());
         return database.executeQuery(sql);
     }
 
@@ -108,26 +110,28 @@ public class PaymentController implements ModelController<Payment> {
     }
 
     private Payment fetchInfo(ResultSet rs) throws SQLException {
+        int index = 1;
         Payment payment = new Payment();
-        payment.setId(rs.getInt(1));
-        payment.setPaymentNo(rs.getString(2));
-        payment.setName(rs.getString(3));
-        payment.setPaymentFor(rs.getString(4));
-        payment.setExtraInfo(rs.getString(5));
-        payment.setAmountToPay(rs.getDouble(6));
-        payment.setDiscount(rs.getDouble(7));
-        payment.setVat(rs.getDouble(8));
-        payment.setSurcharges(rs.getDouble(9));
-        payment.setAmountTotal(rs.getDouble(10));
-        payment.setAmountPaid(rs.getDouble(11));
-        payment.setBalance(rs.getDouble(12));
-        payment.setPaymentDate(rs.getDate(13).toLocalDate());
-        payment.setPreparedBy(rs.getString(14));
-        payment.setStatus(rs.getString(15));
-        payment.setTag(rs.getString(16));
-        payment.setDateCreated(rs.getTimestamp(17).toLocalDateTime());
-        payment.setDateUpdated(rs.getTimestamp(18).toLocalDateTime());
-        Timestamp dateDeleted = rs.getTimestamp(19);
+        payment.setId(rs.getInt(index++));
+        payment.setPaymentNo(rs.getString(index++));
+        payment.setName(rs.getString(index++));
+        payment.setPaymentFor(rs.getString(index++));
+        payment.setExtraInfo(rs.getString(index++));
+        payment.setPrevBalance(rs.getDouble(index++));
+        payment.setAmountToPay(rs.getDouble(index++));
+        payment.setDiscount(rs.getDouble(index++));
+        payment.setVat(rs.getDouble(index++));
+        payment.setSurcharges(rs.getDouble(index++));
+        payment.setAmountTotal(rs.getDouble(index++));
+        payment.setAmountPaid(rs.getDouble(index++));
+        payment.setBalance(rs.getDouble(index++));
+        payment.setPaymentDate(rs.getDate(index++).toLocalDate());
+        payment.setPreparedBy(rs.getString(index++));
+        payment.setStatus(rs.getString(index++));
+        payment.setTag(rs.getString(index++));
+        payment.setDateCreated(rs.getTimestamp(index++).toLocalDateTime());
+        payment.setDateUpdated(rs.getTimestamp(index++).toLocalDateTime());
+        Timestamp dateDeleted = rs.getTimestamp(index);
         if (dateDeleted != null) payment.setDateDeleted(dateDeleted.toLocalDateTime());
         return payment;
     }

@@ -31,7 +31,8 @@ public class AcceptPaymentWindow extends AbstractWindow {
     @FXML private TextField tfAmount;
     @FXML private TextField tfCashier;
     @FXML private ProgressBar progressBar;
-    @FXML private Button btnConfirm;
+    @FXML private Button btnConfirm;    // save and print
+    @FXML private Button btnExport;     // save and export
     @FXML private Button btnCancel;
 
     // billing number validation icons
@@ -46,6 +47,7 @@ public class AcceptPaymentWindow extends AbstractWindow {
     private final CompositeDisposable disposables;
 
     private final PrintWindow printWindow;
+    private final SaveImageWindow saveImageWindow;
 
     private String mBillingNo;
     private Billing mBilling;
@@ -64,7 +66,7 @@ public class AcceptPaymentWindow extends AbstractWindow {
 
     private boolean mPaymentValid = false;
 
-    public AcceptPaymentWindow(Database database, PrintWindow printWindow) {
+    public AcceptPaymentWindow(Database database, PrintWindow printWindow, SaveImageWindow saveImageWindow) {
         super("Accept Payment", AcceptPaymentWindow.class.getResource("accept_payment.fxml"), null, null);
         this.billingController = new BillingController(database);
         this.accountController = new AccountController(database);
@@ -74,6 +76,7 @@ public class AcceptPaymentWindow extends AbstractWindow {
         this.disposables = new CompositeDisposable();
 
         this.printWindow = printWindow;
+        this.saveImageWindow = saveImageWindow;
     }
 
     @Override
@@ -82,13 +85,10 @@ public class AcceptPaymentWindow extends AbstractWindow {
 
         tfAmount.textProperty().addListener((o, oldVal, newVal) -> calculate());
 
-        btnConfirm.setOnAction(evt -> {
-            if (!mPaymentValid) {
-                validate();
-            } else {
-                saveAndPrint();
-            }
-        });
+        btnConfirm.setOnAction(evt -> validateAndSave(this::saveAndPrint));
+
+        btnExport.setOnAction(evt -> validateAndSave(this::saveAndExport));
+
         btnCancel.setOnAction(evt -> close());
     }
 
@@ -131,37 +131,51 @@ public class AcceptPaymentWindow extends AbstractWindow {
         lblBalance.setText(String.format("%.2f", balance));
     }
 
-    private void validate() {
+    private void validateAndSave(Runnable onValidated) {
         lblErrPaymentNo.getStyleClass().removeAll("label-error", "label-success");
+        lblErrPaymentNo.setGraphic(null);
+
+        boolean mValid = true;
         if (tfPaymentNo.getText().isBlank()) {
             lblErrPaymentNo.getStyleClass().add("label-error");
             lblErrPaymentNo.setGraphic(xCircleIcon);
-            mPaymentValid = false;
-            return;
+            mValid = false;
         }
-        progressBar.setVisible(true);
-        disposables.add(Single.fromCallable(() -> paymentController.hasPayment(ViewUtils.normalize(tfPaymentNo.getText())))
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(hasPayment -> {
-                    progressBar.setVisible(false);
-                    lblErrPaymentNo.getStyleClass().add(hasPayment ? "label-error" : "label-success");
-                    lblErrPaymentNo.setGraphic(hasPayment ? xCircleIcon : checkCircleIcon);
-                    if (!hasPayment) {
-                        btnConfirm.setText("Confirm & Print");
-                    }
-                    mPaymentValid = !hasPayment;
-                }, err -> {
-                    progressBar.setVisible(false);
-                    showErrorDialog("Database Error", "Error while querying database.\n" + err);
-                }));
 
+        // check if Payment No. exist
+        if (mValid) {
+            progressBar.setVisible(true);
+            disposables.add(Single.fromCallable(() -> paymentController.hasPayment(ViewUtils.normalize(tfPaymentNo.getText())))
+                    .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(hasPayment -> {
+                        progressBar.setVisible(false);
+                        lblErrPaymentNo.getStyleClass().add(hasPayment ? "label-error" : "label-success");
+                        lblErrPaymentNo.setGraphic(hasPayment ? xCircleIcon : checkCircleIcon);
+
+                        if (!hasPayment) onValidated.run();
+                    }, err -> {
+                        progressBar.setVisible(false);
+                        showErrorDialog("Database Error", "Error while querying database.\n" + err);
+                    }));
+        }
     }
 
     private void saveAndPrint() {
-        if (tfAmount.getText().isBlank()) {
-            showWarningDialog("Invalid", "No entered amount. Try again.");
-            return;
-        }
+        save(() -> {
+            if (printWindow != null) {
+                printWindow.showAndWait(PrintWindow.Type.RECEIPT, mBillingNo);
+            }
+        });
+    }
 
+    private void saveAndExport() {
+        save(() -> {
+            if (saveImageWindow != null) {
+                saveImageWindow.showAndWait(SaveImageWindow.Type.RECEIPT, mBillingNo);
+            }
+        });
+    }
+
+    private void save(Runnable onSave) {
         progressBar.setVisible(true);
         disposables.add(Single.fromCallable(() -> {
             Payment payment = fetchPaymentData();
@@ -175,19 +189,17 @@ public class AcceptPaymentWindow extends AbstractWindow {
 
                 // update balance
                 if (mBalances != null) {
-                    double oldBal = 0;
+                    // old balances are updated to Paid status
                     for (Balance b : mBalances) {
-                        oldBal += b.getAmount();
                         b.setStatus(Balance.STATUS_PAID);
                         b.setDatePaid(LocalDate.now());
                         balanceController.update(b);
                     }
-                    double newBal = Math.abs(oldBal - balance);
-                    System.out.println("New Balance: " + newBal);
-                    if (newBal > 0) {
+                    // new balance will be saved
+                    if (balance > 0) {
                         Balance newBalance = new Balance();
                         newBalance.setAccountNo(mBilling.getAccountNo());
-                        newBalance.setAmount(newBal);
+                        newBalance.setAmount(balance);
                         balanceController.insert(newBalance);
                     }
                 }
@@ -196,10 +208,10 @@ public class AcceptPaymentWindow extends AbstractWindow {
         })).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
             progressBar.setVisible(false);
             if (!success) showWarningDialog("Failed", "Failed to add Payment entry.");
-            if (printWindow != null) {
-                printWindow.showAndWait(PrintWindow.Type.RECEIPT, mBillingNo);
+            else {
+                if (onSave != null) onSave.run();
+                close();
             }
-            close();
         }, err -> {
             progressBar.setVisible(false);
             showErrorDialog("Database Error", "Error while adding new Payment entry.\n" + err);
@@ -212,7 +224,8 @@ public class AcceptPaymentWindow extends AbstractWindow {
         payment.setName(mAccount.getName());
         payment.setPaymentFor(Payment.TYPE_BILLING);
         payment.setExtraInfo(mBillingNo);
-        payment.setAmountToPay(amountToPay + prevBalance);
+        payment.setPrevBalance(prevBalance);
+        payment.setAmountToPay(amountToPay);
         payment.setDiscount(discount);
         payment.setSurcharges(penalty);
         payment.setVat(vat);
@@ -233,7 +246,6 @@ public class AcceptPaymentWindow extends AbstractWindow {
         penalty = mBillingStatement.getPenalty();
         vat = mBillingStatement.getVat();
         totalAmount = mBillingStatement.getTotal();
-        System.out.println("Total: " + totalAmount + " vs calc=" + (amountToPay + prevBalance + penalty - discount));
 
         lblFee.setText(String.format("%.2f", amountToPay));
         lblPrevBalance.setText(String.format("%.2f", prevBalance));

@@ -191,7 +191,7 @@ public class PaymentsPanel extends AbstractPanel {
 
     @Override
     public void onResume() {
-        // init some windows
+        // create PrintWindow and SaveImageWindow
         if (printWindow == null) printWindow = new PrintWindow(database);
         if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(database);
 
@@ -296,7 +296,8 @@ public class PaymentsPanel extends AbstractPanel {
             showWarningDialog("Invalid", "Billing already paid.");
         } else {
             checkBillingStatementExists(billing.getBillingNo(), () -> {
-                if (acceptPaymentWindow == null) acceptPaymentWindow = new AcceptPaymentWindow(database, printWindow);
+                if (acceptPaymentWindow == null) acceptPaymentWindow = new AcceptPaymentWindow(
+                        database, printWindow, saveImageWindow);
                 acceptPaymentWindow.showAndWait(selectedBilling.get().getBillingNo());
                 refreshBillings();
                 refreshReceipts();
@@ -331,7 +332,7 @@ public class PaymentsPanel extends AbstractPanel {
             checkBillingStatementExists(selectedBilling.get().getBillingNo(), () -> {
                 // save billing as image
                 if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(database);
-                saveImageWindow.showAndWait(PrintWindow.Type.STATEMENT, selectedBilling.get().getBillingNo());
+                saveImageWindow.showAndWait(SaveImageWindow.Type.STATEMENT, selectedBilling.get().getBillingNo());
             }, () -> {
                 showWarningDialog("Invalid Action", "Create Billing Statement first.");
             });
@@ -344,8 +345,9 @@ public class PaymentsPanel extends AbstractPanel {
         } else {
             checkBillingStatementExists(selectedBilling.get().getBillingNo(), () -> {
                 // print directly
-                if (printWindow == null) printWindow = new PrintWindow(database);
-                printWindow.showAndWait(PrintWindow.Type.STATEMENT, selectedBilling.get().getBillingNo());
+                if (printWindow != null) {
+                    printWindow.showAndWait(PrintWindow.Type.STATEMENT, selectedBilling.get().getBillingNo());
+                }
             }, () -> {
                 showWarningDialog("Invalid Action", "Create Billing Statement first.");
             });
@@ -353,7 +355,17 @@ public class PaymentsPanel extends AbstractPanel {
     }
 
     private void saveReceiptAsImage() {
-        // TODO
+        if (selectedBilling.get() == null) {
+            showWarningDialog("Invalid", "No selected Billing entry. Try again.");
+        } else {
+            checkPaymentExists(selectedBilling.get().getBillingNo(), () -> {
+                if (saveImageWindow != null) {
+                    saveImageWindow.showAndWait(SaveImageWindow.Type.RECEIPT, selectedBilling.get().getBillingNo());
+                }
+            }, () -> {
+                showWarningDialog("Invalid Action", "The Payment for this Billing does not exist.");
+            });
+        }
     }
 
     private void printReceipt() {
@@ -361,8 +373,9 @@ public class PaymentsPanel extends AbstractPanel {
             showWarningDialog("Invalid", "No selected Billing entry. Try again.");
         } else {
             checkPaymentExists(selectedBilling.get().getBillingNo(), () -> {
-                if (printWindow == null) printWindow = new PrintWindow(database);
-                printWindow.showAndWait(PrintWindow.Type.RECEIPT, selectedBilling.get().getBillingNo());
+                if (printWindow != null) {
+                    printWindow.showAndWait(PrintWindow.Type.RECEIPT, selectedBilling.get().getBillingNo());
+                }
             }, () -> {
                 showWarningDialog("Invalid Action", "The Payment for this Billing does not exist.");
             });

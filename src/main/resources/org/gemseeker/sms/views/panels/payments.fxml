@@ -74,16 +74,16 @@
                                 </HBox>
                                 <TableView fx:id="billingsTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                     <columns>
-                                        <TableColumn fx:id="colStatus" prefWidth="84.0" styleClass="table-cell-center-align" text="Status" />
-                              <TableColumn fx:id="colOrNo" prefWidth="92.0" style="-fx-alignment: center;" text="OR #" />
-                                        <TableColumn fx:id="colBillingNo" prefWidth="96.0" styleClass="table-cell-center-align" text="Billing No" />
-                                        <TableColumn fx:id="colName" prefWidth="199.0" text="Account Name" />
-                                        <TableColumn fx:id="colFrom" prefWidth="105.0" styleClass="table-cell-center-align" text="From" />
-                                        <TableColumn fx:id="colTo" prefWidth="91.0" styleClass="table-cell-center-align" text="To" />
-                                        <TableColumn fx:id="colDueDate" prefWidth="103.0" styleClass="table-cell-center-align" text="Due Date" />
-                                        <TableColumn fx:id="colAmountDue" prefWidth="108.0" styleClass="table-cell-right-align" text="Amount Due" />
-                                        <TableColumn fx:id="colAmountPaid" prefWidth="113.0" styleClass="table-cell-right-align" text="Amount Paid" />
-                                        <TableColumn fx:id="colBalance" prefWidth="92.0" styleClass="table-cell-right-align" text="Balance" />
+                                        <TableColumn fx:id="colStatus" prefWidth="75.0" style="-fx-alignment: center;" text="Status" />
+                              <TableColumn fx:id="colOrNo" prefWidth="75.0" style="-fx-alignment: center;" text="OR #" />
+                                        <TableColumn fx:id="colBillingNo" prefWidth="75.0" style="-fx-alignment: center;" text="Billing No" />
+                                        <TableColumn fx:id="colName" prefWidth="199.0" style="-fx-alignment: center;" text="Account Name" />
+                                        <TableColumn fx:id="colFrom" prefWidth="100.0" style="-fx-alignment: center;" text="From" />
+                                        <TableColumn fx:id="colTo" prefWidth="100.0" style="-fx-alignment: center;" text="To" />
+                                        <TableColumn fx:id="colDueDate" prefWidth="100.0" style="-fx-alignment: center;" text="Due Date" />
+                                        <TableColumn fx:id="colAmountDue" prefWidth="100.0" style="-fx-alignment: center;" text="Amount Due" />
+                                        <TableColumn fx:id="colAmountPaid" prefWidth="100.0" style="-fx-alignment: center;" text="Amount Paid" />
+                                        <TableColumn fx:id="colBalance" prefWidth="100.0" style="-fx-alignment: center;" text="Balance" />
                                     </columns>
                                 </TableView>
                             </children>
@@ -126,18 +126,18 @@
                                         <TableColumn fx:id="colStatementTag" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" style="-fx-alignment: center;" text="" />
                                         <TableColumn fx:id="colStatementBillingNo" style="-fx-alignment: center;" text="Billing No" />
                                         <TableColumn fx:id="colStatementIncludeBalance" prefWidth="75.0" style="-fx-alignment: center;" text="Inc. Balance" />
-                                        <TableColumn fx:id="colStatementBalance" prefWidth="75.0" styleClass="table-cell-right-align" text="Balance" />
-                                        <TableColumn fx:id="colStatementMonthlyFee" prefWidth="75.0" styleClass="table-cell-right-align" text="Monthly Fee" />
-                                        <TableColumn fx:id="colStatementDiscount" prefWidth="75.0" styleClass="table-cell-right-align" text="Discount %" />
-                                        <TableColumn fx:id="colStatementPenalty" prefWidth="75.0" styleClass="table-cell-right-align" text="Penalty" />
-                                        <TableColumn fx:id="colStatementVat" prefWidth="75.0" styleClass="table-cell-right-align" text="Vat" />
-                                        <TableColumn fx:id="colStatementTotal" prefWidth="75.0" styleClass="table-cell-right-align" text="Total" />
-                                        <TableColumn fx:id="colStatementDatePrinted" prefWidth="100.0" text="Date Printed" />
-                                        <TableColumn fx:id="colStatementCreatedAt" prefWidth="100.0" text="Created at" />
-                                        <TableColumn fx:id="colStatementUpdatedAt" prefWidth="100.0" text="Updated at" />
-                              <TableColumn fx:id="colPreparedBy" prefWidth="100.0" text="Prepared By" />
-                              <TableColumn fx:id="colDesignation" prefWidth="100.0" text="Designation" />
-                              <TableColumn fx:id="colReceivedBy" prefWidth="100.0" text="Received By" />
+                                        <TableColumn fx:id="colStatementBalance" prefWidth="75.0" style="-fx-alignment: center;" text="Balance" />
+                                        <TableColumn fx:id="colStatementMonthlyFee" prefWidth="75.0" style="-fx-alignment: center;" text="Monthly Fee" />
+                                        <TableColumn fx:id="colStatementDiscount" prefWidth="75.0" style="-fx-alignment: center;" text="Discount %" />
+                                        <TableColumn fx:id="colStatementPenalty" prefWidth="75.0" style="-fx-alignment: center;" text="Penalty" />
+                                        <TableColumn fx:id="colStatementVat" prefWidth="75.0" style="-fx-alignment: center;" text="Vat" />
+                                        <TableColumn fx:id="colStatementTotal" prefWidth="75.0" style="-fx-alignment: center;" text="Total" />
+                                        <TableColumn fx:id="colStatementDatePrinted" prefWidth="100.0" style="-fx-alignment: center;" text="Date Printed" />
+                                        <TableColumn fx:id="colStatementCreatedAt" prefWidth="100.0" style="-fx-alignment: center;" text="Created at" />
+                                        <TableColumn fx:id="colStatementUpdatedAt" prefWidth="100.0" style="-fx-alignment: center;" text="Updated at" />
+                              <TableColumn fx:id="colPreparedBy" prefWidth="100.0" style="-fx-alignment: center;" text="Prepared By" />
+                              <TableColumn fx:id="colDesignation" prefWidth="100.0" style="-fx-alignment: center;" text="Designation" />
+                              <TableColumn fx:id="colReceivedBy" prefWidth="100.0" style="-fx-alignment: center;" text="Received By" />
                                     </columns>
                                 </TableView>
                             </children>
@@ -155,15 +155,15 @@
                               <TableColumn fx:id="colPaymentFor" prefWidth="100.0" style="-fx-alignment: center;" text="Payment For" />
                               <TableColumn fx:id="colPaymentStatus" prefWidth="75.0" style="-fx-alignment: center;" text="Status" />
                               <TableColumn fx:id="colPaymentDate" prefWidth="100.0" style="-fx-alignment: center;" text="Date" />
-                              <TableColumn fx:id="colPaymentName" prefWidth="150.0" text="Name" />
-                              <TableColumn fx:id="colPaymentToPay" prefWidth="100.0" style="-fx-alignment: center-right;" text="To Pay" />
-                              <TableColumn fx:id="colPaymentDiscount" prefWidth="100.0" style="-fx-alignment: center-right;" text="Discount" />
-                              <TableColumn fx:id="colPaymentVat" prefWidth="100.0" style="-fx-alignment: center-right;" text="VAT" />
-                              <TableColumn fx:id="colPaymentSurcharges" prefWidth="100.0" style="-fx-alignment: center-right;" text="Surcharges" />
-                              <TableColumn fx:id="colPaymentTotal" prefWidth="100.0" style="-fx-alignment: center-right; -fx-font-weight: bold;" text="TOTAL" />
-                              <TableColumn fx:id="colPaymentPaid" prefWidth="100.0" style="-fx-alignment: center-right; -fx-font-weight: bold;" text="Paid" />
-                              <TableColumn fx:id="colPaymentBalance" prefWidth="100.0" style="-fx-alignment: center-right;" text="Balance" />
-                              <TableColumn fx:id="colPaymentPreparedBy" prefWidth="100.0" text="Prepared By" />
+                              <TableColumn fx:id="colPaymentName" prefWidth="150.0" style="-fx-alignment: center;" text="Name" />
+                              <TableColumn fx:id="colPaymentToPay" prefWidth="100.0" style="-fx-alignment: center;" text="To Pay" />
+                              <TableColumn fx:id="colPaymentDiscount" prefWidth="100.0" style="-fx-alignment: center;" text="Discount" />
+                              <TableColumn fx:id="colPaymentVat" prefWidth="100.0" style="-fx-alignment: center;" text="VAT" />
+                              <TableColumn fx:id="colPaymentSurcharges" prefWidth="100.0" style="-fx-alignment: center;" text="Surcharges" />
+                              <TableColumn fx:id="colPaymentTotal" prefWidth="100.0" style="-fx-alignment: center;" text="TOTAL" />
+                              <TableColumn fx:id="colPaymentPaid" prefWidth="100.0" style="-fx-alignment: center;" text="Paid" />
+                              <TableColumn fx:id="colPaymentBalance" prefWidth="100.0" style="-fx-alignment: center;" text="Balance" />
+                              <TableColumn fx:id="colPaymentPreparedBy" prefWidth="100.0" style="-fx-alignment: center;" text="Prepared By" />
                           </columns>
                         </TableView>
                      </children></VBox>

@@ -21,10 +21,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.gemseeker.sms.Utils;
 import org.gemseeker.sms.data.*;
-import org.gemseeker.sms.data.controllers.AccountController;
-import org.gemseeker.sms.data.controllers.BillingController;
-import org.gemseeker.sms.data.controllers.BillingStatementController;
-import org.gemseeker.sms.data.controllers.SubscriptionController;
+import org.gemseeker.sms.data.controllers.*;
+import org.gemseeker.sms.views.forms.BillingReceiptEcopyForm;
+import org.gemseeker.sms.views.forms.BillingReceiptForm;
 import org.gemseeker.sms.views.forms.StatementEcopyForm;
 import org.gemseeker.sms.views.panels.AbstractPanel;
 
@@ -58,18 +57,20 @@ public class SaveImageWindow extends AbstractWindow {
     private final SubscriptionController subscriptionController;
     private final BillingController billingController;
     private final BillingStatementController billingStatementController;
+    private final PaymentController paymentController;
     private final CompositeDisposable disposables;
 
     // billing statement & receipt e-copy forms
     private StatementEcopyForm statementEcopyForm;
-    // private ReceiptEcopyForm receiptEcopyForm;
+    private BillingReceiptEcopyForm billingReceiptEcopyForm;
 
     private Account account;
     private Subscription subscription;
     private Billing billing;
     private BillingStatement billingStatement;
+    private Payment payment;
 
-    private PrintWindow.Type mType;
+    private SaveImageWindow.Type mType;
     private String mBillingNo;
     private AbstractPanel mForm = null;
     private Node mContent = null;
@@ -83,6 +84,7 @@ public class SaveImageWindow extends AbstractWindow {
         this.subscriptionController = new SubscriptionController(database);
         this.billingController = new BillingController(database);
         this.billingStatementController = new BillingStatementController(database);
+        this.paymentController = new PaymentController(database);
         this.disposables = new CompositeDisposable();
     }
 
@@ -106,7 +108,7 @@ public class SaveImageWindow extends AbstractWindow {
     /**
      * Must be called instead of showAndWait().
      */
-    public void showAndWait(PrintWindow.Type type, String billingNo) {
+    public void showAndWait(SaveImageWindow.Type type, String billingNo) {
         if (type == null || billingNo == null) return;
         mType = type;
         mBillingNo = billingNo;
@@ -120,7 +122,7 @@ public class SaveImageWindow extends AbstractWindow {
             close();
         }
 
-        if (mType == PrintWindow.Type.STATEMENT) {
+        if (mType == SaveImageWindow.Type.STATEMENT) {
             loadBillingStatementForm();
         } else {
             loadBillingReceiptForm();
@@ -160,8 +162,34 @@ public class SaveImageWindow extends AbstractWindow {
     }
 
     private void loadBillingReceiptForm() {
-
+        progress.setVisible(true);
+        disposables.add(Single.fromCallable(() -> billingStatementController.getByBillingNo(mBillingNo))
+                .flatMap(bStatement -> {
+                    billingStatement = bStatement;
+                    return Single.fromCallable(() -> billingController.getByBillingNo(mBillingNo));
+                }).flatMap(b -> {
+                    billing = b;
+                    return Single.fromCallable(() -> accountController.getByAccountNo(b.getAccountNo()));
+                }).flatMap(acct -> {
+                    account = acct;
+                    return Single.fromCallable(() -> paymentController.getByExtraInfo(mBillingNo));
+                }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(p -> {
+                    progress.setVisible(false);
+                    payment = p;
+                    if (billingReceiptEcopyForm == null) billingReceiptEcopyForm = new BillingReceiptEcopyForm();
+                    mForm = billingReceiptEcopyForm;
+                    fillBillingReceiptForm();
+                }));
     }
+
+    private void fillBillingReceiptForm() {
+        mContent = billingReceiptEcopyForm.getView();
+        contentPane.getChildren().clear();
+        contentPane.getChildren().add(mContent);
+        billingReceiptEcopyForm.setData(account, payment);
+        billingReceiptEcopyForm.onResume();
+    }
+
 
     private void saveImage() {
         if (mForm == null) return;
@@ -196,12 +224,14 @@ public class SaveImageWindow extends AbstractWindow {
         subscription = null;
         billingStatement = null;
         billing = null;
+        payment = null;
         contentPane.getChildren().clear();
         mContent = null;
     }
 
     public void dispose() {
         if (statementEcopyForm != null) statementEcopyForm.onDispose();
+        if (billingReceiptEcopyForm != null) billingReceiptEcopyForm.onDispose();
         disposables.dispose();
     }
 }

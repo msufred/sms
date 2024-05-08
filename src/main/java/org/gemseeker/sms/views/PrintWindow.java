@@ -173,7 +173,7 @@ public class PrintWindow extends AbstractWindow {
         mContent = billingReceiptForm.getView();
         contentPane.getChildren().clear();
         contentPane.getChildren().add(mContent);
-        billingReceiptForm.setData(account, billingStatement, payment);
+        billingReceiptForm.setData(account, payment);
         billingReceiptForm.onResume();
     }
 
@@ -183,6 +183,7 @@ public class PrintWindow extends AbstractWindow {
         contentPane.getTransforms().clear();
 
         if (mForm != null && mForm == statementForm) ((StatementForm) mForm).showTempBg(false);
+        if (mForm != null && mForm == billingReceiptForm) ((BillingReceiptForm) mForm).showTempBg(false);
 
         Printer printer = cbPrinters.getValue() == null ? Printer.getDefaultPrinter() : cbPrinters.getValue();
         PrinterJob printerJob = PrinterJob.createPrinterJob(printer);

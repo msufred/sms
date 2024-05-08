@@ -2,15 +2,16 @@ package org.gemseeker.sms.views.forms;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
-import org.gemseeker.sms.data.*;
+import org.gemseeker.sms.data.Account;
+import org.gemseeker.sms.data.Payment;
 import org.gemseeker.sms.views.panels.AbstractPanel;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class BillingReceiptForm extends AbstractPanel {
+public class BillingReceiptEcopyForm extends AbstractPanel {
 
+    @FXML private Label lblOrNo;
     @FXML private Label lblAccountName;
     @FXML private Label lblDate;
     @FXML private Label lblAddress;
@@ -38,13 +39,12 @@ public class BillingReceiptForm extends AbstractPanel {
     @FXML private Label lblPaymentDue;
     @FXML private Label lblAmountPaid;
     @FXML private Label lblBalance;
-    @FXML private ImageView tempBg;
 
     private Account mAccount;
     private Payment mPayment;
 
-    public BillingReceiptForm() {
-        super(BillingReceiptForm.class.getResource("receipt.fxml"));
+    public BillingReceiptEcopyForm() {
+        super(BillingReceiptEcopyForm.class.getResource("receipt_ecopy.fxml"));
     }
 
     @Override
@@ -65,6 +65,7 @@ public class BillingReceiptForm extends AbstractPanel {
     }
 
     private void fillUpFields() {
+        lblOrNo.setText(mPayment.getPaymentNo());
         lblAccountName.setText(mAccount.getName());
         lblAddress.setText(mAccount.getAddress());
         lblDate.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
@@ -100,10 +101,6 @@ public class BillingReceiptForm extends AbstractPanel {
         clearFields();
     }
 
-    public void showTempBg(boolean show) {
-        tempBg.setVisible(show);
-    }
-
     private void clearFields() {
         lblAccountName.setText("");
         lblDate.setText("");
@@ -132,8 +129,6 @@ public class BillingReceiptForm extends AbstractPanel {
         lblPaymentDue.setText("0.00");
         lblAmountPaid.setText("0.00");
         lblBalance.setText("0.00");
-
-        showTempBg(true);
     }
 
     @Override

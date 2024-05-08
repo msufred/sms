@@ -200,6 +200,7 @@ public final class DBTables {
                 "name VARCHAR(255) NOT NULL, " +
                 "payment_for VARCHAR(16) DEFAULT 'Billing', " +
                 "extra_info VARCHAR(16), " +
+                "prev_balance DOUBLE DEFAULT '0.0', " +
                 "amount_to_pay DOUBLE DEFAULT '0.0', " +
                 "discount DOUBLE DEFAULT '0.0', " +
                 "vat DOUBLE DEFAULT '0.0', " +

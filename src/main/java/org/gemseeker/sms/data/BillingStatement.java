@@ -10,12 +10,12 @@ public class BillingStatement {
     private int id;
     private String billingNo;
     private boolean includeBalance;
-    private double prevBalance;
-    private double monthlyFee;
-    private double discount;
+    private double prevBalance;         // 0 of includeBalance is false
+    private double monthlyFee;          // monthly service fee
+    private double discount;            // discount (percent)
     private double penalty;
     private double vat;
-    private double total;
+    private double total;               // calculated total of all values above
     private String preparedBy;
     private String designation;
     private String receivedBy;

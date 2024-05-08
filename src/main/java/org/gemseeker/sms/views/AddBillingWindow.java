@@ -257,15 +257,17 @@ public class AddBillingWindow extends AbstractWindow {
 
     private void saveAndPrint() {
         save(() -> {
-            if (printWindow == null) printWindow = new PrintWindow(database);
-            printWindow.showAndWait(PrintWindow.Type.STATEMENT, ViewUtils.normalize(tfBillingNo.getText()));
+            if (printWindow != null) {
+                printWindow.showAndWait(PrintWindow.Type.STATEMENT, ViewUtils.normalize(tfBillingNo.getText()));
+            }
         });
     }
 
     private void saveAndExport() {
         save(() -> {
-            if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(database);
-            saveImageWindow.showAndWait(PrintWindow.Type.STATEMENT, ViewUtils.normalize(tfBillingNo.getText()));
+            if (saveImageWindow != null) {
+                saveImageWindow.showAndWait(SaveImageWindow.Type.STATEMENT, ViewUtils.normalize(tfBillingNo.getText()));
+            }
         });
     }
 
