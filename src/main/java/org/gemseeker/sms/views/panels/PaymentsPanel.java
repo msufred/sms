@@ -546,10 +546,10 @@ public class PaymentsPanel extends AbstractPanel {
     }
 
     private void setupIcons() {
-        tabBillings.setGraphic(new PesoIcon(12));
-        tabBillingStatements.setGraphic(new FileTextIcon(12));
-        tabOtherPayments.setGraphic(new FileTextIcon(12));
-        tabReceipts.setGraphic(new FileTextIcon(12));
+        tabBillings.setGraphic(new PesoIcon(14));
+        tabBillingStatements.setGraphic(new FileTextIcon(14));
+        tabOtherPayments.setGraphic(new FileTextIcon(14));
+        tabReceipts.setGraphic(new FileTextIcon(14));
 
         btnAdd.setGraphic(new PlusIcon(14));
         btnEdit.setGraphic(new Edit2Icon(14));

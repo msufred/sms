@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -22,6 +23,7 @@ import org.gemseeker.sms.views.panels.*;
 
 import javax.xml.transform.TransformerException;
 import java.sql.SQLException;
+import java.util.Objects;
 
 public class MainWindow extends AbstractWindow {
 
@@ -73,6 +75,7 @@ public class MainWindow extends AbstractWindow {
     protected void initWindow(Stage stage) {
         // boolean maximized = Boolean.parseBoolean(settings.get("system", "maximized"));
         stage.setMaximized(true);
+        stage.getIcons().add(new Image(Objects.requireNonNull(MainWindow.class.getResourceAsStream("logo_v3.png"))));
     }
 
     @Override

@@ -26,7 +26,6 @@ public class AddBillingWindow extends AbstractWindow {
     private static final int BTN_SAVE_INDEX = 3;
 
     @FXML private TextField tfBillingNo;
-    @FXML private Button btnCheck;
     @FXML private ComboBox<Account> cbAccounts;
     @FXML private Label lblName;
     @FXML private Label lblDuration;
@@ -84,7 +83,6 @@ public class AddBillingWindow extends AbstractWindow {
     private double penalty = 0;
     private double vat = 0;
     private double total = 0;
-    private boolean mBillingValid = false;
 
     public AddBillingWindow(Database database, PrintWindow printWindow, SaveImageWindow saveImageWindow) {
         super("Add Billing Payment", AddBillingWindow.class.getResource("add_billing_2.fxml"), null, null);
@@ -105,8 +103,6 @@ public class AddBillingWindow extends AbstractWindow {
 
         ViewUtils.setAsNumericalTextField(tfBalance, tfMonthlyFee, tfDiscount, tfPenalty, tfVat, tfTotal);
 
-        btnCheck.setOnAction(evt -> checkBillingNo(null));
-
         cbAccounts.valueProperty().addListener((o, oldVal, newVal) -> {
             if (newVal != null) loadSubscriptionDetails(newVal);
         });
@@ -121,13 +117,9 @@ public class AddBillingWindow extends AbstractWindow {
         tfPenalty.textProperty().addListener(o -> calculateTotal());
         tfVat.textProperty().addListener(o -> calculateTotal());
 
-        btnPrint.setOnAction(evt -> {
-            if (validated()) saveAndPrint();
-        });
+        btnPrint.setOnAction(evt -> validateAndSave(this::saveAndPrint));
 
-        btnSave.setOnAction(evt -> {
-            if (validated()) saveAndExport();
-        });
+        btnSave.setOnAction(evt -> validateAndSave(this::saveAndExport));
 
         btnCancel.setOnAction(evt -> close());
     }
@@ -146,31 +138,6 @@ public class AddBillingWindow extends AbstractWindow {
                     disableActions(false);
                     progressBar.setVisible(false);
                     showErrorDialog("Database Error", "Error while retrieving Account entries.\n" + err);
-                }));
-    }
-
-    private void checkBillingNo(Callable<Void> task) {
-        lblErrBillingNo.getStyleClass().removeAll("label-error", "label-success");
-        if (tfBillingNo.getText().isBlank()) {
-            lblErrBillingNo.getStyleClass().add("label-error");
-            lblErrBillingNo.setGraphic(xCircleIcon);
-            return;
-        }
-
-        disableActions(true);
-        progressBar.setVisible(true);
-        disposables.add(Single.fromCallable(() -> billingController.hasBilling(ViewUtils.normalize(tfBillingNo.getText())))
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(hasBilling -> {
-                    progressBar.setVisible(false);
-                    disableActions(false);
-                    lblErrBillingNo.getStyleClass().add(hasBilling ? "label-error" : "label-success");
-                    lblErrBillingNo.setGraphic(hasBilling ? xCircleIcon : checkCircleIcon);
-                    mBillingValid = !hasBilling;
-                    if (task != null) task.call();
-                }, err -> {
-                    progressBar.setVisible(false);
-                    disableActions(false);
-                    showErrorDialog("Database Error", "Error while querying database.\n" + err);
                 }));
     }
 
@@ -236,28 +203,56 @@ public class AddBillingWindow extends AbstractWindow {
         tfTotal.setText(String.format("%.2f", total));
     }
 
-    private boolean validated() {
-        // TODO fix
-        checkBillingNo(() -> {
-            lblErrAccount.setVisible(false);
-            lblErrFrom.setVisible(false);
-            lblErrTo.setVisible(false);
-            lblErrDue.setVisible(false);
+    /**
+     * Checks if all required fields are not empty/blank, then checks if the entered billing no.
+     * already exists. If billing no. already exists, an error icon will appear next to the
+     * Billing No TextField to indicate that the entered billing no. is invalid. If the billing no.
+     * doesn't exist, the Runnable onValidated parameter will be called.
+     * @param onValidated Runnable - called if the entered billing no. does not exist, and all required fields
+     *                    are not empty/blank.
+     */
+    private void validateAndSave(Runnable onValidated) {
+        // reset error labels
+        lblErrBillingNo.getStyleClass().removeAll("label-error", "label-success");
+        lblErrAccount.setVisible(false);
+        lblErrFrom.setVisible(false);
+        lblErrTo.setVisible(false);
+        lblErrDue.setVisible(false);
 
-            lblErrAccount.setVisible(cbAccounts.getValue() == null);
-            lblErrFrom.setVisible(dpFrom.getValue() == null);
-            lblErrTo.setVisible(dpTo.getValue() == null);
-            lblErrDue.setVisible(dpDue.getValue() == null);
+        // check if billing # is entered
+        if (tfBillingNo.getText().isBlank()) {
+            lblErrBillingNo.getStyleClass().add("label-error");
+            lblErrBillingNo.setGraphic(xCircleIcon);
+        }
 
-            mBillingValid = !tfBillingNo.getText().isBlank() && cbAccounts.getValue() != null &&
-                    dpFrom.getValue() != null && dpTo.getValue() != null && dpDue.getValue() != null;
-            if (mBillingValid) {
-                btnPrint.setText("Save & Print");
-                actionGroup.getChildren().add(BTN_SAVE_INDEX, btnSave);
-            }
-            return null;
-        });
-        return mBillingValid;
+        // check required fields
+        lblErrAccount.setVisible(cbAccounts.getValue() == null);
+        lblErrFrom.setVisible(dpFrom.getValue() == null);
+        lblErrTo.setVisible(dpTo.getValue() == null);
+        lblErrDue.setVisible(dpDue.getValue() == null);
+
+        boolean mValid = !tfBillingNo.getText().isBlank() && cbAccounts.getValue() != null &&
+                dpFrom.getValue() != null && dpTo.getValue() != null && dpDue.getValue() != null;
+
+        if (mValid) {
+            disableActions(true);
+            progressBar.setVisible(true);
+            disposables.add(Single.fromCallable(() -> billingController.hasBilling(ViewUtils.normalize(tfBillingNo.getText())))
+                    .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(hasBilling -> {
+                        progressBar.setVisible(false);
+                        disableActions(false);
+                        lblErrBillingNo.getStyleClass().add(hasBilling ? "label-error" : "label-success");
+                        lblErrBillingNo.setGraphic(hasBilling ? xCircleIcon : checkCircleIcon);
+
+                        if (!hasBilling) {
+                            onValidated.run();
+                        }
+                    }, err -> {
+                        progressBar.setVisible(false);
+                        disableActions(false);
+                        showErrorDialog("Database Error", "Error while validating.\n" + err);
+                    }));
+        }
     }
 
     private void saveAndPrint() {

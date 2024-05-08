@@ -12,6 +12,8 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.gemseeker.sms.data.*;
 import org.gemseeker.sms.data.controllers.AccountController;
 import org.gemseeker.sms.data.controllers.DataPlanController;
@@ -24,7 +26,6 @@ public class AddAccountWindow extends AbstractWindow {
 
     // account info group
     @FXML private TextField tfAccountNo;
-    @FXML private Button btnCheck;
     @FXML private Label lblAccountNo;
     @FXML private TextField tfName;
     @FXML private TextField tfAddress;
@@ -54,6 +55,7 @@ public class AddAccountWindow extends AbstractWindow {
     @FXML private TextField tfLongitude;
     @FXML private TextField tfElevation;
     @FXML private ComboBox<Tower> cbParentTower;
+    @FXML private Label lblErrTowerType;
 
     @FXML private VBox subscriptionGroup;
     @FXML private VBox towerInfoGroup;
@@ -76,10 +78,6 @@ public class AddAccountWindow extends AbstractWindow {
     private final XCircleIcon xCircleIcon = new XCircleIcon(14);
     private final CheckCircleIcon checkCircleIcon = new CheckCircleIcon(14);
 
-    private boolean mValidAccountNo = false;
-    private boolean mAccountValid = false;
-    private boolean mSubscriptionValid = false;
-
     public AddAccountWindow(Database database) {
         super("Add Account", AddAccountWindow.class.getResource("add_account.fxml"), null, null);
         dataPlanController = new DataPlanController(database);
@@ -91,20 +89,24 @@ public class AddAccountWindow extends AbstractWindow {
     }
 
     @Override
+    protected void initWindow(Stage stage) {
+        stage.initModality(Modality.APPLICATION_MODAL);
+    }
+
+    @Override
     protected void onFxmlLoaded() {
         setupIcons();
-        btnSave.setText("Validate");
 
         ViewUtils.setAsNumericalTextField(tfTowerHeight, tfLatitude, tfLongitude, tfElevation);
 
-        btnCheck.setOnAction(evt -> checkAccountNo(null));
-
         cbAddSubscription.selectedProperty().addListener((o, oldVal, selected) -> {
             subscriptionGroup.setDisable(!selected);
+            resetValidation();
         });
 
         cbAddTowerInfo.selectedProperty().addListener((o, oldVal, selected) -> {
             towerInfoGroup.setDisable(!selected);
+            resetValidation();
         });
 
         cbDataPlans.valueProperty().addListener((o, oldVal, newVal) -> {
@@ -125,10 +127,7 @@ public class AddAccountWindow extends AbstractWindow {
             refreshDataPlans();
         });
 
-        btnSave.setOnAction(evt -> {
-            if (validated()) saveAndClose();
-        });
-
+        btnSave.setOnAction(evt -> validateAndSave());
         btnCancel.setOnAction(evt -> close());
     }
 
@@ -165,62 +164,64 @@ public class AddAccountWindow extends AbstractWindow {
                 }));
     }
 
-    private void checkAccountNo(Callable<Boolean> task) {
-        lblAccountNo.getStyleClass().removeAll("label-error", "label-success");
+    private void validateAndSave() {
+        resetValidation();
+
+        // check account no. field
         if (tfAccountNo.getText().isBlank()) {
             lblAccountNo.getStyleClass().add("label-error");
             lblAccountNo.setGraphic(xCircleIcon);
-            return;
         }
 
-        progressBar.setVisible(true);
-        disposables.add(Single.fromCallable(() -> accountController.hasAccount(ViewUtils.normalize(tfAccountNo.getText())))
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(hasAccount -> {
-                    progressBar.setVisible(false);
-                    lblAccountNo.getStyleClass().add(hasAccount ? "label-error" : "label-success");
-                    lblAccountNo.setGraphic(hasAccount ? xCircleIcon : checkCircleIcon);
-                    mValidAccountNo = !hasAccount;
-                    if (task != null) task.call(); // do task after
-                }, err -> {
-                    progressBar.setVisible(false);
-                    showErrorDialog("Database Error", "Error while querying database.\n" + err);
-                }));
+        // check required fields
+        lblErrName.setVisible(tfName.getText().isBlank());
+        lblErrAddress.setVisible(tfAddress.getText().isBlank());
+
+        boolean accountValid = !tfAccountNo.getText().isBlank() && !tfName.getText().isBlank() &&
+                !tfAddress.getText().isBlank();
+
+        boolean subscriptionValid = true;
+        if (cbAddSubscription.isSelected()) {
+            lblErrPlanType.setVisible(cbDataPlans.getValue() == null);
+            lblErrStartDate.setVisible(dpStart.getValue() == null);
+            lblErrEndDate.setVisible(dpEnd.getValue() == null);
+
+            subscriptionValid = cbDataPlans.getValue() != null && dpStart.getValue() != null
+                    && dpEnd.getValue() != null;
+        }
+
+        boolean towerValid = true;
+        if (cbAddTowerInfo.isSelected()) {
+            lblErrTowerType.setVisible(cbTowerTypes.getValue() == null);
+            towerValid = cbTowerTypes.getValue() != null;
+        }
+
+        if (accountValid && subscriptionValid && towerValid) {
+            progressBar.setVisible(true);
+            disposables.add(Single.fromCallable(() -> accountController.hasAccount(ViewUtils.normalize(tfAccountNo.getText())))
+                    .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(hasAccount -> {
+                        progressBar.setVisible(false);
+                        lblAccountNo.getStyleClass().add(hasAccount ? "label-error" : "label-success");
+                        lblAccountNo.setGraphic(hasAccount ? xCircleIcon : checkCircleIcon);
+
+                        if (!hasAccount) saveAndClose();
+                    }, err -> {
+                        progressBar.setVisible(false);
+                        showErrorDialog("Database Error", "Error while querying database.\n" + err);
+                    }));
+        }
     }
 
-    private boolean validated() {
-        // check account first, then validate fields (just in case account number wasn't checked)
-        checkAccountNo(() -> {
-            // reset error labels
-            lblErrName.setVisible(false);
-            lblErrAddress.setVisible(false);
-            lblErrPlanType.setVisible(false);
-            lblErrStartDate.setVisible(false);
-            lblErrEndDate.setVisible(false);
-
-            // account info
-            lblErrName.setVisible(tfName.getText().isBlank());
-            lblErrAddress.setVisible(tfAddress.getText().isBlank());
-            mAccountValid = !tfName.getText().isBlank() && !tfAddress.getText().isBlank();
-
-            // subscription info
-            if (cbAddSubscription.isSelected()) {
-                lblErrPlanType.setVisible(cbDataPlans.getValue() == null);
-                lblErrStartDate.setVisible(dpStart.getValue() == null);
-                lblErrEndDate.setVisible(dpEnd.getValue() == null);
-
-                mSubscriptionValid = cbDataPlans.getValue() != null &&
-                        !tfBandwidth.getText().isBlank() && !tfAmount.getText().isBlank() &&
-                        dpStart.getValue() != null && dpEnd.getValue() != null;
-            } else {
-                mSubscriptionValid = true;
-            }
-            if (mValidAccountNo && mAccountValid && mSubscriptionValid) {
-                btnSave.setText("Save Account");
-            }
-            return null;
-        });
-        // NOTE: no need to validate Tower info, if fields are empty, set values to 0
-        return mValidAccountNo && mAccountValid && mSubscriptionValid;
+    private void resetValidation() {
+        // reset error labels
+        lblAccountNo.getStyleClass().removeAll("label-error", "label-success");
+        lblAccountNo.setGraphic(null);
+        lblErrName.setVisible(false);
+        lblErrAddress.setVisible(false);
+        lblErrPlanType.setVisible(false);
+        lblErrStartDate.setVisible(false);
+        lblErrEndDate.setVisible(false);
+        lblErrTowerType.setVisible(false);
     }
 
     private void saveAndClose() {
@@ -294,9 +295,6 @@ public class AddAccountWindow extends AbstractWindow {
     @Override
     protected void onClose() {
         clearFields();
-        mValidAccountNo = false;
-        mAccountValid = false;
-        mSubscriptionValid = false;
     }
 
     private void setupIcons() {
@@ -306,6 +304,7 @@ public class AddAccountWindow extends AbstractWindow {
         lblErrPlanType.setGraphic(new XCircleIcon(14));
         lblErrStartDate.setGraphic(new XCircleIcon(14));
         lblErrEndDate.setGraphic(new XCircleIcon(14));
+        lblErrTowerType.setGraphic(new XCircleIcon(14));
     }
 
     private void clearFields() {
@@ -335,6 +334,7 @@ public class AddAccountWindow extends AbstractWindow {
         lblErrPlanType.setVisible(false);
         lblErrStartDate.setVisible(false);
         lblErrEndDate.setVisible(false);
+        lblErrTowerType.setVisible(false);
     }
 
     public void dispose() {

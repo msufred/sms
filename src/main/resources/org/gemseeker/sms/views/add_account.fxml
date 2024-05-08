@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="700.0" prefWidth="450.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="700.0" prefWidth="450.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ScrollPane fitToWidth="true" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
          <content>
@@ -22,35 +22,34 @@
                   <HBox alignment="CENTER_LEFT" spacing="8.0">
                      <children>
                         <Label alignment="CENTER_RIGHT" minWidth="90.0" styleClass="form-label" text="Account No" />
-                        <TextField fx:id="tfAccountNo" promptText="Account No (Required)" styleClass="form-field" />
-                        <Button fx:id="btnCheck" mnemonicParsing="false" text="Check" />
+                        <TextField fx:id="tfAccountNo" prefWidth="250.0" promptText="Required" styleClass="form-field" />
                         <Label fx:id="lblAccountNo" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" spacing="8.0">
                      <children>
                         <Label alignment="CENTER_RIGHT" minWidth="90.0" styleClass="form-label" text="Name" />
-                        <TextField fx:id="tfName" prefWidth="250.0" promptText="Name (Required)" styleClass="form-field" />
+                        <TextField fx:id="tfName" prefWidth="250.0" promptText="Required" styleClass="form-field" />
                         <Label fx:id="lblErrName" styleClass="label-error" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" spacing="8.0">
                      <children>
                         <Label alignment="CENTER_RIGHT" minWidth="90.0" styleClass="form-label" text="Address" />
-                        <TextField fx:id="tfAddress" prefWidth="250.0" promptText="Address (Required)" styleClass="form-field" />
+                        <TextField fx:id="tfAddress" prefWidth="250.0" promptText="Required" styleClass="form-field" />
                         <Label fx:id="lblErrAddress" styleClass="label-error" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" spacing="8.0">
                      <children>
                         <Label alignment="CENTER_RIGHT" minWidth="90.0" styleClass="form-label" text="Email" />
-                        <TextField fx:id="tfEmail" prefWidth="250.0" promptText="Email (Optional)" styleClass="form-field" />
+                        <TextField fx:id="tfEmail" prefWidth="250.0" promptText="Optional" styleClass="form-field" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" spacing="8.0">
                      <children>
                         <Label alignment="CENTER_RIGHT" minWidth="90.0" styleClass="form-label" text="Phone" />
-                        <TextField fx:id="tfPhone" prefWidth="250.0" promptText="Phone (Optional)" styleClass="form-field" />
+                        <TextField fx:id="tfPhone" prefWidth="250.0" promptText="Optional" styleClass="form-field" />
                      </children>
                   </HBox>
                   <CheckBox fx:id="cbAddSubscription" mnemonicParsing="false" text="Add Subscription">
@@ -83,7 +82,7 @@
                         <HBox alignment="CENTER_LEFT" spacing="8.0">
                            <children>
                               <Label alignment="CENTER_RIGHT" minWidth="90.0" styleClass="form-label" text="IP Address" />
-                              <TextField fx:id="tfIpAddress" prefWidth="250.0" promptText="IP Address (Optional)" styleClass="form-field" />
+                              <TextField fx:id="tfIpAddress" prefWidth="250.0" promptText="Optional" styleClass="form-field" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" spacing="8.0">
@@ -113,6 +112,7 @@
                            <children>
                               <Label alignment="CENTER_RIGHT" minWidth="110.0" styleClass="form-label" text="Type" />
                               <ComboBox fx:id="cbTowerTypes" prefWidth="150.0" promptText="Select Tower Type" />
+                              <Label fx:id="lblErrTowerType" styleClass="label-error" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" spacing="8.0">
@@ -161,7 +161,7 @@
          <children>
             <ProgressBar fx:id="progressBar" prefWidth="200.0" visible="false" />
             <Region HBox.hgrow="ALWAYS" />
-            <Button fx:id="btnSave" mnemonicParsing="false" styleClass="form-button-positve" text="Add Account" />
+            <Button fx:id="btnSave" mnemonicParsing="false" styleClass="form-button-positve" text="Save" />
             <Button fx:id="btnCancel" mnemonicParsing="false" styleClass="form-button-regular" text="Cancel" />
          </children>
       </HBox>

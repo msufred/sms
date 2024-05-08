@@ -11,7 +11,6 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import org.gemseeker.sms.data.Account;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.controllers.AccountController;
 import org.gemseeker.sms.data.controllers.models.AccountSubscription;
@@ -29,7 +28,10 @@ import java.util.Optional;
 public class AccountsPanel extends AbstractPanel {
 
     @FXML private Button btnAdd;
-    @FXML private Button btnEdit;
+    @FXML private MenuButton mEdit;
+    @FXML private MenuItem mEditAccount;
+    @FXML private MenuItem mEditSubscription;
+    @FXML private MenuItem mEditTower;
     @FXML private Button btnDelete;
     @FXML private Button btnRefresh;
     @FXML private Label lblFilter;
@@ -76,7 +78,9 @@ public class AccountsPanel extends AbstractPanel {
         setupTable();
 
         btnAdd.setOnAction(evt -> addItem());
-        btnEdit.setOnAction(evt -> editSelected());
+        mEditAccount.setOnAction(evt -> editAccount());
+        mEditSubscription.setOnAction(evt -> editSubscription());
+        mEditTower.setOnAction(evt -> editTowerInfo());
         btnDelete.setOnAction(evt -> deleteSelected());
         btnRefresh.setOnAction(evt -> refresh());
 
@@ -112,8 +116,8 @@ public class AccountsPanel extends AbstractPanel {
     }
 
     private void refresh() {
-        showProgress(-1, "Retrieving Accounts...");
-        disposables.add(Single.fromCallable(() -> accountController.getAccountsWithSubscription())
+        showProgress("Retrieving Accounts...");
+        disposables.add(Single.fromCallable(accountController::getAccountsWithSubscription)
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
                     hideProgress();
                     filteredList = new FilteredList<>(list);
@@ -131,7 +135,23 @@ public class AccountsPanel extends AbstractPanel {
         refresh();
     }
 
-    private void editSelected() {
+    private void editAccount() {
+        if (selectedItem.get() == null) {
+            showWarningDialog("Invalid", "No selected Account. Try again.");
+        } else {
+            // TODO show edit window
+        }
+    }
+
+    private void editSubscription() {
+        if (selectedItem.get() == null) {
+            showWarningDialog("Invalid", "No selected Account. Try again.");
+        } else {
+            // TODO show edit window
+        }
+    }
+
+    private void editTowerInfo() {
         if (selectedItem.get() == null) {
             showWarningDialog("Invalid", "No selected Account. Try again.");
         } else {
@@ -153,7 +173,7 @@ public class AccountsPanel extends AbstractPanel {
     }
 
     private void delete(int id) {
-        showProgress(-1, "Deleting Account...");
+        showProgress("Deleting Account...");
         disposables.add(Single.fromCallable(() -> accountController.delete(id))
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
                     hideProgress();
@@ -169,7 +189,7 @@ public class AccountsPanel extends AbstractPanel {
         if (selectedItem.get() == null) {
             showWarningDialog("Invalid", "No selected Account. Try again.");
         } else {
-            showProgress(-1, "Changing Account status...");
+            showProgress("Changing Account status...");
             disposables.add(Single.fromCallable(() -> accountController.update(selectedItem.get().getId(), "status", newStatus))
                     .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
                         hideProgress();
@@ -183,7 +203,7 @@ public class AccountsPanel extends AbstractPanel {
 
     private void changeSelectedTag(String tag) {
         if (selectedItem.get() == null || tag == null) return;
-        showProgress(-1, "Changing Account tag...");
+        showProgress("Changing Account tag...");
         disposables.add(Single.fromCallable(() -> accountController.update(selectedItem.get().getId(), "tag", tag))
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
                     hideProgress();
@@ -196,7 +216,10 @@ public class AccountsPanel extends AbstractPanel {
 
     private void setupIcons() {
         btnAdd.setGraphic(new PlusIcon(14));
-        btnEdit.setGraphic(new Edit2Icon(14));
+        mEdit.setGraphic(new Edit2Icon(14));
+        mEditAccount.setGraphic(new UserIcon(14));
+        mEditSubscription.setGraphic(new RssIcon(14));
+        mEditTower.setGraphic(new WifiIcon(14));
         btnRefresh.setGraphic(new RefreshCwIcon(14));
         btnDelete.setGraphic(new TrashIcon(14));
         lblFilter.setGraphic(new FilterIcon(14));
@@ -223,9 +246,21 @@ public class AccountsPanel extends AbstractPanel {
         mAdd.setGraphic(new PlusIcon(12));
         mAdd.setOnAction(evt -> addItem());
 
-        MenuItem mEdit = new MenuItem("Edit");
+        MenuItem mEditAccount = new MenuItem("Account Info");
+        mEditAccount.setGraphic(new UserIcon(12));
+        mEditAccount.setOnAction(evt -> editAccount());
+
+        MenuItem mEditSubscription = new MenuItem("Subscription");
+        mEditSubscription.setGraphic(new RssIcon(12));
+        mEditSubscription.setOnAction(evt -> editSubscription());
+
+        MenuItem mEditTower = new MenuItem("Tower Info");
+        mEditTower.setGraphic(new WifiIcon(12));
+        mEditTower.setOnAction(evt -> editTowerInfo());
+
+        Menu mEdit = new Menu("Edit");
         mEdit.setGraphic(new Edit2Icon(12));
-        mEdit.setOnAction(evt -> editSelected());
+        mEdit.getItems().addAll(mEditAccount, mEditSubscription, mEditTower);
 
         MenuItem mStatActive = new MenuItem("Active");
         mStatActive.setGraphic(new SmileIcon(12));
@@ -262,8 +297,8 @@ public class AccountsPanel extends AbstractPanel {
         selectedItem.bind(accountsTable.getSelectionModel().selectedItemProperty());
     }
 
-    private void showProgress(double progress, String text) {
-        mainWindow.showProgress(progress, text);
+    private void showProgress(String text) {
+        mainWindow.showProgress(-1, text);
     }
 
     private void hideProgress() {

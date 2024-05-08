@@ -1,6 +1,7 @@
 package org.gemseeker.sms.views;
 
 import javafx.fxml.FXML;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -13,6 +14,7 @@ import org.gemseeker.sms.Utils;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Objects;
 
 public class SplashWindow extends AbstractWindow {
 
@@ -28,6 +30,7 @@ public class SplashWindow extends AbstractWindow {
     protected void initWindow(Stage stage) {
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initStyle(StageStyle.UNDECORATED);
+        stage.getIcons().add(new Image(Objects.requireNonNull(MainWindow.class.getResourceAsStream("logo_v3.png"))));
     }
 
     @Override
