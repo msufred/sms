@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="700.0" prefWidth="500.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="700.0" prefWidth="500.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label styleClass="form-title" text="Prepare Billing Statement">
          <VBox.margin>
@@ -187,9 +187,9 @@
       </ScrollPane>
       <HBox fx:id="actionGroup" alignment="CENTER_RIGHT" prefWidth="200.0" spacing="4.0">
          <children>
-            <ProgressBar fx:id="progressBar" prefWidth="200.0" visible="false" />
+            <ProgressBar fx:id="progressBar" visible="false" />
             <Region HBox.hgrow="ALWAYS" />
-            <Button fx:id="btnPrint" defaultButton="true" mnemonicParsing="false" styleClass="form-button-positve" text="Validate" />
+            <Button fx:id="btnPrint" defaultButton="true" mnemonicParsing="false" styleClass="form-button-positve" text="Save &amp; Print" />
             <Button fx:id="btnSave" mnemonicParsing="false" styleClass="form-button-regular" text="Save &amp; Export" />
             <Button fx:id="btnCancel" cancelButton="true" mnemonicParsing="false" styleClass="form-button-regular" text="Cancel" />
          </children>

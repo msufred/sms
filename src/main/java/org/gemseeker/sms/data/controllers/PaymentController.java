@@ -32,13 +32,12 @@ public class PaymentController implements ModelController<Payment> {
 
     @Override
     public boolean update(Payment model) throws SQLException {
-        // NOTE: Receipts should not be updated!!!
-        String sql = String.format("UPDATE payments SET name='%s', payment_for='%s', extra_info='%s', amount_to_pay='%f', " +
-                        "discount='%f', vat='%f', surcharges='%f', amount_total='%f', amount_paid='%f', " +
-                        "balance='%f', payment_date='%s', prepared_by='%s', status='%s', date_updated='%s' WHERE id='%d'",
-                model.getName(), model.getPaymentFor(), model.getExtraInfo(), model.getAmountToPay(), model.getDiscount(),
-                model.getVat(), model.getSurcharges(), model.getAmountTotal(), model.getAmountPaid(), model.getBalance(),
-                model.getPaymentDate(), model.getPreparedBy(), model.getStatus(), LocalDateTime.now(), model.getId());
+        // NOTE: Payment should only update the following: name; prepared_by,
+        // payment_date, status, tag, and date_updated.
+        String sql = String.format("UPDATE payments SET name='%s', payment_date='%s', prepared_by='%s', " +
+                        "status='%s', tag='%s', date_updated='%s' WHERE id='%d'", model.getName(),
+                model.getPaymentDate(), model.getPreparedBy(), model.getStatus(), model.getTag(),
+                LocalDateTime.now(), model.getId());
         return database.executeQuery(sql);
     }
 
@@ -77,6 +76,25 @@ public class PaymentController implements ModelController<Payment> {
             if (rs.next()) return rs.getInt(1) > 0;
         }
         return false;
+    }
+
+    public boolean hasPaymentForBilling(String billingNo) throws SQLException {
+        String sql = String.format("SELECT COUNT(*) FROM payments WHERE extra_info='%s'", billingNo);
+        try (ResultSet rs = database.executeQueryWithResult(sql)) {
+            if (rs.next()) return rs.getInt(1) > 0;
+        }
+        return false;
+    }
+
+    /**
+     * extraInfo can be billing_no, service_no, or product_no
+     */
+    public Payment getByExtraInfo(String info) throws SQLException {
+        String sql = String.format("SELECT * FROM payments WHERE extra_info='%s' LIMIT 1", info);
+        try (ResultSet rs = database.executeQueryWithResult(sql)) {
+            if (rs.next()) return fetchInfo(rs);
+        }
+        return null;
     }
 
     @Override

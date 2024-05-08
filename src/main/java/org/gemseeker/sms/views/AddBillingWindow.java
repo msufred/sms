@@ -259,7 +259,6 @@ public class AddBillingWindow extends AbstractWindow {
         save(() -> {
             if (printWindow == null) printWindow = new PrintWindow(database);
             printWindow.showAndWait(PrintWindow.Type.STATEMENT, ViewUtils.normalize(tfBillingNo.getText()));
-            return null;
         });
     }
 
@@ -267,11 +266,10 @@ public class AddBillingWindow extends AbstractWindow {
         save(() -> {
             if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(database);
             saveImageWindow.showAndWait(PrintWindow.Type.STATEMENT, ViewUtils.normalize(tfBillingNo.getText()));
-            return null;
         });
     }
 
-    private void save(Callable<Void> onSave) {
+    private void save(Runnable onSave) {
         progressBar.setVisible(true);
         disableActions(true);
         disposables.add(Single.fromCallable(() -> {
@@ -306,7 +304,8 @@ public class AddBillingWindow extends AbstractWindow {
             disableActions(false);
             if (!success) showWarningDialog("Failed", "Failed to add new Billing entry.");
             else {
-                if (onSave != null) onSave.call();
+                if (onSave != null) onSave.run();
+                close();
             }
         }, err -> {
             progressBar.setVisible(false);
@@ -361,9 +360,6 @@ public class AddBillingWindow extends AbstractWindow {
         lblErrFrom.setVisible(false);
         lblErrTo.setVisible(false);
         lblErrDue.setVisible(false);
-
-        btnPrint.setText("Validate");
-        actionGroup.getChildren().remove(btnSave);
     }
 
     public void dispose() {

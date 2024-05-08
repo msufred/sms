@@ -37,7 +37,7 @@ public class Payment {
     public Payment() {
         paymentFor = TYPE_BILLING;
         amountToPay = discount = vat = amountTotal = amountPaid = balance = 0;
-        status = "valid";
+        status = "Valid";
         tag = "normal";
         dateCreated = dateUpdated = LocalDateTime.now();
     }

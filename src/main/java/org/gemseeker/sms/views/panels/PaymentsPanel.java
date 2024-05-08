@@ -37,6 +37,7 @@ import java.util.concurrent.Callable;
 
 public class PaymentsPanel extends AbstractPanel {
 
+    // <editor-fold default-state="collapsed" desc="FXML Components">
     @FXML private TabPane tabPane;
     @FXML private Tab tabBillings;
     @FXML private Tab tabOtherPayments;
@@ -104,6 +105,8 @@ public class PaymentsPanel extends AbstractPanel {
     @FXML private TableColumn<Payment, String> colPaymentBalance;
     @FXML private TableColumn<Payment, String> colPaymentPreparedBy;
 
+    // </editor-fold>
+
     private FilteredList<BillingPayment> billingsList;
     private final SimpleObjectProperty<BillingPayment> selectedBilling = new SimpleObjectProperty<>();
 
@@ -129,6 +132,7 @@ public class PaymentsPanel extends AbstractPanel {
     private PrintWindow printWindow;
     private SaveImageWindow saveImageWindow;
     private AcceptPaymentWindow acceptPaymentWindow;
+    private EditPaymentWindow editPaymentWindow;
 
     public PaymentsPanel(MainWindow mainWindow, Settings settings, Database database) {
         super(PaymentsPanel.class.getResource("payments.fxml"));
@@ -296,11 +300,9 @@ public class PaymentsPanel extends AbstractPanel {
                 acceptPaymentWindow.showAndWait(selectedBilling.get().getBillingNo());
                 refreshBillings();
                 refreshReceipts();
-                return null;
             }, () -> {
                 showInfoDialog("Invalid", "No Billing Statement issued for " +
                         "this Billing entry.");
-                return null;
             });
         }
     }
@@ -312,14 +314,12 @@ public class PaymentsPanel extends AbstractPanel {
             checkBillingStatementExists(selectedBilling.get().getBillingNo(), () -> {
                 showWarningDialog("Billing Statement Exists", "A Billing Statement already exists " +
                         "for this Billing entry.");
-                return null;
             }, () -> {
                 if (prepareBillingStatementWindow == null) prepareBillingStatementWindow =
                         new PrepareBillingStatementWindow(database);
                 prepareBillingStatementWindow.showAndWait(selectedBilling.get().getBillingNo());
                 refreshBillings();
                 refreshBillingStatements();
-                return null;
             });
         }
     }
@@ -332,11 +332,8 @@ public class PaymentsPanel extends AbstractPanel {
                 // save billing as image
                 if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(database);
                 saveImageWindow.showAndWait(PrintWindow.Type.STATEMENT, selectedBilling.get().getBillingNo());
-                return null;
             }, () -> {
-                showWarningDialog("Invalid Action", "No Billing Statement issued for this Billing entry. " +
-                        "Use Billing Statement -> Create to create Billing Statement");
-                return null;
+                showWarningDialog("Invalid Action", "Create Billing Statement first.");
             });
         }
     }
@@ -349,34 +346,10 @@ public class PaymentsPanel extends AbstractPanel {
                 // print directly
                 if (printWindow == null) printWindow = new PrintWindow(database);
                 printWindow.showAndWait(PrintWindow.Type.STATEMENT, selectedBilling.get().getBillingNo());
-                return null;
             }, () -> {
-                showWarningDialog("Invalid Action", "No Billing Statement issued for this Billing entry. " +
-                        "Use Billing Statement -> Create to create Billing Statement");
-                return null;
+                showWarningDialog("Invalid Action", "Create Billing Statement first.");
             });
         }
-    }
-
-    /**
-     * Checks if BillingStatement entry for the given billing number exists.
-     * Executes Callable (by calling Callable.call()) objects according to the
-     * query result.
-     * @param billingNo String - billing number
-     * @param onExists  Callable - called if exists
-     * @param onNotExists Callable - called if not exists
-     */
-    private void checkBillingStatementExists(String billingNo, Callable<Void> onExists, Callable<Void> onNotExists) {
-        showProgress("Checking if Billing Statement exists...");
-        disposables.add(Single.fromCallable(() -> billingStatementController.hasBillingStatement(billingNo))
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(exists -> {
-                    hideProgress();
-                    if (exists) onExists.call();
-                    else onNotExists.call();
-                }, err -> {
-                    hideProgress();
-                    showErrorDialog("Database Error", "Error while checking Billing Statement entry.\n" + err);
-                }));
     }
 
     private void saveReceiptAsImage() {
@@ -387,7 +360,12 @@ public class PaymentsPanel extends AbstractPanel {
         if (selectedBilling.get() == null) {
             showWarningDialog("Invalid", "No selected Billing entry. Try again.");
         } else {
-            // TODO
+            checkPaymentExists(selectedBilling.get().getBillingNo(), () -> {
+                if (printWindow == null) printWindow = new PrintWindow(database);
+                printWindow.showAndWait(PrintWindow.Type.RECEIPT, selectedBilling.get().getBillingNo());
+            }, () -> {
+                showWarningDialog("Invalid Action", "The Payment for this Billing does not exist.");
+            });
         }
     }
 
@@ -414,6 +392,41 @@ public class PaymentsPanel extends AbstractPanel {
                 }, err -> {
                     hideProgress();
                     showErrorDialog("Database Error", "Error while deleting Billing entry.\n" + err);
+                }));
+    }
+
+
+    /**
+     * Checks if BillingStatement entry for the given billing number exists.
+     * Executes Runnable (by calling Callable.call()) objects according to the
+     * query result.
+     * @param billingNo String - billing number
+     * @param onExists  Runnable - called if exists
+     * @param onNotExists Runnable - called if not exists
+     */
+    private void checkBillingStatementExists(String billingNo, Runnable onExists,Runnable onNotExists) {
+        showProgress("Checking if Billing Statement exists...");
+        disposables.add(Single.fromCallable(() -> billingStatementController.hasBillingStatement(billingNo))
+                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(exists -> {
+                    hideProgress();
+                    if (exists) onExists.run();
+                    else onNotExists.run();
+                }, err -> {
+                    hideProgress();
+                    showErrorDialog("Database Error", "Error while checking Billing Statement entry.\n" + err);
+                }));
+    }
+
+    private void checkPaymentExists(String billingNo, Runnable onExists, Runnable onNoExists) {
+        showProgress("Checking if Payment for this Billing exists...");
+        disposables.add(Single.fromCallable(() -> paymentController.hasPaymentForBilling(billingNo))
+                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(exists -> {
+                    hideProgress();
+                    if (exists) onExists.run();
+                    else onNoExists.run();
+                }, err -> {
+                    hideProgress();
+                    showErrorDialog("Database Error", "Error while querying database.\n" + err);
                 }));
     }
 
@@ -450,6 +463,42 @@ public class PaymentsPanel extends AbstractPanel {
                 }, err -> {
                     hideProgress();
                     showErrorDialog("Database Error", "Error while deleting Billing Statement.\n" + err);
+                }));
+    }
+
+    private void editSelectedPayment() {
+        if (selectedPayment.get() == null) {
+            showWarningDialog("Invalid", "No selected Payment entry. Try again.");
+        } else {
+            if (editPaymentWindow == null) editPaymentWindow = new EditPaymentWindow(database);
+            editPaymentWindow.showAndWait(selectedPayment.get().getId());
+            refreshReceipts();
+        }
+    }
+
+    private void deleteSelectedPayment() {
+        if (selectedPayment.get() == null) {
+            showWarningDialog("Invalid", "No selected Payment entry. Try again.");
+        } else {
+            Optional<ButtonType> result = showConfirmDialog("Delete Payment",
+                    "Are you sure you want to delete this Payment entry?",
+                    ButtonType.YES, ButtonType.NO);
+            if (result.isPresent() && result.get() == ButtonType.YES) {
+                deletePayment(selectedPayment.get().getId());
+            }
+        }
+    }
+
+    private void deletePayment(int id) {
+        showProgress("Deleting Payment entry...");
+        disposables.add(Single.fromCallable(() -> paymentController.delete(id))
+                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
+                    hideProgress();
+                    if (!success) showWarningDialog("Failed", "Failed to delete Payment entry.");
+                    refreshReceipts();
+                }, err -> {
+                    hideProgress();
+                    showErrorDialog("Database Error", "Error while deleting Payment entry.\n" + err);
                 }));
     }
 
@@ -704,11 +753,11 @@ public class PaymentsPanel extends AbstractPanel {
 
         MenuItem mEdit = new MenuItem("Edit");
         mEdit.setGraphic(new Edit2Icon(12));
-        mEdit.setOnAction(evt -> showInfoDialog("Not Implemented", ""));
+        mEdit.setOnAction(evt -> editSelectedPayment());
 
         MenuItem mDelete = new MenuItem("Delete");
         mDelete.setGraphic(new TrashIcon(12));
-        mDelete.setOnAction(evt -> showInfoDialog("Not Implemented", ""));
+        mDelete.setOnAction(evt -> deleteSelectedPayment());
 
         ContextMenu cm = new ContextMenu(mEdit, mDelete);
         paymentsTable.setContextMenu(cm);
@@ -729,6 +778,7 @@ public class PaymentsPanel extends AbstractPanel {
         if (addBillingWindow != null) addBillingWindow.dispose();
         if (editBillingWindow != null) editBillingWindow.dispose();
         if (prepareBillingStatementWindow != null) prepareBillingStatementWindow.dispose();
+        if (editPaymentWindow != null) editPaymentWindow.dispose();
         if (printWindow != null) printWindow.dispose();
         if (saveImageWindow != null) saveImageWindow.dispose();
         disposables.dispose();

@@ -127,7 +127,7 @@ public class AcceptPaymentWindow extends AbstractWindow {
     private void calculate() {
         String paidStr = tfAmount.getText();
         amountPaid = paidStr.isBlank() ? 0 : Double.parseDouble(paidStr.trim());
-        balance = amountToPay - amountPaid;
+        balance = amountToPay + prevBalance - amountPaid;
         lblBalance.setText(String.format("%.2f", balance));
     }
 
@@ -175,17 +175,19 @@ public class AcceptPaymentWindow extends AbstractWindow {
 
                 // update balance
                 if (mBalances != null) {
-                    double bal = balance;
+                    double oldBal = 0;
                     for (Balance b : mBalances) {
-                        bal += b.getAmount();
+                        oldBal += b.getAmount();
                         b.setStatus(Balance.STATUS_PAID);
                         b.setDatePaid(LocalDate.now());
                         balanceController.update(b);
                     }
-                    if (bal > 0) {
+                    double newBal = Math.abs(oldBal - balance);
+                    System.out.println("New Balance: " + newBal);
+                    if (newBal > 0) {
                         Balance newBalance = new Balance();
                         newBalance.setAccountNo(mBilling.getAccountNo());
-                        newBalance.setAmount(bal);
+                        newBalance.setAmount(newBal);
                         balanceController.insert(newBalance);
                     }
                 }

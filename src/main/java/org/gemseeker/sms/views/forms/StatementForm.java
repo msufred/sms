@@ -49,7 +49,7 @@ public class StatementForm extends AbstractPanel {
 
     @Override
     protected void onFxmlLoaded() {
-        lblAccountName.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+
     }
 
     public void setData(Account account, Subscription subscription, Billing billing, BillingStatement billingStatement) {

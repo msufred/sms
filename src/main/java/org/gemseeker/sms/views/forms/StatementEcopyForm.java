@@ -42,7 +42,7 @@ public class StatementEcopyForm extends AbstractPanel {
     private BillingStatement mBillingStatement;
 
     public StatementEcopyForm() {
-        super(StatementEcopyForm.class.getResource("statement.fxml"));
+        super(StatementEcopyForm.class.getResource("billing_statement_ecopy.fxml"));
     }
 
     @Override

@@ -16,10 +16,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.scene.transform.Scale;
 import org.gemseeker.sms.data.*;
-import org.gemseeker.sms.data.controllers.AccountController;
-import org.gemseeker.sms.data.controllers.BillingController;
-import org.gemseeker.sms.data.controllers.BillingStatementController;
-import org.gemseeker.sms.data.controllers.SubscriptionController;
+import org.gemseeker.sms.data.controllers.*;
+import org.gemseeker.sms.views.forms.BillingReceiptForm;
 import org.gemseeker.sms.views.forms.StatementForm;
 import org.gemseeker.sms.views.panels.AbstractPanel;
 
@@ -49,12 +47,13 @@ public class PrintWindow extends AbstractWindow {
     private final SubscriptionController subscriptionController;
     private final BillingController billingController;
     private final BillingStatementController billingStatementController;
+    private final PaymentController paymentController;
     private final CompositeDisposable disposables;
 
     private final ObservableList<Printer> printers = FXCollections.observableArrayList();
 
     private StatementForm statementForm;
-//    private ReceiptForm receiptForm;
+    private BillingReceiptForm billingReceiptForm;
 
     private Type mType;
     private String mBillingNo;
@@ -63,6 +62,7 @@ public class PrintWindow extends AbstractWindow {
     private Subscription subscription;
     private Billing billing;
     private BillingStatement billingStatement;
+    private Payment payment;
 
     private AbstractPanel mForm = null;
     private Node mContent = null;
@@ -73,6 +73,7 @@ public class PrintWindow extends AbstractWindow {
         this.subscriptionController = new SubscriptionController(database);
         this.billingController = new BillingController(database);
         this.billingStatementController = new BillingStatementController(database);
+        this.paymentController = new PaymentController(database);
         this.disposables = new CompositeDisposable();
     }
 
@@ -105,7 +106,7 @@ public class PrintWindow extends AbstractWindow {
     protected void onShow() {
         // refresh printers
         printers.clear();
-        Printer.getAllPrinters().stream().forEach(p -> printers.add(p));
+        printers.addAll(Printer.getAllPrinters());
         cbPrinters.setValue(Printer.getDefaultPrinter());
 
         if (Objects.requireNonNull(mType) == Type.STATEMENT) {
@@ -148,7 +149,32 @@ public class PrintWindow extends AbstractWindow {
     }
 
     private void loadBillingReceiptForm() {
+        progress.setVisible(true);
+        disposables.add(Single.fromCallable(() -> billingStatementController.getByBillingNo(mBillingNo))
+                .flatMap(bStatement -> {
+                    billingStatement = bStatement;
+                    return Single.fromCallable(() -> billingController.getByBillingNo(mBillingNo));
+                }).flatMap(b -> {
+                    billing = b;
+                    return Single.fromCallable(() -> accountController.getByAccountNo(b.getAccountNo()));
+                }).flatMap(acct -> {
+                    account = acct;
+                    return Single.fromCallable(() -> paymentController.getByExtraInfo(mBillingNo));
+                }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(p -> {
+                    progress.setVisible(false);
+                    payment = p;
+                    if (billingReceiptForm == null) billingReceiptForm = new BillingReceiptForm();
+                    mForm = billingReceiptForm;
+                    fillBillingReceiptForm();
+                }));
+    }
 
+    private void fillBillingReceiptForm() {
+        mContent = billingReceiptForm.getView();
+        contentPane.getChildren().clear();
+        contentPane.getChildren().add(mContent);
+        billingReceiptForm.setData(account, billingStatement, payment);
+        billingReceiptForm.onResume();
     }
 
     private void print() {
@@ -194,6 +220,7 @@ public class PrintWindow extends AbstractWindow {
         subscription = null;
         billingStatement = null;
         billing = null;
+        payment = null;
         contentPane.getChildren().clear();
         mContent = null;
     }

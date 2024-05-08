@@ -152,16 +152,16 @@
                           <columns>
                             <TableColumn fx:id="colPaymentTag" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" style="-fx-alignment: center;" />
                             <TableColumn fx:id="colPaymentNo" prefWidth="75.0" style="-fx-alignment: center;" text="OR #" />
+                              <TableColumn fx:id="colPaymentFor" prefWidth="100.0" style="-fx-alignment: center;" text="Payment For" />
                               <TableColumn fx:id="colPaymentStatus" prefWidth="75.0" style="-fx-alignment: center;" text="Status" />
                               <TableColumn fx:id="colPaymentDate" prefWidth="100.0" style="-fx-alignment: center;" text="Date" />
                               <TableColumn fx:id="colPaymentName" prefWidth="150.0" text="Name" />
-                              <TableColumn fx:id="colPaymentFor" prefWidth="100.0" style="-fx-alignment: center;" text="Payment For" />
                               <TableColumn fx:id="colPaymentToPay" prefWidth="100.0" style="-fx-alignment: center-right;" text="To Pay" />
                               <TableColumn fx:id="colPaymentDiscount" prefWidth="100.0" style="-fx-alignment: center-right;" text="Discount" />
                               <TableColumn fx:id="colPaymentVat" prefWidth="100.0" style="-fx-alignment: center-right;" text="VAT" />
                               <TableColumn fx:id="colPaymentSurcharges" prefWidth="100.0" style="-fx-alignment: center-right;" text="Surcharges" />
-                              <TableColumn fx:id="colPaymentTotal" prefWidth="100.0" style="-fx-alignment: center-right;" text="TOTAL" />
-                              <TableColumn fx:id="colPaymentPaid" prefWidth="100.0" style="-fx-alignment: center-right;" text="Paid" />
+                              <TableColumn fx:id="colPaymentTotal" prefWidth="100.0" style="-fx-alignment: center-right; -fx-font-weight: bold;" text="TOTAL" />
+                              <TableColumn fx:id="colPaymentPaid" prefWidth="100.0" style="-fx-alignment: center-right; -fx-font-weight: bold;" text="Paid" />
                               <TableColumn fx:id="colPaymentBalance" prefWidth="100.0" style="-fx-alignment: center-right;" text="Balance" />
                               <TableColumn fx:id="colPaymentPreparedBy" prefWidth="100.0" text="Prepared By" />
                           </columns>
