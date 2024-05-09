@@ -47,7 +47,7 @@
                         <Insets left="200.0" />
                      </HBox.margin>
                   </VBox>
-                  <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                  <VBox prefWidth="100.0" HBox.hgrow="ALWAYS">
                      <children>
                         <Label fx:id="lblStatementDate" styleClass="text-8pt" text="January 01, 2022">
                            <VBox.margin>
@@ -56,22 +56,22 @@
                         </Label>
                         <Label fx:id="lblContractPeriod" styleClass="text-8pt" text="May 01 - Jun 01">
                            <VBox.margin>
-                              <Insets top="-5.0" />
+                              <Insets top="-7.0" />
                            </VBox.margin>
                         </Label>
                         <Label fx:id="lblPlanType" styleClass="text-8pt" text="Home">
                            <VBox.margin>
-                              <Insets top="-5.0" />
+                              <Insets top="-7.0" />
                            </VBox.margin>
                         </Label>
                         <Label fx:id="lblBandwidth" styleClass="text-8pt" text="5mpbs">
                            <VBox.margin>
-                              <Insets top="-5.0" />
+                              <Insets top="-7.0" />
                            </VBox.margin>
                         </Label>
                      </children>
                      <HBox.margin>
-                        <Insets top="35.0" />
+                        <Insets top="24.0" />
                      </HBox.margin>
                   </VBox>
                </children>
@@ -83,6 +83,9 @@
                         <String fx:value="text-12pt" />
                         <String fx:value="text-bold" />
                      </styleClass>
+                     <HBox.margin>
+                        <Insets top="36.0" />
+                     </HBox.margin>
                   </Label>
                </children>
                <VBox.margin>
@@ -91,17 +94,17 @@
             </HBox>
             <Label fx:id="lblPrevBalance" alignment="CENTER_RIGHT" minWidth="300.0" styleClass="text-10pt" text="0.00">
                <VBox.margin>
-                  <Insets left="1670.0" top="60.0" />
+                  <Insets left="1670.0" top="30.0" />
                </VBox.margin>
             </Label>
             <Label fx:id="lblCurrentCharges" alignment="CENTER_RIGHT" minWidth="300.0" styleClass="text-10pt" text="0.00">
                <VBox.margin>
-                  <Insets left="1670.0" top="70.0" />
+                  <Insets left="1670.0" top="60.0" />
                </VBox.margin>
             </Label>
             <Label fx:id="lblVat" alignment="CENTER_RIGHT" minWidth="300.0" styleClass="text-10pt" text="0.00">
                <VBox.margin>
-                  <Insets left="1670.0" top="-5.0" />
+                  <Insets left="1670.0" top="-8.0" />
                </VBox.margin>
             </Label>
             <Label fx:id="lblTotalCharges" alignment="CENTER_RIGHT" minWidth="300.0" styleClass="text-10pt" text="0.00">
@@ -136,6 +139,9 @@
                               <String fx:value="text-10pt" />
                               <String fx:value="text-bold" />
                            </styleClass>
+                           <VBox.margin>
+                              <Insets top="-5.0" />
+                           </VBox.margin>
                         </Label>
                      </children>
                      <HBox.margin>
@@ -146,7 +152,7 @@
             </HBox>
             <Label fx:id="lblTotal" alignment="CENTER_RIGHT" minWidth="300.0" text="0.00">
                <VBox.margin>
-                  <Insets left="1670.0" top="50.0" />
+                  <Insets left="1670.0" top="24.0" />
                </VBox.margin>
                <styleClass>
                   <String fx:value="text-12pt" />
@@ -155,24 +161,24 @@
             </Label>
             <HBox>
                <children>
-                  <Label fx:id="lblPreparedBy" minWidth="450.0" styleClass="text-10pt">
+                  <Label fx:id="lblPreparedBy" alignment="CENTER" minWidth="450.0" styleClass="text-10pt">
                      <HBox.margin>
-                        <Insets left="320.0" />
+                        <Insets left="260.0" />
                      </HBox.margin>
                   </Label>
-                  <Label fx:id="lblDesignation" minWidth="300.0" styleClass="text-10pt">
+                  <Label fx:id="lblDesignation" alignment="CENTER" minWidth="300.0" styleClass="text-10pt">
                      <HBox.margin>
-                        <Insets left="250.0" />
+                        <Insets left="220.0" />
                      </HBox.margin>
                   </Label>
-                  <Label fx:id="lblReceivedBy" minWidth="350.0" styleClass="text-10pt">
+                  <Label fx:id="lblReceivedBy" alignment="CENTER" minWidth="540.0" styleClass="text-10pt">
                      <HBox.margin>
                         <Insets left="230.0" />
                      </HBox.margin>
                   </Label>
                </children>
                <VBox.margin>
-                  <Insets left="40.0" top="80.0" />
+                  <Insets left="40.0" top="60.0" />
                </VBox.margin>
             </HBox>
          </children>
