@@ -17,11 +17,13 @@ module org.gemseeker.sms {
 
     requires feathericons;
     requires java.naming;
+    requires com.gluonhq.maps;
+    requires com.gluonhq.attach.storage;
+    requires com.gluonhq.attach.util;
 
     opens org.gemseeker.sms.views to javafx.fxml;
     opens org.gemseeker.sms.views.panels to javafx.fxml;
     opens org.gemseeker.sms.views.forms to javafx.fxml;
-    //opens org.gemseeker.sms.views.fonts to javafx.fxml;
 
     opens org.gemseeker.sms.data to javafx.base;
     opens org.gemseeker.sms.data.controllers.models to javafx.base;

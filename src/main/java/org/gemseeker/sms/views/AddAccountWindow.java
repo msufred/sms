@@ -78,6 +78,8 @@ public class AddAccountWindow extends AbstractWindow {
     private final XCircleIcon xCircleIcon = new XCircleIcon(14);
     private final CheckCircleIcon checkCircleIcon = new CheckCircleIcon(14);
 
+    private final Tower source;
+
     public AddAccountWindow(Database database) {
         super("Add Account", AddAccountWindow.class.getResource("add_account.fxml"), null, null);
         dataPlanController = new DataPlanController(database);
@@ -86,6 +88,11 @@ public class AddAccountWindow extends AbstractWindow {
         towerController = new TowerController(database);
         disposables = new CompositeDisposable();
         this.database = database;
+
+        source = new Tower();
+        source.setLatitude(6.34137f);
+        source.setLongitude(124.72314f);
+        source.setAccountNo("Main Tower");
     }
 
     @Override
@@ -145,6 +152,7 @@ public class AddAccountWindow extends AbstractWindow {
                     return Single.fromCallable(towerController::getAll);
                 }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(towers -> {
                     progressBar.setVisible(false);
+                    towers.add(0, source);
                     cbParentTower.setItems(towers);
                 }, err -> {
                     progressBar.setVisible(false);

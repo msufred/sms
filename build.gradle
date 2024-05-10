@@ -3,6 +3,7 @@ plugins {
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.13'
     id 'org.beryx.jlink' version '3.0.1'
+    id 'com.gluonhq.gluonfx-gradle-plugin' version '1.0.3'
 }
 
 group 'org.gemseeker'
@@ -48,6 +49,7 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")
     implementation("io.reactivex.rxjava2:rxjavafx:2.2.2")
     implementation("io.github.msufred:feathericons:1.0.0")
+    implementation("com.gluonhq:maps:2.0.0-ea+6")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")

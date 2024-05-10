@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Optional;
 
 public class AppMain extends Application {
 
@@ -35,12 +36,7 @@ public class AppMain extends Application {
                     protected Void call() throws Exception {
                         createFolders();
                         copyFiles();
-
-                        try {
-                            Thread.sleep(4000);
-                        } catch (InterruptedException e) {
-                            System.err.println(e);
-                        }
+                        Thread.sleep(4000);
                         return null;
                     }
                 };
