@@ -22,6 +22,7 @@ public final class Database {
         this.settings = settings;
         initConnection();
         createTables();
+        updateTables();
     }
 
     private void initConnection() throws ClassNotFoundException, SQLException {
@@ -35,6 +36,15 @@ public final class Database {
     private void createTables() throws SQLException {
         if (connection == null) throw new NullPointerException("Connection is null");
         for (String sql : DBTables.createTableSql()) {
+            try (Statement s = connection.createStatement()) {
+                s.execute(sql);
+            }
+        }
+    }
+
+    private void updateTables() throws SQLException {
+        if (connection == null) throw new NullPointerException("Connection is null");
+        for (String sql : DBTables.updatesSql()) {
             try (Statement s = connection.createStatement()) {
                 s.execute(sql);
             }

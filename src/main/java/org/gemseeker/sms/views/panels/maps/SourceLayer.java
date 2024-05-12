@@ -9,12 +9,15 @@ import javafx.scene.shape.Circle;
 
 public class SourceLayer extends MapLayer {
 
+    public static final double LATITUDE = 6.34137;
+    public static final double LONGITUDE = 124.72314;
+
     private final MapPoint source;
     private final Circle marker;
 
     public SourceLayer() {
-        source = new MapPoint(6.34137, 124.72314);
-        marker = new Circle(5, Color.RED);
+        source = new MapPoint(LATITUDE, LONGITUDE);
+        marker = new Circle(8, Color.RED);
         Tooltip.install(marker, new Tooltip("MAIN TOWER"));
         getChildren().add(marker);
     }

@@ -20,6 +20,12 @@ public final class DBTables {
         };
     }
 
+    public static String[] updatesSql() {
+        return new String[] {
+                updateTowersTable(),
+        };
+    }
+
     private static String createUsersTable() {
         return "CREATE TABLE IF NOT EXISTS users (" +
                 "id INT NOT NULL AUTO_INCREMENT, " +
@@ -248,5 +254,11 @@ public final class DBTables {
                 "date_deleted TIMESTAMP, " +
                 "PRIMARY KEY (id)" +
                 ")";
+    }
+
+    // Updates
+
+    private static String updateTowersTable() {
+        return "ALTER TABLE towers ADD COLUMN IF NOT EXISTS name VARCHAR(255) DEFAULT '' AFTER type";
     }
 }

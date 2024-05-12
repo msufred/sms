@@ -20,20 +20,23 @@ public class TowerController implements ModelController<Tower> {
 
     @Override
     public boolean insert(Tower model) throws SQLException {
-        String sql = String.format("INSERT INTO towers (account_no, type, latitude, longitude, elevation, tower_height, " +
-                "ip_address, parent_tower_id, status, tag, date_created, date_updated) VALUES ('%s', '%s', '%f', '%f', " +
-                "'%f', '%f', '%s', '%d', '%s', '%s', '%s', '%s')", model.getAccountNo(), model.getType(), model.getLatitude(),
-                model.getLongitude(), model.getElevation(), model.getTowerHeight(), model.getIpAddress(), model.getParentTowerId(),
+        String sql = String.format("INSERT INTO towers (account_no, type, name, latitude, longitude, elevation, " +
+                        "tower_height, ip_address, parent_tower_id, status, tag, date_created, date_updated) VALUES " +
+                        "('%s', '%s', '%s', '%f', '%f', '%f', '%f', '%s', '%d', '%s', '%s', '%s', '%s')",
+                model.getAccountNo(), model.getType(), model.getName(), model.getLatitude(), model.getLongitude(),
+                model.getElevation(), model.getTowerHeight(), model.getIpAddress(), model.getParentTowerId(),
                 model.getStatus(), model.getTag(), model.getDateCreated(), model.getDateUpdated());
         return database.executeQuery(sql);
     }
 
     @Override
     public boolean update(Tower model) throws SQLException {
-        String sql = String.format("UPDATE towers SET type='%s', latitude='%f', longitude='%f', elevation='%f', tower_height='%f', " +
-                "ip_address='%s', parent_tower_id='%d', status='%s', tag='%s', date_updated='%s' WHERE id='%d'",
-                model.getType(), model.getLatitude(), model.getLongitude(), model.getElevation(), model.getTowerHeight(),
-                model.getIpAddress(), model.getParentTowerId(), model.getStatus(), model.getTag(), LocalDateTime.now(), model.getId());
+        String sql = String.format("UPDATE towers SET type='%s', name='%s', latitude='%f', longitude='%f', " +
+                        "elevation='%f', tower_height='%f', ip_address='%s', parent_tower_id='%d', status='%s', " +
+                        "tag='%s', date_updated='%s' WHERE id='%d'",
+                model.getType(), model.getName(), model.getLatitude(), model.getLongitude(), model.getElevation(),
+                model.getTowerHeight(), model.getIpAddress(), model.getParentTowerId(), model.getStatus(),
+                model.getTag(), LocalDateTime.now(), model.getId());
         return database.executeQuery(sql);
     }
 
@@ -58,6 +61,14 @@ public class TowerController implements ModelController<Tower> {
         return null;
     }
 
+    public Tower getByAccountNo(String accountNo) throws SQLException {
+        String sql = String.format("SELECT * FROM towers WHERE account_no='%s' AND date_deleted IS NULL LIMIT 1", accountNo);
+        try (ResultSet rs = database.executeQueryWithResult(sql)) {
+            if (rs.next()) return fetchInfo(rs);
+        }
+        return null;
+    }
+
     @Override
     public ObservableList<Tower> getAll() throws SQLException {
         ObservableList<Tower> list = FXCollections.observableArrayList();
@@ -69,22 +80,32 @@ public class TowerController implements ModelController<Tower> {
     }
 
     private Tower fetchInfo(ResultSet rs) throws SQLException {
+        int index = 1;
         Tower tower = new Tower();
-        tower.setId(rs.getInt(1));
-        tower.setAccountNo(rs.getString(2));
-        tower.setType(rs.getString(3));
-        tower.setLatitude(rs.getFloat(4));
-        tower.setLongitude(rs.getFloat(5));
-        tower.setElevation(rs.getFloat(6));
-        tower.setTowerHeight(rs.getDouble(7));
-        tower.setIpAddress(rs.getString(8));
-        tower.setParentTowerId(rs.getInt(9));
-        tower.setStatus(rs.getString(10));
-        tower.setTag(rs.getString(11));
-        tower.setDateCreated(rs.getTimestamp(12).toLocalDateTime());
-        tower.setDateUpdated(rs.getTimestamp(13).toLocalDateTime());
-        Timestamp dateDeleted = rs.getTimestamp(14);
+        tower.setId(rs.getInt(index++));
+        tower.setAccountNo(rs.getString(index++));
+        tower.setType(rs.getString(index++));
+        tower.setName(rs.getString(index++));
+        tower.setLatitude(rs.getFloat(index++));
+        tower.setLongitude(rs.getFloat(index++));
+        tower.setElevation(rs.getFloat(index++));
+        tower.setTowerHeight(rs.getDouble(index++));
+        tower.setIpAddress(rs.getString(index++));
+        tower.setParentTowerId(rs.getInt(index++));
+        tower.setStatus(rs.getString(index++));
+        tower.setTag(rs.getString(index++));
+        tower.setDateCreated(rs.getTimestamp(index++).toLocalDateTime());
+        tower.setDateUpdated(rs.getTimestamp(index++).toLocalDateTime());
+        Timestamp dateDeleted = rs.getTimestamp(index);
         if (dateDeleted != null) tower.setDateDeleted(dateDeleted.toLocalDateTime());
         return tower;
+    }
+
+    public boolean hasTower(String accountNo) throws SQLException {
+        String sql = String.format("SELECT COUNT(*) FROM towers WHERE account_no='%s'", accountNo);
+        try (ResultSet rs = database.executeQueryWithResult(sql)) {
+            if (rs.next()) return rs.getInt(1) > 0;
+        }
+        return false;
     }
 }

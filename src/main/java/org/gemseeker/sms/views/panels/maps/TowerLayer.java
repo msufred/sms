@@ -5,7 +5,9 @@ import com.gluonhq.maps.MapPoint;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
@@ -24,17 +26,17 @@ public class TowerLayer extends MapLayer {
         for (Tower t : towers) {
             Circle circle = new Circle();
             if (Objects.equals(t.getType(), Tower.TYPE_ACCESS_POINT)) {
-                circle.setFill(Color.RED);
+                circle.setFill(Color.CRIMSON);
                 circle.setRadius(8);
             } else if (Objects.equals(t.getType(), Tower.TYPE_RELAY)) {
-                circle.setFill(Color.ORANGE);
+                circle.setFill(Color.CORAL);
                 circle.setRadius(8);
             } else {
-                circle.setFill(Color.BLUE);
+                circle.setFill(Color.DARKGRAY);
                 circle.setRadius(5);
             }
 
-            Tooltip.install(circle, new Tooltip(t.getAccountNo()));
+            Tooltip.install(circle, new Tooltip(t.getName()));
             markers.put(t.getId(), circle);
             getChildren().add(circle);
         }
@@ -49,6 +51,16 @@ public class TowerLayer extends MapLayer {
                 marker.setTranslateX(point.getX());
                 marker.setTranslateY(point.getY());
             }
+        }
+    }
+
+    private static class TowerNode extends VBox {
+        final Circle circle;
+        final Label label;
+
+        public TowerNode(Tower tower) {
+            circle = new Circle(6, Color.CRIMSON);
+            label = new Label();
         }
     }
 }

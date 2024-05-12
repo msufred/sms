@@ -13,10 +13,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.controllers.AccountController;
+import org.gemseeker.sms.data.controllers.TowerController;
 import org.gemseeker.sms.data.controllers.models.AccountSubscription;
-import org.gemseeker.sms.views.AddAccountWindow;
-import org.gemseeker.sms.views.MainWindow;
-import org.gemseeker.sms.views.ViewUtils;
+import org.gemseeker.sms.views.*;
 import org.gemseeker.sms.views.cells.DateTableCell;
 import org.gemseeker.sms.views.cells.StatusTableCell;
 import org.gemseeker.sms.views.cells.TagTableCell;
@@ -59,16 +58,20 @@ public class AccountsPanel extends AbstractPanel {
     private final MainWindow mainWindow;
     private final Database database;
     private final AccountController accountController;
+    private final TowerController towerController;
     private final CompositeDisposable disposables;
 
     // Windows
     private AddAccountWindow addAccountWindow;
+    private AddTowerWindow addTowerWindow;
+    private EditTowerWindow editTowerWindow;
 
     public AccountsPanel(MainWindow mainWindow, Database database) {
         super(AccountsPanel.class.getResource("accounts.fxml"));
         this.mainWindow = mainWindow;
         this.database = database;
         this.accountController = new AccountController(database);
+        this.towerController = new TowerController(database);
         this.disposables = new CompositeDisposable();
     }
 
@@ -155,7 +158,21 @@ public class AccountsPanel extends AbstractPanel {
         if (selectedItem.get() == null) {
             showWarningDialog("Invalid", "No selected Account. Try again.");
         } else {
-            // TODO show edit window
+            showProgress("Checking Tower info...");
+            disposables.add(Single.fromCallable(() -> towerController.hasTower(selectedItem.get().getAccountNo()))
+                    .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(hasTower -> {
+                        hideProgress();
+                        if (hasTower) {
+                            if (editTowerWindow == null) editTowerWindow = new EditTowerWindow(database);
+                            editTowerWindow.showAndWait(selectedItem.get().getAccountNo());
+                        } else {
+                            if (addTowerWindow == null) addTowerWindow = new AddTowerWindow(database);
+                            addTowerWindow.showAndWait();
+                        }
+                        refresh();
+                    }, err -> {
+                        showErrorDialog("Database Error", "Error while checking Tower info.\n" + err);
+                    }));
         }
     }
 
@@ -308,6 +325,8 @@ public class AccountsPanel extends AbstractPanel {
     @Override
     public void onDispose() {
         if (addAccountWindow != null) addAccountWindow.dispose();
+        if (addTowerWindow != null) addTowerWindow.dispose();
+        if (editTowerWindow != null) editTowerWindow.dispose();
         disposables.dispose();
     }
 }

@@ -11,6 +11,7 @@ public class Tower {
     private int id;
     private String accountNo;
     private String type;
+    private String name;
     private float latitude;
     private float longitude;
     private float elevation;
@@ -56,6 +57,14 @@ public class Tower {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public float getLatitude() {
@@ -144,5 +153,10 @@ public class Tower {
 
     public void setDateDeleted(LocalDateTime dateDeleted) {
         this.dateDeleted = dateDeleted;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }
