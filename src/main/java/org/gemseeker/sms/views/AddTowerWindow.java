@@ -128,7 +128,7 @@ public class AddTowerWindow extends AbstractWindow {
             tower.setLatitude(latStr.isBlank() ? 0.0f : Float.parseFloat(latStr.trim()));
             String longStr = tfLongitude.getText();
             tower.setLongitude((longStr.isBlank() ? 0.0f : Float.parseFloat(longStr.trim())));
-            String heightStr = tfTowerHeight.getId();
+            String heightStr = tfTowerHeight.getText();
             tower.setTowerHeight(heightStr.isBlank() ? 0.0f : Float.parseFloat(heightStr.trim()));
             String elevStr = tfElevation.getText();
             tower.setElevation(elevStr.isBlank() ? 0.0f : Float.parseFloat(elevStr.trim()));

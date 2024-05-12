@@ -1,66 +1,64 @@
 package org.gemseeker.sms.views.panels.maps;
 
 import com.gluonhq.maps.MapLayer;
-import com.gluonhq.maps.MapPoint;
+import io.github.msufred.feathericons.SVGIcon;
+import io.github.msufred.feathericons.TriangleIcon;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
 import org.gemseeker.sms.data.Tower;
+import org.gemseeker.sms.views.icons.CircleFilledIcon;
+import org.gemseeker.sms.views.icons.PentagonIcon;
+import org.gemseeker.sms.views.icons.TriangleFilledIcon;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
 public class TowerLayer extends MapLayer {
 
-    private final ObservableList<Tower> towers;
-    private final LinkedHashMap<Integer, Circle> markers = new LinkedHashMap<>();
+    private final ObservableList<Marker> markers = FXCollections.observableArrayList();
 
     public TowerLayer(ObservableList<Tower> towers) {
-        this.towers = towers;
         for (Tower t : towers) {
-            Circle circle = new Circle();
-            if (Objects.equals(t.getType(), Tower.TYPE_ACCESS_POINT)) {
-                circle.setFill(Color.CRIMSON);
-                circle.setRadius(8);
-            } else if (Objects.equals(t.getType(), Tower.TYPE_RELAY)) {
-                circle.setFill(Color.CORAL);
-                circle.setRadius(8);
-            } else {
-                circle.setFill(Color.DARKGRAY);
-                circle.setRadius(5);
-            }
-
-            Tooltip.install(circle, new Tooltip(t.getName()));
-            markers.put(t.getId(), circle);
-            getChildren().add(circle);
+            Marker marker = new Marker(t);
+            getChildren().add(marker);
+            markers.add(marker);
         }
     }
 
     @Override
     protected void layoutLayer() {
-        for (Tower t : towers) {
-            Circle marker = markers.get(t.getId());
-            if (marker != null) {
-                Point2D point = getMapPoint(t.getLatitude(), t.getLongitude());
-                marker.setTranslateX(point.getX());
-                marker.setTranslateY(point.getY());
-            }
+        for (Marker marker : markers) {
+            Point2D point2D = getMapPoint(marker.tower.getLatitude(), marker.tower.getLongitude());
+            marker.setTranslateX(point2D.getX() - (marker.SIZE / 2));
+            marker.setTranslateY(point2D.getY() - (marker.SIZE / 2));
         }
     }
 
-    private static class TowerNode extends VBox {
-        final Circle circle;
-        final Label label;
-
-        public TowerNode(Tower tower) {
-            circle = new Circle(6, Color.CRIMSON);
-            label = new Label();
+    private static class Marker extends VBox {
+        final double SIZE = 18;
+        final Tower tower;
+        public Marker(Tower tower) {
+            this.tower = tower;
+            SVGIcon icon;
+            if (Objects.equals(tower.getType(), Tower.TYPE_ACCESS_POINT)) {
+                icon = new PentagonIcon(SIZE);
+                icon.setStyle("-fx-background-color: #c2410c");
+            } else if (Objects.equals(tower.getType(), Tower.TYPE_RELAY)) {
+                icon = new TriangleFilledIcon(SIZE);
+                icon.setStyle("-fx-background-color: #eab308");
+            } else {
+                icon = new CircleFilledIcon(SIZE);
+                icon.setStyle("-fx-background-color: #15803d");
+            }
+            Tooltip.install(icon, new Tooltip(tower.getName()));
+            getChildren().add(icon);
         }
     }
 }

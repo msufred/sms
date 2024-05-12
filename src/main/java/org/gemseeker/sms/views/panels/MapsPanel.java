@@ -4,6 +4,7 @@ import com.gluonhq.attach.storage.StorageService;
 import com.gluonhq.maps.MapPoint;
 import com.gluonhq.maps.MapView;
 import io.github.msufred.feathericons.Edit2Icon;
+import io.github.msufred.feathericons.MapPinIcon;
 import io.github.msufred.feathericons.PlusIcon;
 import io.github.msufred.feathericons.TrashIcon;
 import io.reactivex.Single;
@@ -16,6 +17,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.Tower;
@@ -37,6 +39,9 @@ public class MapsPanel extends AbstractPanel {
     @FXML private Button btnDelete;
     @FXML private ListView<Tower> listview;
     @FXML private StackPane stackPane;
+    @FXML private Label lblCoordinate;
+    @FXML private Label lblLatitude;
+    @FXML private Label lblLongitude;
     private MapView mapView;
 
     private FilteredList<Tower> filteredList;
@@ -70,6 +75,11 @@ public class MapsPanel extends AbstractPanel {
         btnEdit.setOnAction(evt -> editSelected());
         btnDelete.setOnAction(evt -> deleteSelected());
 
+        setupListView();
+        setupMapView();
+    }
+
+    private void setupListView() {
         // ListView ContextMenu
         MenuItem mAdd = new MenuItem("Add Tower");
         mAdd.setGraphic(new PlusIcon(12));
@@ -86,6 +96,18 @@ public class MapsPanel extends AbstractPanel {
         ContextMenu cm = new ContextMenu(mAdd, mEdit, mDelete);
         listview.setContextMenu(cm);
         selectedItem.bind(listview.getSelectionModel().selectedItemProperty());
+    }
+
+    private void setupMapView() {
+        mapView = new MapView();
+        mapView.addEventHandler(MouseEvent.MOUSE_MOVED, evt -> {
+            MapPoint mapPoint = mapView.getMapPosition(evt.getSceneX(), evt.getSceneY());
+            lblLatitude.setText(mapPoint.getLatitude() + "");
+            lblLongitude.setText(mapPoint.getLongitude() + "");
+        });
+        mapView.setZoom(15);
+        mapView.setCenter(new MapPoint(6.3414027, 124.7205275));
+        stackPane.getChildren().add(mapView);
     }
 
     @Override
@@ -108,14 +130,6 @@ public class MapsPanel extends AbstractPanel {
     }
 
     private void refreshMap(ObservableList<Tower> list) {
-        if (mapView == null) {
-            mapView = new MapView();
-            mapView.setZoom(15);
-            mapView.setCenter(new MapPoint(6.3414027, 124.7205275));
-            stackPane.getChildren().clear();
-            stackPane.getChildren().add(mapView);
-        }
-
         if (sourceLayer == null) {
             sourceLayer = new SourceLayer();
         }
@@ -202,6 +216,7 @@ public class MapsPanel extends AbstractPanel {
         btnAdd.setGraphic(new PlusIcon(14));
         btnEdit.setGraphic(new Edit2Icon(14));
         btnDelete.setGraphic(new TrashIcon(14));
+        lblCoordinate.setGraphic(new MapPinIcon(14));
     }
 
     private void showProgress(String text) {
