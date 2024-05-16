@@ -17,6 +17,7 @@ public final class DBTables {
                 createPaymentsTable(),
                 createPaymentItemsTable(),
                 createBalancesTable(),
+                createExpensesTable(),
         };
     }
 
@@ -248,6 +249,21 @@ public final class DBTables {
                 "amount DOUBLE DEFAULT '0.0', " +
                 "status VARCHAR(16) DEFAULT 'Pending', " +
                 "date_paid DATE, " +
+                "tag VARCHAR(16) DEFAULT 'normal', " +
+                "date_created TIMESTAMP, " +
+                "date_updated TIMESTAMP, " +
+                "date_deleted TIMESTAMP, " +
+                "PRIMARY KEY (id)" +
+                ")";
+    }
+
+    private static String createExpensesTable() {
+        return "CREATE TABLE IF NOT EXISTS expenses (" +
+                "id INT NOT NULL AUTO_INCREMENT, " +
+                "type VARCHAR(255) DEFAULT 'Others', " +
+                "description VARCHAR(255) DEFAULT '', " +
+                "amount DOUBLE DEFAULT '0.0', " +
+                "date DATE NOT NULL, " +
                 "tag VARCHAR(16) DEFAULT 'normal', " +
                 "date_created TIMESTAMP, " +
                 "date_updated TIMESTAMP, " +

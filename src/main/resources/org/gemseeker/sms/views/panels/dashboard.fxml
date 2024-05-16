@@ -2,14 +2,14 @@
 
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
@@ -63,24 +63,48 @@
             <Insets left="8.0" right="8.0" />
          </padding>
       </HBox>
-      <Separator prefWidth="200.0" />
-      <ToolBar prefHeight="40.0" prefWidth="200.0">
-         <items>
-            <ToggleButton fx:id="toggleRecent" mnemonicParsing="false" selected="true" text="Recent Sales" />
-            <ToggleButton fx:id="toggleSales" mnemonicParsing="false" text="Sales Projections" />
-            <ToggleButton fx:id="toggleRevenues" mnemonicParsing="false" text="Revenues" />
-            <ToggleButton fx:id="toggleExpenses" mnemonicParsing="false" text="Expenses" />
-            <Separator orientation="VERTICAL" />
-            <MenuButton fx:id="printMenuButton" mnemonicParsing="false" text="Print Report">
-              <items>
-                <MenuItem fx:id="miDaily" mnemonicParsing="false" text="Daily Report" />
-                <MenuItem fx:id="miWeekly" mnemonicParsing="false" text="Weekly Report" />
-                  <MenuItem fx:id="miMonthly" mnemonicParsing="false" text="Monthly Report" />
-              </items>
-            </MenuButton>
-         </items>
-      </ToolBar>
-      <StackPane fx:id="stackpane" VBox.vgrow="ALWAYS" />
+      <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <tabs>
+           <Tab fx:id="tabRecentSales" text="Recent Sales">
+              <VBox />
+           </Tab>
+           <Tab fx:id="tabProjections" text="Sales Projections">
+              <VBox />
+           </Tab>
+            <Tab fx:id="tabRevenues" text="Other Revenues">
+               <content>
+                  <VBox />
+               </content>
+            </Tab>
+            <Tab fx:id="tabExpenses" text="Expenses">
+               <content>
+                  <VBox>
+                     <children>
+                        <HBox spacing="4.0">
+                           <children>
+                              <Button fx:id="btnAddExpense" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnEditExpense" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnDeleteExpense" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnRefreshExpense" mnemonicParsing="false" styleClass="btn" />
+                           </children>
+                           <padding>
+                              <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                           </padding>
+                        </HBox>
+                        <TableView fx:id="expensesTable" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+                          <columns>
+                            <TableColumn fx:id="colExpenseTag" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" style="-fx-alignment: center;" />
+                            <TableColumn fx:id="colExpenseType" prefWidth="100.0" style="-fx-alignment: center;" text="Type" />
+                              <TableColumn fx:id="colExpenseDescription" prefWidth="100.0" style="-fx-alignment: center;" text="Description" />
+                              <TableColumn fx:id="colExpenseAmount" prefWidth="100.0" style="-fx-alignment: center;" text="Amount" />
+                              <TableColumn fx:id="colExpenseDate" prefWidth="100.0" style="-fx-alignment: center;" text="Date" />
+                          </columns>
+                        </TableView>
+                     </children></VBox>
+               </content>
+            </Tab>
+        </tabs>
+      </TabPane>
    </children>
    <stylesheets>
       <URL value="@../styles.css" />
