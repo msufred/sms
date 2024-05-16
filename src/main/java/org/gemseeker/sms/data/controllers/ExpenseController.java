@@ -8,6 +8,7 @@ import org.gemseeker.sms.data.Expense;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class ExpenseController implements ModelController<Expense> {
@@ -58,6 +59,26 @@ public class ExpenseController implements ModelController<Expense> {
     @Override
     public ObservableList<Expense> getAll() throws SQLException {
         String sql = "SELECT * FROM expenses WHERE date_deleted IS NULL";
+        ObservableList<Expense> list = FXCollections.observableArrayList();
+        try (ResultSet rs = database.executeQueryWithResult(sql)) {
+            while (rs.next()) list.add(fetchInfo(rs));
+        }
+        return list;
+    }
+
+    public ObservableList<Expense> getExpensesToday() throws SQLException {
+        String sql = String.format("SELECT * FROM expenses WHERE date='%s' AND date_deleted IS NULL",
+                LocalDate.now());
+        ObservableList<Expense> list = FXCollections.observableArrayList();
+        try (ResultSet rs = database.executeQueryWithResult(sql)) {
+            while (rs.next()) list.add(fetchInfo(rs));
+        }
+        return list;
+    }
+
+    public ObservableList<Expense> getPrevExpenses() throws SQLException {
+        String sql = String.format("SELECT * FROM expenses WHERE date='%s' AND date_deleted IS NULL",
+                LocalDate.now().minusDays(1));
         ObservableList<Expense> list = FXCollections.observableArrayList();
         try (ResultSet rs = database.executeQueryWithResult(sql)) {
             while (rs.next()) list.add(fetchInfo(rs));

@@ -141,4 +141,21 @@ public class ViewUtils {
         }
         return String.format("%d %s", duration, str);
     }
+
+    public static String toStringMoneyFormat(double amount) {
+        String str = String.format("%.2f", amount);
+        StringBuilder sb = new StringBuilder();
+        int startIndex = str.indexOf('.');
+        if (startIndex < 0) startIndex = 0;
+        int decimalCount = 0;
+        for (int i = startIndex - 1; i >= 0; i--) {
+            if (decimalCount == 3) {
+                sb.append(',');
+                decimalCount = 0;
+            }
+            sb.append(str.charAt(i));
+            decimalCount++;
+        }
+        return sb.reverse().append(str.substring(startIndex)).toString();
+    }
 }

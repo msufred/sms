@@ -44,6 +44,7 @@ public class AcceptPaymentWindow extends AbstractWindow {
     private final BillingStatementController billingStatementController;
     private final BalanceController balanceController;
     private final PaymentController paymentController;
+    private final RevenueController revenueController;
     private final CompositeDisposable disposables;
 
     private final PrintWindow printWindow;
@@ -64,8 +65,6 @@ public class AcceptPaymentWindow extends AbstractWindow {
     private double amountPaid = 0;
     private double balance = 0;
 
-    private boolean mPaymentValid = false;
-
     public AcceptPaymentWindow(Database database, PrintWindow printWindow, SaveImageWindow saveImageWindow) {
         super("Accept Payment", AcceptPaymentWindow.class.getResource("accept_payment.fxml"), null, null);
         this.billingController = new BillingController(database);
@@ -73,6 +72,7 @@ public class AcceptPaymentWindow extends AbstractWindow {
         this.billingStatementController = new BillingStatementController(database);
         this.balanceController = new BalanceController(database);
         this.paymentController = new PaymentController(database);
+        this.revenueController = new RevenueController(database);
         this.disposables = new CompositeDisposable();
 
         this.printWindow = printWindow;
@@ -82,13 +82,9 @@ public class AcceptPaymentWindow extends AbstractWindow {
     @Override
     protected void onFxmlLoaded() {
         ViewUtils.setAsNumericalTextField(tfAmount);
-
         tfAmount.textProperty().addListener((o, oldVal, newVal) -> calculate());
-
         btnConfirm.setOnAction(evt -> validateAndSave(this::saveAndPrint));
-
         btnExport.setOnAction(evt -> validateAndSave(this::saveAndExport));
-
         btnCancel.setOnAction(evt -> close());
     }
 
@@ -203,6 +199,14 @@ public class AcceptPaymentWindow extends AbstractWindow {
                         balanceController.insert(newBalance);
                     }
                 }
+
+                // add to revenues
+                Revenue revenue = new Revenue();
+                revenue.setType(Revenue.TYPE_BILLING);
+                revenue.setAmount(amountPaid);
+                revenue.setDescription("Payment for Billing No" + mBillingNo);
+                revenue.setDate(LocalDate.now());
+                revenueController.insert(revenue);
             }
             return success;
         })).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
@@ -258,7 +262,6 @@ public class AcceptPaymentWindow extends AbstractWindow {
     @Override
     protected void onClose() {
         clearFields();
-        mPaymentValid = false;
         mBillingNo = null;
         mBilling = null;
         mBillingStatement = null;

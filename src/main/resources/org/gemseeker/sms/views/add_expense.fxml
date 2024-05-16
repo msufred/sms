@@ -7,32 +7,61 @@
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="container" spacing="8.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="container" spacing="8.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label styleClass="form-title" text="New Expense" />
-      <HBox>
+      <Label fx:id="lblTitle" styleClass="form-title" text="New Expense" />
+      <HBox alignment="CENTER_LEFT">
          <children>
-            <Label minWidth="60.0" styleClass="form-label" text="Date" />
+            <Label minWidth="80.0" styleClass="form-label" text="Date" />
             <DatePicker fx:id="datePicker" prefWidth="200.0" promptText="Select Date" styleClass="form-datepicker" />
+            <Label fx:id="lblErrDate" styleClass="label-error">
+               <HBox.margin>
+                  <Insets left="8.0" />
+               </HBox.margin>
+            </Label>
          </children>
+         <VBox.margin>
+            <Insets top="16.0" />
+         </VBox.margin>
       </HBox>
-      <HBox>
+      <HBox alignment="CENTER_LEFT">
          <children>
-            <Label minWidth="60.0" styleClass="form-label" text="Type" />
+            <Label minWidth="80.0" styleClass="form-label" text="Type" />
             <ComboBox fx:id="cbTypes" prefWidth="200.0" promptText="Select Expense Type" styleClass="form-combobox" />
+            <Label fx:id="lblErrType" styleClass="label-error">
+               <HBox.margin>
+                  <Insets left="8.0" />
+               </HBox.margin>
+            </Label>
          </children>
       </HBox>
       <HBox>
          <children>
-            <Label minWidth="60.0" styleClass="form-label" text="Amount" />
-            <TextField fx:id="tfAmount" prefWidth="200.0" promptText="Enter Amount" styleClass="form-field" />
+            <Label minWidth="80.0" styleClass="form-label" text="Description">
+               <HBox.margin>
+                  <Insets top="8.0" />
+               </HBox.margin>
+            </Label>
+            <TextArea fx:id="taDescription" prefHeight="100.0" prefWidth="200.0" promptText="Description or Remarks" styleClass="form-textarea" wrapText="true" />
          </children>
       </HBox>
-      <ProgressBar fx:id="progressBar" prefHeight="18.0" prefWidth="260.0" visible="false" />
+      <HBox alignment="CENTER_LEFT">
+         <children>
+            <Label minWidth="80.0" styleClass="form-label" text="Amount" />
+            <TextField fx:id="tfAmount" prefWidth="200.0" promptText="Enter Amount" styleClass="form-field" />
+            <Label fx:id="lblErrAmount" styleClass="label-error">
+               <HBox.margin>
+                  <Insets left="8.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+      </HBox>
+      <ProgressBar fx:id="progressBar" prefHeight="18.0" prefWidth="281.0" visible="false" />
       <HBox alignment="CENTER_RIGHT">
          <children>
             <Button fx:id="btnSave" mnemonicParsing="false" styleClass="form-button-positve" text="Add Expense" />

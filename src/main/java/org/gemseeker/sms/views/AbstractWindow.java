@@ -41,7 +41,7 @@ public abstract class AbstractWindow {
         confirmDialog.setTitle("Confirmation");
     }
 
-    protected Stage getStage() {
+    public Stage getStage() {
         if (stage == null) stage = new Stage();
         if (!mInitialized) {
             stage.setTitle(title);

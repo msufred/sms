@@ -18,6 +18,8 @@ public final class DBTables {
                 createPaymentItemsTable(),
                 createBalancesTable(),
                 createExpensesTable(),
+                createRevenuesTable(),
+                createDailySummariesTable(),
         };
     }
 
@@ -264,6 +266,37 @@ public final class DBTables {
                 "description VARCHAR(255) DEFAULT '', " +
                 "amount DOUBLE DEFAULT '0.0', " +
                 "date DATE NOT NULL, " +
+                "tag VARCHAR(16) DEFAULT 'normal', " +
+                "date_created TIMESTAMP, " +
+                "date_updated TIMESTAMP, " +
+                "date_deleted TIMESTAMP, " +
+                "PRIMARY KEY (id)" +
+                ")";
+    }
+
+    private static String createRevenuesTable() {
+        return "CREATE TABLE IF NOT EXISTS revenues (" +
+                "id INT NOT NULL AUTO_INCREMENT, " +
+                "type VARCHAR(255) DEFAULT 'Others', " +
+                "description VARCHAR(255) DEFAULT '', " +
+                "amount DOUBLE DEFAULT '0.0', " +
+                "date DATE NOT NULL, " +
+                "tag VARCHAR(16) DEFAULT 'normal', " +
+                "date_created TIMESTAMP, " +
+                "date_updated TIMESTAMP, " +
+                "date_deleted TIMESTAMP, " +
+                "PRIMARY KEY (id)" +
+                ")";
+    }
+
+    private static String createDailySummariesTable() {
+        return "CREATE TABLE IF NOT EXISTS daily_summaries (" +
+                "id INT NOT NULL AUTO_INCREMENT, " +
+                "date DATE NOT NULL, " +
+                "forwarded DOUBLE DEFAULT '0.0', " +
+                "revenues DOUBLE DEFAULT '0.0', " +
+                "expenses DOUBLE DEFAULT '0.0', " +
+                "balance DOUBLE DEFAULT '0.0', " +
                 "tag VARCHAR(16) DEFAULT 'normal', " +
                 "date_created TIMESTAMP, " +
                 "date_updated TIMESTAMP, " +

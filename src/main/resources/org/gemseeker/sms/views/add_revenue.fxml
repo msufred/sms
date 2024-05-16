@@ -12,16 +12,35 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefWidth="300.0" spacing="8.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<VBox spacing="8.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label styleClass="form-title" text="New Revenue">
+      <Label fx:id="lblTitle" styleClass="form-title" text="New Revenue">
          <VBox.margin>
             <Insets left="16.0" top="16.0" />
          </VBox.margin></Label>
-      <HBox>
+      <HBox alignment="CENTER_LEFT">
          <children>
-            <Label minWidth="70.0" styleClass="form-label" text="Date" />
-            <DatePicker fx:id="datePicker" prefWidth="220.0" promptText="Select Date" styleClass="form-datepicker" />
+            <Label minWidth="80.0" styleClass="form-label" text="Date" />
+            <DatePicker fx:id="datePicker" prefWidth="200.0" promptText="Select Date" styleClass="form-datepicker" />
+            <Label fx:id="lblErrDate" styleClass="label-error">
+               <HBox.margin>
+                  <Insets left="8.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+         <VBox.margin>
+            <Insets left="16.0" right="16.0" top="16.0" />
+         </VBox.margin>
+      </HBox>
+      <HBox alignment="CENTER_LEFT">
+         <children>
+            <Label minWidth="80.0" styleClass="form-label" text="Type" />
+            <ComboBox fx:id="cbTypes" prefWidth="200.0" promptText="Select Revenue Type" styleClass="form-combobox" />
+            <Label fx:id="lblErrType" styleClass="label-error">
+               <HBox.margin>
+                  <Insets left="8.0" />
+               </HBox.margin>
+            </Label>
          </children>
          <VBox.margin>
             <Insets left="16.0" right="16.0" />
@@ -29,48 +48,31 @@
       </HBox>
       <HBox>
          <children>
-            <Label minWidth="70.0" styleClass="form-label" text="Type" />
-            <ComboBox fx:id="cbTypes" prefWidth="220.0" promptText="Select Revenue Type" styleClass="form-combobox" />
+            <Label minWidth="80.0" styleClass="form-label" text="Description">
+               <HBox.margin>
+                  <Insets top="8.0" />
+               </HBox.margin></Label>
+            <TextArea fx:id="taDescription" prefHeight="100.0" prefWidth="200.0" promptText="Description or Remarks" styleClass="form-textarea" wrapText="true" />
          </children>
          <VBox.margin>
             <Insets left="16.0" right="16.0" />
          </VBox.margin>
       </HBox>
-      <VBox spacing="4.0" styleClass="form-content-grey">
+      <HBox alignment="CENTER_LEFT">
          <children>
-            <HBox fx:id="typeGroup" disable="true">
-               <children>
-                  <Label fx:id="lblType" minWidth="70.0" styleClass="form-label" text="Hotspot" />
-                  <ComboBox fx:id="cbTypeList" prefWidth="220.0" promptText="Select WiFi Hotspot" styleClass="form-combobox" />
-               </children>
-            </HBox>
-         </children>
-         <padding>
-            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
-         </padding>
-         <VBox.margin>
-            <Insets left="8.0" right="8.0" />
-         </VBox.margin>
-      </VBox>
-      <HBox>
-         <children>
-            <Label minWidth="70.0" styleClass="form-label" text="Amount" />
-            <TextField fx:id="tfAmount" prefWidth="220.0" promptText="Enter Amount" styleClass="form-field" />
+            <Label minWidth="80.0" styleClass="form-label" text="Amount" />
+            <TextField fx:id="tfAmount" prefWidth="200.0" promptText="Enter Amount" styleClass="form-field" />
+            <Label fx:id="lblErrAmount" styleClass="label-error">
+               <HBox.margin>
+                  <Insets left="8.0" />
+               </HBox.margin>
+            </Label>
          </children>
          <VBox.margin>
             <Insets left="16.0" right="16.0" />
          </VBox.margin>
       </HBox>
-      <HBox>
-         <children>
-            <Label minWidth="70.0" styleClass="form-label" text="Remarks" />
-            <TextArea fx:id="taRemarks" prefHeight="100.0" prefWidth="220.0" promptText="Remarks or Comments" styleClass="form-textarea" wrapText="true" />
-         </children>
-         <VBox.margin>
-            <Insets left="16.0" right="16.0" />
-         </VBox.margin>
-      </HBox>
-      <ProgressBar fx:id="progressBar" prefHeight="18.0" prefWidth="260.0" visible="false">
+      <ProgressBar fx:id="progressBar" prefHeight="18.0" prefWidth="280.0" visible="false">
          <VBox.margin>
             <Insets left="16.0" right="16.0" />
          </VBox.margin></ProgressBar>

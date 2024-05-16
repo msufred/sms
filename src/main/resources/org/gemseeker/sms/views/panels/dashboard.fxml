@@ -71,9 +71,31 @@
            <Tab fx:id="tabProjections" text="Sales Projections">
               <VBox />
            </Tab>
-            <Tab fx:id="tabRevenues" text="Other Revenues">
+            <Tab fx:id="tabRevenues" text="Revenues">
                <content>
-                  <VBox />
+                  <VBox>
+                     <children>
+                        <HBox spacing="4.0">
+                           <children>
+                              <Button fx:id="btnAddRevenue" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnEditRevenue" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnDeleteRevenue" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnRefreshExpense1" mnemonicParsing="false" styleClass="btn" />
+                           </children>
+                           <padding>
+                              <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                           </padding>
+                        </HBox>
+                        <TableView fx:id="revenuesTable" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+                           <columns>
+                              <TableColumn fx:id="colRevenueTag" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" style="-fx-alignment: center;" />
+                              <TableColumn fx:id="colRevenueType" prefWidth="120.0" style="-fx-alignment: center;" text="Type" />
+                              <TableColumn fx:id="colRevenueDescription" prefWidth="120.0" style="-fx-alignment: center;" text="Description" />
+                              <TableColumn fx:id="colRevenueAmount" prefWidth="120.0" style="-fx-alignment: center;" text="Amount" />
+                              <TableColumn fx:id="colRevenueDate" prefWidth="120.0" style="-fx-alignment: center;" text="Date" />
+                           </columns>
+                        </TableView>
+                     </children></VBox>
                </content>
             </Tab>
             <Tab fx:id="tabExpenses" text="Expenses">
@@ -94,10 +116,10 @@
                         <TableView fx:id="expensesTable" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
                           <columns>
                             <TableColumn fx:id="colExpenseTag" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" style="-fx-alignment: center;" />
-                            <TableColumn fx:id="colExpenseType" prefWidth="100.0" style="-fx-alignment: center;" text="Type" />
-                              <TableColumn fx:id="colExpenseDescription" prefWidth="100.0" style="-fx-alignment: center;" text="Description" />
-                              <TableColumn fx:id="colExpenseAmount" prefWidth="100.0" style="-fx-alignment: center;" text="Amount" />
-                              <TableColumn fx:id="colExpenseDate" prefWidth="100.0" style="-fx-alignment: center;" text="Date" />
+                            <TableColumn fx:id="colExpenseType" prefWidth="120.0" style="-fx-alignment: center;" text="Type" />
+                              <TableColumn fx:id="colExpenseDescription" prefWidth="120.0" style="-fx-alignment: center;" text="Description" />
+                              <TableColumn fx:id="colExpenseAmount" prefWidth="120.0" style="-fx-alignment: center;" text="Amount" />
+                              <TableColumn fx:id="colExpenseDate" prefWidth="120.0" style="-fx-alignment: center;" text="Date" />
                           </columns>
                         </TableView>
                      </children></VBox>
