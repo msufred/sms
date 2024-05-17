@@ -24,6 +24,10 @@ import java.util.Optional;
 
 public class AppMain extends Application {
 
+    static {
+        System.setProperty("http.agent", "Gluon Mobile/1.0.3");
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         SplashWindow splashWindow = new SplashWindow();

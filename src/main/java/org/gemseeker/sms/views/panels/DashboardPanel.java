@@ -9,6 +9,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.gemseeker.sms.data.DailySummary;
@@ -24,6 +28,8 @@ import org.gemseeker.sms.views.cells.TagTableCell;
 import org.gemseeker.sms.views.icons.PesoIcon;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.temporal.ChronoField;
 import java.util.Optional;
 
 public class DashboardPanel extends AbstractPanel {
@@ -39,6 +45,15 @@ public class DashboardPanel extends AbstractPanel {
     @FXML private Tab tabProjections;
     @FXML private Tab tabRevenues;
     @FXML private Tab tabExpenses;
+    @FXML private Tab tabSummaries;
+
+    // Projections
+    @FXML private LineChart<String, Number> monthlyLineChart;
+    @FXML private CategoryAxis monthlyXAxis;
+    @FXML private NumberAxis monthlyYAxis;
+    @FXML private LineChart<String, Number> dailyLineChart;
+    @FXML private CategoryAxis dailyXAxis;
+    @FXML private NumberAxis dailyYAxis;
 
     // Revenues
     @FXML private Button btnAddRevenue;
@@ -62,8 +77,18 @@ public class DashboardPanel extends AbstractPanel {
     @FXML private TableColumn<Expense, Double> colExpenseAmount;
     @FXML private TableColumn<Expense, LocalDate> colExpenseDate;
 
+    // Summaries
+    @FXML private TableView<DailySummary> summariesTable;
+    @FXML private TableColumn<DailySummary, String> colSummaryTag;
+    @FXML private TableColumn<DailySummary, LocalDate> colSummaryDate;
+    @FXML private TableColumn<DailySummary, Double> colSummaryForwarded;
+    @FXML private TableColumn<DailySummary, Double> colSummaryRevenues;
+    @FXML private TableColumn<DailySummary, Double> colSummaryExpenses;
+    @FXML private TableColumn<DailySummary, Double> colSummaryBalance;
+
     private FilteredList<Revenue> revenueList;
     private FilteredList<Expense> expenseList;
+    private FilteredList<DailySummary> summariesList;
     private final SimpleObjectProperty<Revenue> selectedRevenueItem = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<Expense> selectedExpenseItem = new SimpleObjectProperty<>();
 
@@ -83,17 +108,15 @@ public class DashboardPanel extends AbstractPanel {
     private EditExpenseWindow editExpenseWindow;
 
     // Summary Values
-    private DailySummary prevSummary;
-    private ObservableList<Revenue> prevRevenues;
-    private ObservableList<Expense> prevExpenses;
+    private DailySummary mSummary;
+    private ObservableList<Revenue> prevRevenuesList;
+    private ObservableList<Expense> prevExpensesList;
     private ObservableList<Revenue> revenuesToday;
     private ObservableList<Expense> expensesToday;
+    private ObservableList<Revenue> allRevenues;
+    private ObservableList<Expense> allExpenses;
 
-    private double mPrevCashForwared = 0.0;
-    private double mPrevRevenues = 0.0;
-    private double mPrevExpenses = 0.0;
-    private double mPrevCashBalance = 0.0;
-    private double mCashForwared = 0.0;
+    private double mCashForwarded = 0.0;
     private double mRevenues = 0.0;
     private double mExpenses = 0.0;
     private double mCashBalance = 0.0;
@@ -114,13 +137,15 @@ public class DashboardPanel extends AbstractPanel {
         setupIcons();
         setupRevenuesTab();
         setupExpensesTab();
+        setupSummariesTab();
 
         tabPane.getSelectionModel().selectedItemProperty().addListener((o, oldVal, newVal) -> {
             if (newVal != null) {
                 switch (newVal.getText()) {
-                    case "Sales Projections" -> System.out.println("Sales Projections");
+                    case "Sales Projections" -> refreshProjections();
                     case "Revenues" -> refreshRevenues();
                     case "Expenses" -> refreshExpenses();
+                    case "Summaries" -> refreshDailySummaries();
                     default -> System.out.println("Recent Sales");
                 }
             }
@@ -132,6 +157,7 @@ public class DashboardPanel extends AbstractPanel {
         tabProjections.setGraphic(new TrendingUpIcon(14));
         tabRevenues.setGraphic(new PesoIcon(14));
         tabExpenses.setGraphic(new PesoIcon(14));
+        tabSummaries.setGraphic(new FileTextIcon(14));
 
         btnAddRevenue.setGraphic(new PlusIcon(14));
         btnEditRevenue.setGraphic(new Edit2Icon(14));
@@ -222,120 +248,226 @@ public class DashboardPanel extends AbstractPanel {
         selectedExpenseItem.bind(expensesTable.getSelectionModel().selectedItemProperty());
     }
 
-    @Override
-    public void onResume() {
-        if (prevSummary == null) {
-            fetchOrCreatePrevSummary();
-        } else {
-            refreshSummary(this::refreshExpenses); // TODO change to Recent Sales
-        }
+    private void setupSummariesTab() {
+        colSummaryTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
+        colSummaryTag.setCellFactory(col -> new TagTableCell<>());
+        colSummaryDate.setCellValueFactory(new PropertyValueFactory<>("date"));
+        colSummaryDate.setCellFactory(col -> new DateTableCell<>());
+        colSummaryForwarded.setCellValueFactory(new PropertyValueFactory<>("forwarded"));
+        colSummaryRevenues.setCellValueFactory(new PropertyValueFactory<>("revenues"));
+        colSummaryExpenses.setCellValueFactory(new PropertyValueFactory<>("expenses"));
+        colSummaryBalance.setCellValueFactory(new PropertyValueFactory<>("balance"));
     }
 
-    private void fetchOrCreatePrevSummary() {
-        showProgress("Fetching previous summary details...");
-        LocalDate prev = LocalDate.now().minusDays(1);
-        disposables.add(Single.fromCallable(() -> dailySummaryController.getByDate(prev))
+    @Override
+    public void onResume() {
+        // Check if there exist a DailySummary for today. If there is none, create and refresh summary.
+        showProgress("Checking summary for today...");
+        disposables.add(Single.fromCallable(() -> dailySummaryController.getByDate(LocalDate.now()))
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(summary -> {
                     hideProgress();
-                    prevSummary = summary;
-                    refreshSummary(null);
+                    mSummary = summary;
+                    refreshSummary(this::refreshRevenues); // TODO change to recent sales
                 }, err -> {
+                    hideProgress();
                     if (err.toString().contains("NullPointer")) {
-                        createPrevSummaryEntry();
+                        createSummary();
                     } else {
-                        showErrorDialog("Database Error", "Error while retrieving previous summary.\n" + err);
+                        showErrorDialog("Database Error", "Error while checking summary.\n" + err);
                     }
                 }));
     }
 
-    private void createPrevSummaryEntry() {
-        showProgress("Fetching previous summary details...");
-        disposables.add(Single.fromCallable(expenseController::getPrevExpenses)
-                .flatMap(expenses -> {
-                    prevExpenses = expenses;
-                    return Single.fromCallable(revenueController::getPrevRevenues);
-                }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(revenues -> {
+    /**
+     * Create new DailySummary entry for today and reload Dashboard.
+     */
+    private void createSummary() {
+        showProgress("Creating daily summary entry...");
+        disposables.add(Single.fromCallable(revenueController::getPrevRevenues) // get last day revenues
+                .flatMap(revenues -> {
+                    prevRevenuesList = revenues;
+                    return Single.fromCallable(expenseController::getPrevExpenses); // get last day expenses
+                }).flatMap(expenses -> {
+                    prevExpensesList = expenses;
+                    return Single.fromCallable(revenueController::getRevenuesToday); // get today's revenues
+                }).flatMap(revenues -> {
+                    revenuesToday = revenues;
+                    return Single.fromCallable(expenseController::getExpensesToday); // get today's expenses
+                }).flatMap(expenses -> { // calculate and create DailySummary entry for today
+                    expensesToday = expenses;
+
+                    double prevRevenues = 0;
+                    for (Revenue r : prevRevenuesList) prevRevenues += r.getAmount();
+                    double prevExpenses = 0;
+                    for (Expense e : prevExpensesList) prevExpenses += e.getAmount();
+                    mCashForwarded = prevRevenues - prevExpenses;
+
+                    mRevenues = 0;
+                    for (Revenue r : revenuesToday) mRevenues += r.getAmount();
+                    mExpenses = 0;
+                    for (Expense e : expensesToday) mExpenses += e.getAmount();
+                    mCashBalance = mCashForwarded + mRevenues - mExpenses;
+
+                    DailySummary summary = new DailySummary();
+                    summary.setDate(LocalDate.now());
+                    summary.setForwarded(mCashForwarded);
+                    summary.setRevenues(mRevenues);
+                    summary.setExpenses(mExpenses);
+                    summary.setBalance(mCashBalance);
+                    return Single.fromCallable(() -> dailySummaryController.insert(summary));
+                }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
                     hideProgress();
-                    prevRevenues = revenues;
-                    savePrevSummary();
+                    if (!success) showWarningDialog("Failed", "Failed to create daily summary entry.");
+                    onResume();
                 }, err -> {
                     hideProgress();
-                    showErrorDialog("Database Error", "Error while fetching previous summary.\n" + err);
+                    showErrorDialog("Database Error", "Error while creating daily summary entry.\n" + err);
                 }));
     }
 
-    private void savePrevSummary() {
-        if (prevRevenues != null) {
-            mPrevRevenues = 0;
-            for (Revenue r : prevRevenues) mPrevRevenues += r.getAmount();
-        }
-        if (prevExpenses != null) {
-            mPrevExpenses = 0;
-            for (Expense e : prevExpenses) mPrevExpenses += e.getAmount();
-        }
-
-        mPrevCashBalance = mPrevRevenues - mPrevExpenses;
-        mCashForwared = mPrevCashBalance;
-
-        prevSummary = new DailySummary();
-        prevSummary.setDate(LocalDate.now().minusDays(1));
-        prevSummary.setForwarded(0);
-        prevSummary.setRevenues(mPrevRevenues);
-        prevSummary.setExpenses(mPrevExpenses);
-        prevSummary.setBalance(mPrevCashBalance);
-
-        showProgress("Saving previous summary...");
-        disposables.add(Single.fromCallable(() -> dailySummaryController.insert(prevSummary))
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
-                    hideProgress();
-                    if (!success) showWarningDialog("Failed", "Failed to save previous summary.");
-                    refreshSummary(null);
-                }, err -> {
-                    hideProgress();
-                    showErrorDialog("Database Error", "Error while saving previous summary.\n" + err);
-                }));
-    }
-
+    /**
+     * Recalculate today's summary and save it to database.
+     * @param onNext Task to execute after updating daily summary. Can be null.
+     */
     private void refreshSummary(Runnable onNext) {
         showProgress("Fetching summary details...");
         disposables.add(Single.fromCallable(expenseController::getExpensesToday)
                 .flatMap(expenses -> {
                     expensesToday = expenses;
                     return Single.fromCallable(revenueController::getRevenuesToday);
-                }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(revenues -> {
-                    hideProgress();
+                }).flatMap(revenues -> {
                     revenuesToday = revenues;
-                    displaySummary();
-                    if (onNext != null) onNext.run();
+                    mRevenues = 0;
+                    for (Revenue r : revenuesToday) mRevenues += r.getAmount();
+                    mExpenses = 0;
+                    for (Expense e : expensesToday) mExpenses += e.getAmount();
+                    mCashBalance = mSummary.getForwarded() + mRevenues - mExpenses;
+
+                    mSummary.setRevenues(mRevenues);
+                    mSummary.setExpenses(mExpenses);
+                    mSummary.setBalance(mCashBalance);
+                    return Single.fromCallable(() -> dailySummaryController.update(mSummary));
+                }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
+                    hideProgress();
+                    if (!success) showWarningDialog("Failed", "Failed to update daily summary.");
+                    lblForwarded.setText(ViewUtils.toStringMoneyFormat(mSummary.getForwarded()));
+                    lblRevenues.setText(ViewUtils.toStringMoneyFormat(mSummary.getRevenues()));
+                    lblExpenses.setText(ViewUtils.toStringMoneyFormat(mSummary.getExpenses()));
+                    lblBalances.setText(ViewUtils.toStringMoneyFormat(mSummary.getBalance()));
                 }, err -> {
                     hideProgress();
-                    showErrorDialog("Database Error", "Error while retrieving summary details.\n" + err);
+                    showErrorDialog("Database Error", "Error while updating summary details.\n" + err);
                 }));
     }
 
-    private void displaySummary() {
-        // Total Revenues
-        if (revenuesToday != null) {
-            mRevenues = 0;
-            for (Revenue r : revenuesToday) mRevenues += r.getAmount();
-        }
-        lblRevenues.setText(ViewUtils.toStringMoneyFormat(mRevenues));
-
-        // Total Expenses
-        if (expensesToday != null) {
-            mExpenses = 0;
-            for (Expense e : expensesToday) mExpenses += e.getAmount();
-        }
-        lblExpenses.setText(ViewUtils.toStringMoneyFormat(mExpenses));
-
-        // Cash Balance
-        mCashBalance = mCashForwared + mRevenues - mExpenses;
-        lblBalances.setText(ViewUtils.toStringMoneyFormat(mCashBalance));
+    private void refreshDailySummaries() {
+        showProgress("Retrieving daily summary entries...");
+        disposables.add(Single.fromCallable(dailySummaryController::getAll)
+                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
+                    hideProgress();
+                    summariesList = new FilteredList<>(list);
+                    summariesTable.setItems(summariesList);
+                }, err -> {
+                    hideProgress();
+                    showErrorDialog("Database Error", "Error while retrieving daily summary entries.\n" + err);
+                }));
     }
 
     @Override
     public void onPause() {
 
+    }
+
+    private void refreshProjections() {
+        showProgress("Retrieving data...");
+        disposables.add(Single.fromCallable(revenueController::getAll)
+                .flatMap(revenues -> {
+                    allRevenues = revenues;
+                    return Single.fromCallable(expenseController::getAll);
+                }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(expenses -> {
+                    hideProgress();
+                    allExpenses = expenses;
+                    displayProjections();
+                }, err -> {
+                    hideProgress();
+                    showErrorDialog("Database Error", "Error while retrieving data.\n" + err);
+                }));
+    }
+
+    private void displayProjections() {
+        if (allRevenues != null && allExpenses != null) {
+            // MONTHLY PROJECTIONS
+
+            monthlyXAxis.getCategories().addAll("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+            LocalDate now = LocalDate.now();
+
+            XYChart.Series<String, Number> monthlyRevenues = new XYChart.Series<>();
+            XYChart.Series<String, Number> monthlyExpenses = new XYChart.Series<>();
+            XYChart.Series<String, Number> monthlyBalance = new XYChart.Series<>();
+            monthlyRevenues.setName("Revenues");
+            monthlyExpenses.setName("Expenses");
+            monthlyBalance.setName("Cash Balance");
+
+            for (int month = 1; month <= 12; month++) {
+                double revenues = 0;
+                double expenses = 0;
+
+                for (Revenue r : allRevenues) {
+                    if (r.getDate().getMonthValue() == month && r.getDate().getYear() == now.getYear()) {
+                        revenues += r.getAmount();
+                    }
+                }
+
+                for (Expense e : allExpenses) {
+                    if (e.getDate().getMonthValue() == month && e.getDate().getYear() == now.getYear()) {
+                        expenses += e.getAmount();
+                    }
+                }
+
+                double balance = revenues - expenses;
+                monthlyRevenues.getData().add(new XYChart.Data<>(ViewUtils.shortMonthStringValue(month), revenues));
+                monthlyExpenses.getData().add(new XYChart.Data<>(ViewUtils.shortMonthStringValue(month), expenses));
+                monthlyBalance.getData().add(new XYChart.Data<>(ViewUtils.shortMonthStringValue(month), balance));
+            }
+
+            monthlyLineChart.getData().clear();
+            monthlyLineChart.getData().addAll(monthlyRevenues, monthlyExpenses, monthlyBalance);
+
+            // DAILY PROJECTIONS
+            XYChart.Series<String, Number> dailyRevenues = new XYChart.Series<>();
+            XYChart.Series<String, Number> dailyExpenses = new XYChart.Series<>();
+            XYChart.Series<String, Number> dailyBalance = new XYChart.Series<>();
+            dailyRevenues.setName("Revenues");
+            dailyExpenses.setName("Expenses");
+            dailyBalance.setName("Cash Balance");
+
+            YearMonth ym = YearMonth.now();
+            for (int d = 1; d <= ym.atEndOfMonth().getDayOfMonth(); d++) {
+                dailyXAxis.getCategories().add(d + "");
+                double revenues = 0;
+                double expenses = 0;
+
+                for (Revenue r : allRevenues) {
+                    if (r.getDate().getDayOfMonth() == d && r.getDate().getYear() == ym.getYear()) {
+                        revenues += r.getAmount();
+                    }
+                }
+
+                for (Expense e : allExpenses) {
+                    if (e.getDate().getDayOfMonth() == d && e.getDate().getYear() == ym.getYear()) {
+                        expenses += e.getAmount();
+                    }
+                }
+
+                double balance = revenues - expenses;
+                dailyRevenues.getData().add(new XYChart.Data<>(d + "", revenues));
+                dailyExpenses.getData().add(new XYChart.Data<>(d + "", expenses));
+                dailyBalance.getData().add(new XYChart.Data<>(d + "", balance));
+            }
+
+            dailyLineChart.getData().clear();
+            dailyLineChart.getData().addAll(dailyRevenues, dailyExpenses, dailyBalance);
+        }
     }
 
     private void refreshRevenues() {
