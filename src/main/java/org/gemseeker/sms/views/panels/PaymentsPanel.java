@@ -515,6 +515,12 @@ public class PaymentsPanel extends AbstractPanel {
                 }));
     }
 
+    private void printTermsAndConditions() {
+        if (printWindow != null) {
+            printWindow.showAndWait(PrintWindow.Type.TERMS_AND_CONDITIONS, null);
+        }
+    }
+
     private void updateFilters() {
         if (billingsList == null || cbAccounts.getValue() == null || cbStatus.getValue() == null ||
                 cbMonths.getValue() == null || cbYears.getValue() == null) {
@@ -691,11 +697,15 @@ public class PaymentsPanel extends AbstractPanel {
         mReceipt.setGraphic(new FileIcon(12));
         mReceipt.getItems().addAll(mSaveReceipt, mPrintReceipt);
 
+        MenuItem mPrintTerms = new MenuItem("Print Terms & Conditions");
+        mPrintTerms.setGraphic(new PrinterIcon(12));
+        mPrintTerms.setOnAction(evt -> printTermsAndConditions());
+
         MenuItem mDelete = new MenuItem("Delete");
         mDelete.setGraphic(new TrashIcon(12));
         mDelete.setOnAction(evt -> deleteSelectedBilling());
 
-        ContextMenu cm = new ContextMenu(mAdd, mEdit, mAcceptPayment, mBilling, mReceipt, new SeparatorMenuItem(), mDelete);
+        ContextMenu cm = new ContextMenu(mAdd, mEdit, mAcceptPayment, mBilling, mReceipt, mPrintTerms, new SeparatorMenuItem(), mDelete);
         billingsTable.setContextMenu(cm);
         selectedBilling.bind(billingsTable.getSelectionModel().selectedItemProperty());
     }

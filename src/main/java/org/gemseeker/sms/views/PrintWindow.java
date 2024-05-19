@@ -21,6 +21,7 @@ import org.gemseeker.sms.data.*;
 import org.gemseeker.sms.data.controllers.*;
 import org.gemseeker.sms.views.forms.BillingReceiptForm;
 import org.gemseeker.sms.views.forms.StatementForm;
+import org.gemseeker.sms.views.forms.TermsConditionsForm;
 import org.gemseeker.sms.views.panels.AbstractPanel;
 
 import java.util.Objects;
@@ -30,7 +31,7 @@ import java.util.Objects;
  */
 public class PrintWindow extends AbstractWindow {
 
-    public enum Type { STATEMENT, RECEIPT }
+    public enum Type { STATEMENT, RECEIPT, TERMS_AND_CONDITIONS }
 
     @FXML private Label lblPrinter;
     @FXML private Label lblCopies;
@@ -56,6 +57,7 @@ public class PrintWindow extends AbstractWindow {
 
     private StatementForm statementForm;
     private BillingReceiptForm billingReceiptForm;
+    private TermsConditionsForm termsConditionsForm;
 
     private Type mType;
     private String mBillingNo;
@@ -103,7 +105,7 @@ public class PrintWindow extends AbstractWindow {
     }
 
     public void showAndWait(Type type, String billingNo) {
-        if (type == null || billingNo == null) return;
+        if (type == null || (type != Type.TERMS_AND_CONDITIONS && billingNo == null)) return;
         mType = type;
         mBillingNo = billingNo;
         showAndWait();
@@ -116,10 +118,10 @@ public class PrintWindow extends AbstractWindow {
         printers.addAll(Printer.getAllPrinters());
         cbPrinters.setValue(Printer.getDefaultPrinter());
 
-        if (Objects.requireNonNull(mType) == Type.STATEMENT) {
-            loadBillingStatementForm();
-        } else {
-            loadBillingReceiptForm();
+        switch (mType) {
+            case STATEMENT -> loadBillingStatementForm();
+            case RECEIPT -> loadBillingReceiptForm();
+            default -> loadTermsAndConditions();
         }
     }
 
@@ -182,6 +184,13 @@ public class PrintWindow extends AbstractWindow {
         contentPane.getChildren().add(mContent);
         billingReceiptForm.setData(account, payment);
         billingReceiptForm.onResume();
+    }
+
+    private void loadTermsAndConditions() {
+        if (termsConditionsForm == null) termsConditionsForm = new TermsConditionsForm();
+        mContent = termsConditionsForm.getView();
+        contentPane.getChildren().clear();
+        contentPane.getChildren().add(mContent);
     }
 
     private void print() {

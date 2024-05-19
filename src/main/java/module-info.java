@@ -21,6 +21,9 @@ module org.gemseeker.sms {
     requires com.gluonhq.attach.storage;
     requires com.gluonhq.attach.util;
 
+    requires org.apache.poi.poi;
+    requires org.apache.poi.ooxml;
+
     opens org.gemseeker.sms.views to javafx.fxml;
     opens org.gemseeker.sms.views.panels to javafx.fxml;
     opens org.gemseeker.sms.views.forms to javafx.fxml;

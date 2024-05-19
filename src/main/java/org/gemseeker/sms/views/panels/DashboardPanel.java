@@ -1,6 +1,7 @@
 package org.gemseeker.sms.views.panels;
 
 import io.github.msufred.feathericons.*;
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
@@ -13,6 +14,11 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.DirectoryChooser;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.gemseeker.sms.Utils;
 import org.gemseeker.sms.data.DailySummary;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.Expense;
@@ -26,8 +32,13 @@ import org.gemseeker.sms.views.cells.DateTableCell;
 import org.gemseeker.sms.views.cells.TagTableCell;
 import org.gemseeker.sms.views.icons.PesoIcon;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.util.Optional;
 
@@ -59,6 +70,8 @@ public class DashboardPanel extends AbstractPanel {
     @FXML private Button btnAddRevenue;
     @FXML private Button btnEditRevenue;
     @FXML private Button btnDeleteRevenue;
+    @FXML private Button btnExportRevenues;
+
     @FXML private TableView<Revenue> revenuesTable;
     @FXML private TableColumn<Revenue, String> colRevenueTag;
     @FXML private TableColumn<Revenue, String> colRevenueType;
@@ -70,6 +83,7 @@ public class DashboardPanel extends AbstractPanel {
     @FXML private Button btnAddExpense;
     @FXML private Button btnEditExpense;
     @FXML private Button btnDeleteExpense;
+    @FXML private Button btnExportExpenses;
     @FXML private TableView<Expense> expensesTable;
     @FXML private TableColumn<Expense, String> colExpenseTag;
     @FXML private TableColumn<Expense, String> colExpenseType;
@@ -85,6 +99,8 @@ public class DashboardPanel extends AbstractPanel {
     @FXML private TableColumn<DailySummary, Double> colSummaryRevenues;
     @FXML private TableColumn<DailySummary, Double> colSummaryExpenses;
     @FXML private TableColumn<DailySummary, Double> colSummaryBalance;
+
+    private DirectoryChooser directoryChooser;
 
     private FilteredList<Revenue> revenueList;
     private FilteredList<Expense> expenseList;
@@ -160,16 +176,19 @@ public class DashboardPanel extends AbstractPanel {
         btnAddRevenue.setGraphic(new PlusIcon(14));
         btnEditRevenue.setGraphic(new Edit2Icon(14));
         btnDeleteRevenue.setGraphic(new TrashIcon(14));
+        btnExportRevenues.setGraphic(new UploadIcon(14));
 
         btnAddExpense.setGraphic(new PlusIcon(14));
         btnEditExpense.setGraphic(new Edit2Icon(14));
         btnDeleteExpense.setGraphic(new TrashIcon(14));
+        btnExportExpenses.setGraphic(new UploadIcon(14));
     }
 
     private void setupRevenuesTab() {
         btnAddRevenue.setOnAction(evt -> addRevenue());
         btnEditRevenue.setOnAction(evt -> editRevenue());
         btnDeleteRevenue.setOnAction(evt -> deleteRevenue());
+        btnExportRevenues.setOnAction(evt -> exportRevenues());
 
         colRevenueTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
         colRevenueTag.setCellFactory(col -> new TagTableCell<>());
@@ -188,6 +207,10 @@ public class DashboardPanel extends AbstractPanel {
         mEdit.setGraphic(new Edit2Icon(12));
         mEdit.setOnAction(evt -> editRevenue());
 
+        MenuItem mExport = new MenuItem("Export List");
+        mExport.setGraphic(new UploadIcon(12));
+        mExport.setOnAction(evt -> exportRevenues());
+
         Menu mTag = new Menu("Change Tag");
         mTag.setGraphic(new CircleIcon(12));
         ViewUtils.getTags().forEach((tag, icon) -> {
@@ -201,7 +224,7 @@ public class DashboardPanel extends AbstractPanel {
         mDelete.setGraphic(new TrashIcon(12));
         mDelete.setOnAction(evt -> deleteRevenue());
 
-        ContextMenu cm = new ContextMenu(mAdd, mEdit, mTag, new SeparatorMenuItem(), mDelete);
+        ContextMenu cm = new ContextMenu(mAdd, mEdit, mExport, mTag, new SeparatorMenuItem(), mDelete);
         revenuesTable.setContextMenu(cm);
 
         selectedRevenueItem.bind(revenuesTable.getSelectionModel().selectedItemProperty());
@@ -211,6 +234,7 @@ public class DashboardPanel extends AbstractPanel {
         btnAddExpense.setOnAction(evt -> addExpense());
         btnEditExpense.setOnAction(evt -> editExpense());
         btnDeleteExpense.setOnAction(evt -> deleteExpense());
+        btnExportExpenses.setOnAction(evt -> exportExpenses());
 
         colExpenseTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
         colExpenseTag.setCellFactory(col -> new TagTableCell<>());
@@ -229,6 +253,10 @@ public class DashboardPanel extends AbstractPanel {
         mEdit.setGraphic(new Edit2Icon(12));
         mEdit.setOnAction(evt -> editExpense());
 
+        MenuItem mExport = new MenuItem("Export List");
+        mExport.setGraphic(new UploadIcon(12));
+        mExport.setOnAction(evt -> exportExpenses());
+
         Menu mTag = new Menu("Change Tag");
         mTag.setGraphic(new CircleIcon(12));
         ViewUtils.getTags().forEach((tag, icon) -> {
@@ -242,7 +270,7 @@ public class DashboardPanel extends AbstractPanel {
         mDelete.setGraphic(new TrashIcon(12));
         mDelete.setOnAction(evt -> deleteExpense());
 
-        ContextMenu cm = new ContextMenu(mAdd, mEdit, mTag, new SeparatorMenuItem(), mDelete);
+        ContextMenu cm = new ContextMenu(mAdd, mEdit, mExport, mTag, new SeparatorMenuItem(), mDelete);
         expensesTable.setContextMenu(cm);
 
         selectedExpenseItem.bind(expensesTable.getSelectionModel().selectedItemProperty());
@@ -702,6 +730,51 @@ public class DashboardPanel extends AbstractPanel {
                         hideProgress();
                         showErrorDialog("Database Error", "Error while updating Expense entry.");
                     }));
+        }
+    }
+
+    private void exportRevenues() {
+        if (revenueList == null) return;
+
+        if (directoryChooser == null) {
+            directoryChooser = new DirectoryChooser();
+            directoryChooser.setTitle("Set Destination Folder");
+        }
+        File dirFolder = directoryChooser.showDialog(mainWindow.getStage());
+        if (dirFolder != null) {
+            String filename = String.format("revenues_%s.xls", LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMM-dd-yyyy_hh-mm-ss")));
+            File outputFile = new File(dirFolder + Utils.FILE_SEPARATOR + filename);
+            showProgress("Exporting Revenue list...");
+            disposables.add(Completable.fromAction(() -> {
+                ExportUtils.exportRevenues(revenueList, outputFile);
+            }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(() -> {
+                hideProgress();
+            }, err -> {
+                hideProgress();
+                showErrorDialog("IOException", "Error while exporting Revenue list to file.\n" + err);
+            }));
+        }
+    }
+
+    private void exportExpenses() {
+        if (expenseList == null) return;
+        if (directoryChooser == null) {
+            directoryChooser = new DirectoryChooser();
+            directoryChooser.setTitle("Set Destination Folder");
+        }
+        File dirFolder = directoryChooser.showDialog(mainWindow.getStage());
+        if (dirFolder != null) {
+            String filename = String.format("expenses_%s.xls", LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMM-dd-yyyy_hh-mm-ss")));
+            File outputFile = new File(dirFolder + Utils.FILE_SEPARATOR + filename);
+            showProgress("Exporting Expense list...");
+            disposables.add(Completable.fromAction(() -> {
+                ExportUtils.exportRevenues(revenueList, outputFile);
+            }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(() -> {
+                hideProgress();
+            }, err -> {
+                hideProgress();
+                showErrorDialog("IOException", "Error while exporting Expense list to file.\n" + err);
+            }));
         }
     }
 
