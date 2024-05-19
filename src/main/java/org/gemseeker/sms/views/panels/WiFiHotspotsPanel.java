@@ -116,7 +116,7 @@ public class WiFiHotspotsPanel extends AbstractPanel {
     }
 
     private void addItem() {
-        if (addWifiVendoWindow == null) addWifiVendoWindow = new AddWifiVendoWindow(database);
+        if (addWifiVendoWindow == null) addWifiVendoWindow = new AddWifiVendoWindow(database, mainWindow.getStage());
         addWifiVendoWindow.showAndWait();
         refresh();
     }
@@ -125,7 +125,7 @@ public class WiFiHotspotsPanel extends AbstractPanel {
         if (selectedItem.get() == null) {
             showWarningDialog("Invalid", "No selected WiFi Vendo. Try again.");
         } else {
-            if (editWifiVendoWindow == null) editWifiVendoWindow = new EditWifiVendoWindow(database);
+            if (editWifiVendoWindow == null) editWifiVendoWindow = new EditWifiVendoWindow(database, mainWindow.getStage());
             editWifiVendoWindow.showAndWait(selectedItem.get());
             refresh();
         }

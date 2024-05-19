@@ -10,6 +10,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.WifiVendo;
 import org.gemseeker.sms.data.controllers.WifiVendoController;
@@ -27,10 +29,15 @@ public class EditWifiVendoWindow extends AbstractWindow {
 
     private WifiVendo mVendo;
 
-    public EditWifiVendoWindow(Database database) {
-        super("Edit WiFi Vendo", EditWifiVendoWindow.class.getResource("add_wifi.fxml"), null, null);
+    public EditWifiVendoWindow(Database database, Stage owner) {
+        super("Edit WiFi Vendo", EditWifiVendoWindow.class.getResource("add_wifi.fxml"), null, owner);
         wifiVendoController = new WifiVendoController(database);
         disposables = new CompositeDisposable();
+    }
+
+    @Override
+    protected void initWindow(Stage stage) {
+        stage.initModality(Modality.APPLICATION_MODAL);
     }
 
     @Override

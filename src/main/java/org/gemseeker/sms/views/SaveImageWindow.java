@@ -78,8 +78,8 @@ public class SaveImageWindow extends AbstractWindow {
     private FileChooser fileChooser;
     private DirectoryChooser directoryChooser;
 
-    public SaveImageWindow(Database database) {
-        super("Save As Image", SaveImageWindow.class.getResource("save_image_window.fxml"), null, null);
+    public SaveImageWindow(Database database, Stage owner) {
+        super("Save As Image", SaveImageWindow.class.getResource("save_image_window.fxml"), null, owner);
         this.accountController = new AccountController(database);
         this.subscriptionController = new SubscriptionController(database);
         this.billingController = new BillingController(database);

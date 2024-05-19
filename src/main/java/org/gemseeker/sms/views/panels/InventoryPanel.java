@@ -33,8 +33,6 @@ public class InventoryPanel extends AbstractPanel {
     @FXML private Button btnDeleteProduct;
     @FXML private Button btnRefreshProducts;
     @FXML private Button btnPrintList;
-    @FXML private Label lblFilter;
-    @FXML private ComboBox<String> cbFilterProducts;
     @FXML private Label lblSearch;
     @FXML private TextField tfSearch;
     @FXML private TableView<Product> productsTable;
@@ -159,13 +157,13 @@ public class InventoryPanel extends AbstractPanel {
     }
 
     private void addProduct() {
-        if (addProductWindow == null) addProductWindow = new AddProductWindow(database);
+        if (addProductWindow == null) addProductWindow = new AddProductWindow(database, mainWindow.getStage());
         addProductWindow.showAndWait();
         refreshProducts();
     }
 
     private void addService() {
-        if (addServiceWindow == null) addServiceWindow = new AddServiceWindow(database);
+        if (addServiceWindow == null) addServiceWindow = new AddServiceWindow(database, mainWindow.getStage());
         addServiceWindow.showAndWait();
         refreshServices();
     }
@@ -174,7 +172,7 @@ public class InventoryPanel extends AbstractPanel {
         if (selectedProduct.get() == null) {
             showWarningDialog("Invalid", "No selected Product. Try again.");
         } else {
-            if (editProductWindow == null) editProductWindow = new EditProductWindow(database);
+            if (editProductWindow == null) editProductWindow = new EditProductWindow(database, mainWindow.getStage());
             editProductWindow.showAndWait(selectedProduct.get());
             refreshProducts();
         }
@@ -184,7 +182,7 @@ public class InventoryPanel extends AbstractPanel {
         if (selectedService.get() == null) {
             showWarningDialog("Invalid", "No selected Service. Try again.");
         } else {
-            if (editServiceWindow == null) editServiceWindow = new EditServiceWindow(database);
+            if (editServiceWindow == null) editServiceWindow = new EditServiceWindow(database, mainWindow.getStage());
             editServiceWindow.showAndWait(selectedService.get());
             refreshServices();
         }
@@ -288,7 +286,6 @@ public class InventoryPanel extends AbstractPanel {
         btnDeleteProduct.setGraphic(new TrashIcon(14));
         btnRefreshProducts.setGraphic(new RefreshCwIcon(14));
         btnPrintList.setGraphic(new PrinterIcon(14));
-        lblFilter.setGraphic(new FilterIcon(14));
         lblSearch.setGraphic(new SearchIcon(14));
 
         // Service Group

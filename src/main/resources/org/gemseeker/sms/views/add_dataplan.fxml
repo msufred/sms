@@ -7,7 +7,6 @@
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox spacing="8.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
@@ -16,6 +15,7 @@
          <children>
             <Label minWidth="100.0" styleClass="form-label" text="Plan Name" />
             <TextField fx:id="tfName" promptText="Required" styleClass="form-field" />
+            <Label fx:id="lblErrName" styleClass="label-error" />
          </children>
          <VBox.margin>
             <Insets />
@@ -25,22 +25,22 @@
          <children>
             <Label minWidth="100.0" styleClass="form-label" text="Speed (MB)" />
             <TextField fx:id="tfBandwidth" styleClass="form-field" text="0" />
+            <Label fx:id="lblErrSpeed" styleClass="label-error" />
          </children>
       </HBox>
       <HBox alignment="CENTER_LEFT" spacing="8.0">
          <children>
             <Label minWidth="100.0" styleClass="form-label" text="Monthly Fee" />
             <TextField fx:id="tfAmount" styleClass="form-field" text="0.0" />
+            <Label fx:id="lblErrFee" styleClass="label-error" />
          </children>
       </HBox>
-      <Label fx:id="lblError" prefWidth="368.0" styleClass="form-label-error" text="Error" visible="false" wrapText="true" />
       <HBox alignment="CENTER_RIGHT" spacing="8.0">
          <VBox.margin>
             <Insets top="16.0" />
          </VBox.margin>
          <children>
-            <ProgressBar fx:id="progressBar" visible="false" />
-            <Region HBox.hgrow="ALWAYS" />
+            <ProgressBar fx:id="progressBar" prefWidth="200.0" visible="false" />
             <Button fx:id="btnSave" defaultButton="true" mnemonicParsing="false" styleClass="form-button-positve" text="Add Data Plan" />
             <Button fx:id="btnCancel" cancelButton="true" mnemonicParsing="false" styleClass="form-button-regular" text="Cancel" />
          </children>

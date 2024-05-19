@@ -15,6 +15,8 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.scene.transform.Scale;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.gemseeker.sms.data.*;
 import org.gemseeker.sms.data.controllers.*;
 import org.gemseeker.sms.views.forms.BillingReceiptForm;
@@ -67,14 +69,19 @@ public class PrintWindow extends AbstractWindow {
     private AbstractPanel mForm = null;
     private Node mContent = null;
 
-    public PrintWindow(Database database) {
-        super("Print", PrintWindow.class.getResource("print_window.fxml"), null, null);
+    public PrintWindow(Database database, Stage owner) {
+        super("Print", PrintWindow.class.getResource("print_window.fxml"), null, owner);
         this.accountController = new AccountController(database);
         this.subscriptionController = new SubscriptionController(database);
         this.billingController = new BillingController(database);
         this.billingStatementController = new BillingStatementController(database);
         this.paymentController = new PaymentController(database);
         this.disposables = new CompositeDisposable();
+    }
+
+    @Override
+    protected void initWindow(Stage stage) {
+        stage.initModality(Modality.APPLICATION_MODAL);
     }
 
     @Override

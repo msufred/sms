@@ -20,6 +20,7 @@ public final class DBTables {
                 createExpensesTable(),
                 createRevenuesTable(),
                 createDailySummariesTable(),
+                createSchedulesTable(),
         };
     }
 
@@ -297,6 +298,21 @@ public final class DBTables {
                 "revenues DOUBLE DEFAULT '0.0', " +
                 "expenses DOUBLE DEFAULT '0.0', " +
                 "balance DOUBLE DEFAULT '0.0', " +
+                "tag VARCHAR(16) DEFAULT 'normal', " +
+                "date_created TIMESTAMP, " +
+                "date_updated TIMESTAMP, " +
+                "date_deleted TIMESTAMP, " +
+                "PRIMARY KEY (id)" +
+                ")";
+    }
+
+    private static String createSchedulesTable() {
+        return "CREATE TABLE IF NOT EXISTS schedules (" +
+                "id INT NOT NULL AUTO_INCREMENT, " +
+                "title VARCHAR(255) NOT NULL, " +
+                "description VARCHAR(255) DEFAULT '', " +
+                "date DATE NOT NULL, " +
+                "status VARCHAR(16) DEFAULT 'pending', " +
                 "tag VARCHAR(16) DEFAULT 'normal', " +
                 "date_created TIMESTAMP, " +
                 "date_updated TIMESTAMP, " +

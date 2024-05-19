@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import org.gemseeker.sms.Settings;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.User;
+import org.gemseeker.sms.data.controllers.ScheduleController;
 import org.gemseeker.sms.data.controllers.UserController;
 import org.gemseeker.sms.views.icons.PesoIcon;
 import org.gemseeker.sms.views.panels.*;
@@ -48,10 +49,13 @@ public class MainWindow extends AbstractWindow {
     private final Settings settings;
     private final Database database;
     private final UserController userController;
+    private final ScheduleController scheduleController;
     private final CompositeDisposable disposables;
 
     private long userId = -1;
     private User user = null;
+    private int pendingTasks = 0;
+    private int outdatedTasks = 0;
 
     // panels
     private DashboardPanel dashboardPanel;
@@ -68,6 +72,7 @@ public class MainWindow extends AbstractWindow {
         this.settings = settings;
         this.database = database;
         this.userController = new UserController(database);
+        this.scheduleController = new ScheduleController(database);
         this.disposables = new CompositeDisposable();
     }
 
@@ -93,12 +98,20 @@ public class MainWindow extends AbstractWindow {
         if (userId != -1) {
             showProgress(-1, "Retrieving user info...");
             disposables.add(Single.fromCallable(() -> userController.get((int) userId))
-                    .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(usr -> {
+                    .flatMap(usr -> {
+                        user = usr;
+                        return Single.fromCallable(scheduleController::getOutdatedCount);
+                    }).flatMap(count -> {
+                        outdatedTasks = count;
+                        return Single.fromCallable(scheduleController::getUpcomingCount);
+                    }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(count -> {
                         hideProgress();
-                        this.user = usr;
+                        pendingTasks = count;
                         if (user != null) {
                             lblAuthority.setText(String.format("%s [%s]", user.getUsername(), ViewUtils.capitalize(user.getRole())));
                         }
+                        lblOutdated.setText(outdatedTasks + "");
+                        lblUpcoming.setText(pendingTasks + "");
                         setupPanels();
                     }, err -> {
                         hideProgress();
@@ -185,6 +198,16 @@ public class MainWindow extends AbstractWindow {
         progressBar.setProgress(0);
         progressLabel.setVisible(false);
         progressLabel.setText("");
+    }
+
+    public void setOutdateCount(int count) {
+        outdatedTasks = count;
+        lblOutdated.setText(outdatedTasks + "");
+    }
+
+    public void setUpcomingCount(int count) {
+        pendingTasks = count;
+        lblUpcoming.setText(pendingTasks + "");
     }
 
     @Override

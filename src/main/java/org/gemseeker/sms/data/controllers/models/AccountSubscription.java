@@ -24,6 +24,7 @@ public class AccountSubscription {
     private String subscriptionStatus;
     private LocalDate startDate;
     private LocalDate endDate;
+    private double monthlyFee;
 
     public int getId() {
         return id;
@@ -135,5 +136,13 @@ public class AccountSubscription {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public double getMonthlyFee() {
+        return monthlyFee;
+    }
+
+    public void setMonthlyFee(double monthlyFee) {
+        this.monthlyFee = monthlyFee;
     }
 }

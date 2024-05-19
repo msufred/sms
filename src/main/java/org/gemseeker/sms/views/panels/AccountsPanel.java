@@ -11,11 +11,14 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import org.gemseeker.sms.data.DataPlan;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.controllers.AccountController;
+import org.gemseeker.sms.data.controllers.DataPlanController;
 import org.gemseeker.sms.data.controllers.TowerController;
 import org.gemseeker.sms.data.controllers.models.AccountSubscription;
 import org.gemseeker.sms.views.*;
+import org.gemseeker.sms.views.cells.AmountTableCell;
 import org.gemseeker.sms.views.cells.DateTableCell;
 import org.gemseeker.sms.views.cells.StatusTableCell;
 import org.gemseeker.sms.views.cells.TagTableCell;
@@ -25,6 +28,10 @@ import java.util.LinkedHashMap;
 import java.util.Optional;
 
 public class AccountsPanel extends AbstractPanel {
+
+    @FXML private TabPane tabPane;
+    @FXML private Tab tabAccounts;
+    @FXML private Tab tabPlans;
 
     @FXML private Button btnAdd;
     @FXML private MenuButton mEdit;
@@ -48,29 +55,48 @@ public class AccountsPanel extends AbstractPanel {
     @FXML private TableColumn<AccountSubscription, String> colSubscription;
     @FXML private TableColumn<AccountSubscription, LocalDate> colStartDate;
     @FXML private TableColumn<AccountSubscription, LocalDate> colEndDate;
+    @FXML private TableColumn<AccountSubscription, Double> colMonthlyFee;
+
+    // DataPlan
+    @FXML private Button btnAddPlan;
+    @FXML private Button btnEditPlan;
+    @FXML private Button btnDeletePlan;
+    @FXML private TableView<DataPlan> dataPlansTable;
+    @FXML private TableColumn<DataPlan, String> colPlanTag;
+    @FXML private TableColumn<DataPlan, String> colPlanName;
+    @FXML private TableColumn<DataPlan, Integer> colPlanSpeed;
+    @FXML private TableColumn<DataPlan, Double> colPlanFee;
 
     // Tag Icons
     private final LinkedHashMap<String, SVGIcon> tags = ViewUtils.getTags();
 
     private FilteredList<AccountSubscription> filteredList;
     private final SimpleObjectProperty<AccountSubscription> selectedItem = new SimpleObjectProperty<>();
+    private FilteredList<DataPlan> dataPlanList;
+    private final SimpleObjectProperty<DataPlan> selectedPlan = new SimpleObjectProperty<>();
 
     private final MainWindow mainWindow;
     private final Database database;
     private final AccountController accountController;
+    private final DataPlanController dataPlanController;
     private final TowerController towerController;
     private final CompositeDisposable disposables;
 
     // Windows
     private AddAccountWindow addAccountWindow;
+    private EditAccountInfoWindow editAccountInfoWindow;
+    private EditSubscriptionWindow editSubscriptionWindow;
     private AddTowerWindow addTowerWindow;
     private EditTowerWindow editTowerWindow;
+    private AddDataPlanWindow addDataPlanWindow;
+    private EditDataPlanWindow editDataPlanWindow;
 
     public AccountsPanel(MainWindow mainWindow, Database database) {
         super(AccountsPanel.class.getResource("accounts.fxml"));
         this.mainWindow = mainWindow;
         this.database = database;
         this.accountController = new AccountController(database);
+        this.dataPlanController = new DataPlanController(database);
         this.towerController = new TowerController(database);
         this.disposables = new CompositeDisposable();
     }
@@ -79,6 +105,12 @@ public class AccountsPanel extends AbstractPanel {
     protected void onFxmlLoaded() {
         setupIcons();
         setupTable();
+        setupDataPlanTable();
+
+        tabPane.getSelectionModel().selectedIndexProperty().addListener((o, oldVal, newVal) -> {
+            if (newVal.intValue() == 0) refresh();
+            else refreshPlans();
+        });
 
         btnAdd.setOnAction(evt -> addItem());
         mEditAccount.setOnAction(evt -> editAccount());
@@ -106,11 +138,17 @@ public class AccountsPanel extends AbstractPanel {
                         account.getEmail().toLowerCase().contains(newVal.toLowerCase());
             });
         });
+
+        // Data Plan
+        btnAddPlan.setOnAction(evt -> addPlan());
+        btnEditPlan.setOnAction(evt -> editPlan());
+        btnDeletePlan.setOnAction(evt -> deletePlan());
     }
 
     @Override
     public void onResume() {
-        refresh();
+        if (tabPane.getSelectionModel().getSelectedIndex() == 0) refresh();
+        else refreshPlans();
     }
 
     @Override
@@ -132,8 +170,21 @@ public class AccountsPanel extends AbstractPanel {
                 }));
     }
 
+    private void refreshPlans() {
+        showProgress("Retrieving Data Plan entries...");
+        disposables.add(Single.fromCallable(dataPlanController::getAll)
+                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
+                    hideProgress();
+                    dataPlanList = new FilteredList<>(list);
+                    dataPlansTable.setItems(dataPlanList);
+                }, err -> {
+                    hideProgress();
+                    showErrorDialog("Database Error", "Error while retrieving Data Plan entries.\n" + err);
+                }));
+    }
+
     private void addItem() {
-        if (addAccountWindow == null) addAccountWindow = new AddAccountWindow(database);
+        if (addAccountWindow == null) addAccountWindow = new AddAccountWindow(database, mainWindow.getStage());
         addAccountWindow.showAndWait();
         refresh();
     }
@@ -142,7 +193,9 @@ public class AccountsPanel extends AbstractPanel {
         if (selectedItem.get() == null) {
             showWarningDialog("Invalid", "No selected Account. Try again.");
         } else {
-            // TODO show edit window
+            if (editAccountInfoWindow == null) editAccountInfoWindow = new EditAccountInfoWindow(database, mainWindow.getStage());
+            editAccountInfoWindow.showAndWait(selectedItem.get().getAccountNo());
+            refresh();
         }
     }
 
@@ -150,7 +203,9 @@ public class AccountsPanel extends AbstractPanel {
         if (selectedItem.get() == null) {
             showWarningDialog("Invalid", "No selected Account. Try again.");
         } else {
-            // TODO show edit window
+            if (editSubscriptionWindow == null) editSubscriptionWindow = new EditSubscriptionWindow(database, mainWindow.getStage());
+            editSubscriptionWindow.showAndWait(selectedItem.get().getAccountNo());
+            refresh();
         }
     }
 
@@ -163,10 +218,10 @@ public class AccountsPanel extends AbstractPanel {
                     .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(hasTower -> {
                         hideProgress();
                         if (hasTower) {
-                            if (editTowerWindow == null) editTowerWindow = new EditTowerWindow(database);
+                            if (editTowerWindow == null) editTowerWindow = new EditTowerWindow(database, mainWindow.getStage());
                             editTowerWindow.showAndWait(selectedItem.get().getAccountNo());
                         } else {
-                            if (addTowerWindow == null) addTowerWindow = new AddTowerWindow(database);
+                            if (addTowerWindow == null) addTowerWindow = new AddTowerWindow(database, mainWindow.getStage());
                             addTowerWindow.showAndWait();
                         }
                         refresh();
@@ -231,7 +286,68 @@ public class AccountsPanel extends AbstractPanel {
                 }));
     }
 
+    // DataPlan
+    private void addPlan() {
+        if (addDataPlanWindow == null) addDataPlanWindow = new AddDataPlanWindow(database, mainWindow.getStage());
+        addDataPlanWindow.showAndWait();
+        refreshPlans();
+    }
+
+    private void editPlan() {
+        if (selectedPlan.get() == null) {
+            showWarningDialog("Invalid Action", "No selected DataPlan entry. Try again.");
+        } else {
+            if (editDataPlanWindow == null) editDataPlanWindow = new EditDataPlanWindow(database, mainWindow.getStage());
+            editDataPlanWindow.showAndWait(selectedPlan.get());
+            refreshPlans();
+        }
+    }
+
+    private void deletePlan() {
+        if (selectedPlan.get() == null) {
+            showWarningDialog("Invalid Action", "No selected DataPlan entry. Try again.");
+        } else {
+            Optional<ButtonType> result = showConfirmDialog("Delete Data Plan",
+                    "Are you sure you want to delete this Data Plan entry?",
+                    ButtonType.YES, ButtonType.NO);
+            if (result.isPresent() && result.get() == ButtonType.YES) deletePlan(selectedPlan.get().getId());
+        }
+    }
+
+    private void deletePlan(int id) {
+        showProgress("Deleting Data Plan entry...");
+        disposables.add(Single.fromCallable(() -> dataPlanController.delete(id))
+                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
+                    hideProgress();
+                    if (!success) showWarningDialog("Failed", "Failed to delete Data Plan entry.");
+                    refreshPlans();
+                }, err -> {
+                    hideProgress();
+                    showErrorDialog("Database Error", "Error while deleting Data Plan entry.\n" + err);
+                }));
+    }
+
+    private void updatePlanTag(String tag) {
+        if (selectedPlan.get() == null) {
+            showWarningDialog("Invalid Action", "No selected DataPlan entry. Try again.");
+        } else {
+            showProgress("Upading Data Plan entry...");
+            disposables.add(Single.fromCallable(() -> dataPlanController.update(selectedPlan.get().getId(), "tag", tag))
+                    .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
+                        hideProgress();
+                        if (!success) showWarningDialog("Failed", "Failed to update Data Plan entry.");
+                        refreshPlans();
+                    }, err -> {
+                        hideProgress();
+                        showErrorDialog("Database Error", "Error while updating Data Plan entry.\n" + err);
+                    }));
+        }
+    }
+
     private void setupIcons() {
+        tabAccounts.setGraphic(new UsersIcon(14));
+        tabPlans.setGraphic(new WifiIcon(14));
+
         btnAdd.setGraphic(new PlusIcon(14));
         mEdit.setGraphic(new Edit2Icon(14));
         mEditAccount.setGraphic(new UserIcon(14));
@@ -241,6 +357,10 @@ public class AccountsPanel extends AbstractPanel {
         btnDelete.setGraphic(new TrashIcon(14));
         lblFilter.setGraphic(new FilterIcon(14));
         lblSearch.setGraphic(new SearchIcon(14));
+
+        btnAddPlan.setGraphic(new PlusIcon(14));
+        btnEditPlan.setGraphic(new Edit2Icon(14));
+        btnDeletePlan.setGraphic(new TrashIcon(14));
     }
 
     private void setupTable() {
@@ -258,6 +378,8 @@ public class AccountsPanel extends AbstractPanel {
         colStartDate.setCellFactory(col -> new DateTableCell<>());
         colEndDate.setCellValueFactory(new PropertyValueFactory<>("endDate"));
         colEndDate.setCellFactory(col -> new DateTableCell<>());
+        colMonthlyFee.setCellValueFactory(new PropertyValueFactory<>("monthlyFee"));
+        colMonthlyFee.setCellFactory(col -> new AmountTableCell<>());
 
         MenuItem mAdd = new MenuItem("New Account");
         mAdd.setGraphic(new PlusIcon(12));
@@ -314,6 +436,40 @@ public class AccountsPanel extends AbstractPanel {
         selectedItem.bind(accountsTable.getSelectionModel().selectedItemProperty());
     }
 
+    private void setupDataPlanTable() {
+        colPlanTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
+        colPlanTag.setCellFactory(col -> new TagTableCell<>());
+        colPlanName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colPlanSpeed.setCellValueFactory(new PropertyValueFactory<>("speed"));
+        colPlanFee.setCellValueFactory(new PropertyValueFactory<>("monthlyFee"));
+        colPlanFee.setCellFactory(col -> new AmountTableCell<>());
+
+        MenuItem mAdd = new MenuItem("Add");
+        mAdd.setGraphic(new PlusIcon(12));
+        mAdd.setOnAction(evt -> addPlan());
+
+        MenuItem mEdit = new MenuItem("Edit");
+        mEdit.setGraphic(new Edit2Icon(12));
+        mEdit.setOnAction(evt -> editPlan());
+
+        MenuItem mDelete = new MenuItem("Delete");
+        mDelete.setGraphic(new TrashIcon(12));
+        mDelete.setOnAction(evt -> deletePlan());
+
+        Menu mTag = new Menu("Change Tag");
+        mTag.setGraphic(new CircleIcon(12));
+        ViewUtils.getTags().forEach((tag, icon) -> {
+            MenuItem item = new MenuItem(ViewUtils.capitalize(tag));
+            item.setGraphic(icon);
+            item.setOnAction(evt -> updatePlanTag(tag));
+            mTag.getItems().add(item);
+        });
+
+        ContextMenu cm = new ContextMenu(mAdd, mEdit, mDelete, mTag);
+        dataPlansTable.setContextMenu(cm);
+        selectedPlan.bind(dataPlansTable.getSelectionModel().selectedItemProperty());
+    }
+
     private void showProgress(String text) {
         mainWindow.showProgress(-1, text);
     }
@@ -325,8 +481,11 @@ public class AccountsPanel extends AbstractPanel {
     @Override
     public void onDispose() {
         if (addAccountWindow != null) addAccountWindow.dispose();
+        if (editAccountInfoWindow != null) editAccountInfoWindow.dispose();
         if (addTowerWindow != null) addTowerWindow.dispose();
         if (editTowerWindow != null) editTowerWindow.dispose();
+        if (addDataPlanWindow != null) addDataPlanWindow.dispose();
+        if (editDataPlanWindow != null) editDataPlanWindow.dispose();
         disposables.dispose();
     }
 }

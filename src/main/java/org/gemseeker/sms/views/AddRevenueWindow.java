@@ -8,6 +8,7 @@ import io.reactivex.schedulers.Schedulers;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.Revenue;
@@ -32,6 +33,11 @@ public class AddRevenueWindow extends AbstractWindow {
         super("Revenue", AddRevenueWindow.class.getResource("add_revenue.fxml"), null, owner);
         revenueController = new RevenueController(database);
         disposables = new CompositeDisposable();
+    }
+
+    @Override
+    protected void initWindow(Stage stage) {
+        stage.initModality(Modality.APPLICATION_MODAL);
     }
 
     @Override

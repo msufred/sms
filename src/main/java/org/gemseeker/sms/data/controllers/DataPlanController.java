@@ -31,7 +31,7 @@ public class DataPlanController implements ModelController<DataPlan> {
         LocalDateTime now = LocalDateTime.now();
         String sql = String.format("UPDATE data_plans SET name='%s', speed='%d', monthly_fee='%f', tag='%s', " +
                 "date_updated='%s' WHERE id='%d'", model.getName(), model.getSpeed(), model.getMonthlyFee(), model.getTag(),
-                now);
+                now, model.getId());
         return database.executeQuery(sql);
     }
 

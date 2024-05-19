@@ -20,6 +20,7 @@ import org.gemseeker.sms.data.controllers.DataPlanController;
 import org.gemseeker.sms.data.controllers.SubscriptionController;
 import org.gemseeker.sms.data.controllers.TowerController;
 
+import javax.swing.text.View;
 import java.util.concurrent.Callable;
 
 public class AddAccountWindow extends AbstractWindow {
@@ -80,8 +81,8 @@ public class AddAccountWindow extends AbstractWindow {
 
     private final Tower source;
 
-    public AddAccountWindow(Database database) {
-        super("Add Account", AddAccountWindow.class.getResource("add_account.fxml"), null, null);
+    public AddAccountWindow(Database database, Stage owner) {
+        super("Add Account", AddAccountWindow.class.getResource("add_account.fxml"), null, owner);
         dataPlanController = new DataPlanController(database);
         accountController = new AccountController(database);
         subscriptionController = new SubscriptionController(database);
@@ -104,7 +105,7 @@ public class AddAccountWindow extends AbstractWindow {
     protected void onFxmlLoaded() {
         setupIcons();
 
-        ViewUtils.setAsNumericalTextField(tfTowerHeight, tfLatitude, tfLongitude, tfElevation);
+        ViewUtils.setAsNumericalTextField(tfAmount, tfTowerHeight, tfLatitude, tfLongitude, tfElevation);
 
         cbAddSubscription.selectedProperty().addListener((o, oldVal, selected) -> {
             subscriptionGroup.setDisable(!selected);
@@ -129,7 +130,7 @@ public class AddAccountWindow extends AbstractWindow {
         cbTowerTypes.setValue(Tower.TYPE_DEFAULT);
 
         btnAdd.setOnAction(evt -> {
-            if (addDataPlanWindow == null) addDataPlanWindow = new AddDataPlanWindow(database);
+            if (addDataPlanWindow == null) addDataPlanWindow = new AddDataPlanWindow(database, getStage());
             addDataPlanWindow.showAndWait();
             refreshDataPlans();
         });

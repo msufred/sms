@@ -192,8 +192,8 @@ public class PaymentsPanel extends AbstractPanel {
     @Override
     public void onResume() {
         // create PrintWindow and SaveImageWindow
-        if (printWindow == null) printWindow = new PrintWindow(database);
-        if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(database);
+        if (printWindow == null) printWindow = new PrintWindow(database, mainWindow.getStage());
+        if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(database, mainWindow.getStage());
 
         showProgress("Retrieving Account entries...");
         disposables.add(Single.fromCallable(accountController::getAll)
@@ -273,7 +273,7 @@ public class PaymentsPanel extends AbstractPanel {
     }
 
     private void addBilling() {
-        if (addBillingWindow == null) addBillingWindow = new AddBillingWindow(database, printWindow, saveImageWindow);
+        if (addBillingWindow == null) addBillingWindow = new AddBillingWindow(database, printWindow, saveImageWindow, mainWindow.getStage());
         addBillingWindow.showAndWait();
         refreshBillings();
     }
@@ -282,7 +282,7 @@ public class PaymentsPanel extends AbstractPanel {
         if (selectedBilling.get() == null) {
             showWarningDialog("Invalid", "No selected Billing entry. Try again.");
         } else {
-            if (editBillingWindow == null) editBillingWindow = new EditBillingWindow(database);
+            if (editBillingWindow == null) editBillingWindow = new EditBillingWindow(database, mainWindow.getStage());
             editBillingWindow.showAndWait(selectedBilling.get().getBillingNo());
             refreshBillings();
         }
@@ -297,7 +297,7 @@ public class PaymentsPanel extends AbstractPanel {
         } else {
             checkBillingStatementExists(billing.getBillingNo(), () -> {
                 if (acceptPaymentWindow == null) acceptPaymentWindow = new AcceptPaymentWindow(
-                        database, printWindow, saveImageWindow);
+                        database, printWindow, saveImageWindow, mainWindow.getStage());
                 acceptPaymentWindow.showAndWait(selectedBilling.get().getBillingNo());
                 refreshBillings();
                 refreshReceipts();
@@ -317,7 +317,7 @@ public class PaymentsPanel extends AbstractPanel {
                         "for this Billing entry.");
             }, () -> {
                 if (prepareBillingStatementWindow == null) prepareBillingStatementWindow =
-                        new PrepareBillingStatementWindow(database);
+                        new PrepareBillingStatementWindow(database, mainWindow.getStage());
                 prepareBillingStatementWindow.showAndWait(selectedBilling.get().getBillingNo());
                 refreshBillings();
                 refreshBillingStatements();
@@ -331,7 +331,7 @@ public class PaymentsPanel extends AbstractPanel {
         } else {
             checkBillingStatementExists(selectedBilling.get().getBillingNo(), () -> {
                 // save billing as image
-                if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(database);
+                if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(database, mainWindow.getStage());
                 saveImageWindow.showAndWait(SaveImageWindow.Type.STATEMENT, selectedBilling.get().getBillingNo());
             }, () -> {
                 showWarningDialog("Invalid Action", "Create Billing Statement first.");
@@ -447,7 +447,7 @@ public class PaymentsPanel extends AbstractPanel {
         if (selectedBillingStatement.get() == null) {
             showWarningDialog("Invalid", "No selected Billing Statement. Try again.");
         } else {
-            if (prepareBillingStatementWindow == null) prepareBillingStatementWindow = new PrepareBillingStatementWindow(database);
+            if (prepareBillingStatementWindow == null) prepareBillingStatementWindow = new PrepareBillingStatementWindow(database, mainWindow.getStage());
             prepareBillingStatementWindow.showAndWait(selectedBillingStatement.get().getBillingNo());
             refreshBillingStatements();
         }
@@ -483,7 +483,7 @@ public class PaymentsPanel extends AbstractPanel {
         if (selectedPayment.get() == null) {
             showWarningDialog("Invalid", "No selected Payment entry. Try again.");
         } else {
-            if (editPaymentWindow == null) editPaymentWindow = new EditPaymentWindow(database);
+            if (editPaymentWindow == null) editPaymentWindow = new EditPaymentWindow(database, mainWindow.getStage());
             editPaymentWindow.showAndWait(selectedPayment.get().getId());
             refreshReceipts();
         }

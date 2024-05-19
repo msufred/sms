@@ -35,7 +35,7 @@ public class SplashWindow extends AbstractWindow {
 
     @Override
     protected void onFxmlLoaded() {
-
+        // empty
     }
 
     @Override

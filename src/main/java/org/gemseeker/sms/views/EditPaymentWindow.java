@@ -9,6 +9,8 @@ import io.reactivex.schedulers.Schedulers;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.Payment;
 import org.gemseeker.sms.data.controllers.PaymentController;
@@ -37,10 +39,15 @@ public class EditPaymentWindow extends AbstractWindow {
     private String mTag = "normal";
     private Payment mPayment;
 
-    public EditPaymentWindow(Database database) {
-        super("Edit Payment", EditPaymentWindow.class.getResource("edit_payment.fxml"), null, null);
+    public EditPaymentWindow(Database database, Stage owner) {
+        super("Edit Payment", EditPaymentWindow.class.getResource("edit_payment.fxml"), null, owner);
         this.paymentController = new PaymentController(database);
         this.disposables = new CompositeDisposable();
+    }
+
+    @Override
+    protected void initWindow(Stage stage) {
+        stage.initModality(Modality.APPLICATION_MODAL);
     }
 
     @Override

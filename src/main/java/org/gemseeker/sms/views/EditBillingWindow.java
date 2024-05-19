@@ -10,6 +10,8 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.gemseeker.sms.data.Account;
 import org.gemseeker.sms.data.Billing;
 import org.gemseeker.sms.data.Database;
@@ -53,12 +55,17 @@ public class EditBillingWindow extends AbstractWindow {
     private Billing mBilling;
     private Account mAccount;
 
-    public EditBillingWindow(Database database) {
-        super("Edit Billing", EditBillingWindow.class.getResource("add_billing.fxml"), null, null);
+    public EditBillingWindow(Database database, Stage owner) {
+        super("Edit Billing", EditBillingWindow.class.getResource("add_billing.fxml"), null, owner);
         accountController = new AccountController(database);
         subscriptionController = new SubscriptionController(database);
         billingController = new BillingController(database);
         disposables = new CompositeDisposable();
+    }
+
+    @Override
+    protected void initWindow(Stage stage) {
+        stage.initModality(Modality.APPLICATION_MODAL);
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.gemseeker.sms.views.cells;
 import io.github.msufred.feathericons.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
+import org.gemseeker.sms.views.ViewUtils;
 
 public class StatusTableCell<T> extends TableCell<T, String> {
 
@@ -17,7 +18,7 @@ public class StatusTableCell<T> extends TableCell<T, String> {
             switch (status.toLowerCase()) {
                 case "active":
                     icon = new SmileIcon(12);
-                    styleClass = "tag-emerald";
+                    styleClass = "tag-nephritis";
                     break;
                 case "inactive":
                     icon = new FrownIcon(12);
@@ -35,12 +36,24 @@ public class StatusTableCell<T> extends TableCell<T, String> {
                     icon = new AlertOctagonIcon(12);
                     styleClass = "tag-orange";
                     break;
+                case "pending":
+                    icon = new ClockIcon(12);
+                    styleClass = "tag-normal";
+                    break;
+                case "outdated":
+                    icon = new AlertCircleIcon(12);
+                    styleClass = "tag-alizarin";
+                    break;
+                case "done":
+                    icon = new CheckIcon(12);
+                    styleClass = "tag-nephritis";
+                    break;
                 default:
                     styleClass = "tag-normal";
                     icon = null;
             }
             if (icon != null) icon.getStyleClass().add(styleClass);
-            Label label = new Label(status);
+            Label label = new Label(ViewUtils.capitalize(status));
             label.setGraphic(icon);
             setText("");
             setGraphic(label);

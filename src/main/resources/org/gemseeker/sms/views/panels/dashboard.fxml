@@ -5,6 +5,7 @@
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
@@ -69,9 +70,6 @@
       </HBox>
       <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <tabs>
-           <Tab fx:id="tabRecentSales" text="Recent Sales">
-              <VBox />
-           </Tab>
            <Tab fx:id="tabProjections" text="Sales Projections">
                <ScrollPane fitToWidth="true">
                   <content>
@@ -81,23 +79,40 @@
                         </padding>
                         <children>
                            <Label text="Monthly Projection (Current Year)" />
-                           <LineChart fx:id="monthlyLineChart" animated="false" legendSide="LEFT" prefHeight="200.0">
+                           <LineChart fx:id="monthlyLineChart" legendSide="LEFT" prefHeight="200.0">
                              <xAxis>
-                               <CategoryAxis fx:id="monthlyXAxis" label="Months" side="BOTTOM" />
+                               <CategoryAxis fx:id="monthlyXAxis" animated="false" label="Months" side="BOTTOM" />
                              </xAxis>
                              <yAxis>
-                               <NumberAxis fx:id="monthlyYAxis" label="Amount" side="LEFT" />
+                               <NumberAxis fx:id="monthlyYAxis" animated="false" label="Amount" side="LEFT" />
                              </yAxis>
                            </LineChart>
                            <Label text="Daily Projection (Current Month)" />
-                           <LineChart fx:id="dailyLineChart" animated="false" legendSide="LEFT" prefHeight="200.0" titleSide="LEFT">
+                           <LineChart fx:id="dailyLineChart" legendSide="LEFT" prefHeight="200.0" titleSide="LEFT">
                               <xAxis>
-                                 <CategoryAxis fx:id="dailyXAxis" label="Days" side="BOTTOM" />
+                                 <CategoryAxis fx:id="dailyXAxis" animated="false" label="Days" side="BOTTOM" />
                               </xAxis>
                               <yAxis>
-                                 <NumberAxis fx:id="dailyYAxis" label="Amount" side="LEFT" />
+                                 <NumberAxis fx:id="dailyYAxis" animated="false" label="Amount" side="LEFT" />
                               </yAxis>
                            </LineChart>
+                           <Label text="Revenues &amp; Expenses Breakdown" />
+                           <HBox prefHeight="100.0" prefWidth="200.0">
+                              <children>
+                                 <VBox alignment="TOP_CENTER" HBox.hgrow="ALWAYS">
+                                    <children>
+                                       <Label text="Revenues" />
+                                       <PieChart fx:id="revenuesPieChart" minHeight="400.0" minWidth="400.0" prefHeight="400.0" prefWidth="400.0" />
+                                    </children>
+                                 </VBox>
+                                 <VBox alignment="TOP_CENTER" HBox.hgrow="ALWAYS">
+                                    <children>
+                                       <Label text="Expenses" />
+                                       <PieChart fx:id="expensesPieChart" minHeight="400.0" minWidth="400.0" prefHeight="400.0" prefWidth="400.0" />
+                                    </children>
+                                 </VBox>
+                              </children>
+                           </HBox>
                         </children>
                      </VBox>
                   </content>

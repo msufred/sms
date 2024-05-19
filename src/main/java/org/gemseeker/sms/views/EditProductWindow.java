@@ -8,6 +8,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.Product;
 import org.gemseeker.sms.data.controllers.ProductController;
@@ -30,10 +32,15 @@ public class EditProductWindow extends AbstractWindow {
 
     private Product mProduct;
 
-    public EditProductWindow(Database database) {
-        super("Edit Product", EditProductWindow.class.getResource("add_product.fxml"), null, null);
+    public EditProductWindow(Database database, Stage owner) {
+        super("Edit Product", EditProductWindow.class.getResource("add_product.fxml"), null, owner);
         productController = new ProductController(database);
         disposables = new CompositeDisposable();
+    }
+
+    @Override
+    protected void initWindow(Stage stage) {
+        stage.initModality(Modality.APPLICATION_MODAL);
     }
 
     @Override

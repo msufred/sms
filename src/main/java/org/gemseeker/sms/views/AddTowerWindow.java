@@ -40,8 +40,8 @@ public class AddTowerWindow extends AbstractWindow {
     private final TowerController towerController;
     private final CompositeDisposable disposables;
 
-    public AddTowerWindow(Database database) {
-        super("Add Tower Info", AddTowerWindow.class.getResource("add_tower.fxml"), null, null);
+    public AddTowerWindow(Database database, Stage owner) {
+        super("Add Tower Info", AddTowerWindow.class.getResource("add_tower.fxml"), null, owner);
         accountController = new AccountController(database);
         towerController = new TowerController(database);
         disposables = new CompositeDisposable();

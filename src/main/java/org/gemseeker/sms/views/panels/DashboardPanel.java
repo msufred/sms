@@ -6,13 +6,11 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import io.reactivex.schedulers.Schedulers;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.gemseeker.sms.data.DailySummary;
@@ -23,6 +21,7 @@ import org.gemseeker.sms.data.controllers.DailySummaryController;
 import org.gemseeker.sms.data.controllers.ExpenseController;
 import org.gemseeker.sms.data.controllers.RevenueController;
 import org.gemseeker.sms.views.*;
+import org.gemseeker.sms.views.cells.AmountTableCell;
 import org.gemseeker.sms.views.cells.DateTableCell;
 import org.gemseeker.sms.views.cells.TagTableCell;
 import org.gemseeker.sms.views.icons.PesoIcon;
@@ -41,7 +40,6 @@ public class DashboardPanel extends AbstractPanel {
     @FXML private Label lblBalances;
 
     @FXML private TabPane tabPane;
-    @FXML private Tab tabRecentSales;
     @FXML private Tab tabProjections;
     @FXML private Tab tabRevenues;
     @FXML private Tab tabExpenses;
@@ -54,6 +52,8 @@ public class DashboardPanel extends AbstractPanel {
     @FXML private LineChart<String, Number> dailyLineChart;
     @FXML private CategoryAxis dailyXAxis;
     @FXML private NumberAxis dailyYAxis;
+    @FXML private PieChart revenuesPieChart;
+    @FXML private PieChart expensesPieChart;
 
     // Revenues
     @FXML private Button btnAddRevenue;
@@ -142,18 +142,16 @@ public class DashboardPanel extends AbstractPanel {
         tabPane.getSelectionModel().selectedItemProperty().addListener((o, oldVal, newVal) -> {
             if (newVal != null) {
                 switch (newVal.getText()) {
-                    case "Sales Projections" -> refreshProjections();
                     case "Revenues" -> refreshRevenues();
                     case "Expenses" -> refreshExpenses();
                     case "Summaries" -> refreshDailySummaries();
-                    default -> System.out.println("Recent Sales");
+                    default -> refreshProjections();
                 }
             }
         });
     }
 
     private void setupIcons() {
-        tabRecentSales.setGraphic(new ShoppingCartIcon(14));
         tabProjections.setGraphic(new TrendingUpIcon(14));
         tabRevenues.setGraphic(new PesoIcon(14));
         tabExpenses.setGraphic(new PesoIcon(14));
@@ -178,6 +176,7 @@ public class DashboardPanel extends AbstractPanel {
         colRevenueType.setCellValueFactory(new PropertyValueFactory<>("type"));
         colRevenueDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
         colRevenueAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        colRevenueAmount.setCellFactory(col -> new AmountTableCell<>());
         colRevenueDate.setCellValueFactory(new PropertyValueFactory<>("date"));
         colRevenueDate.setCellFactory(col -> new DateTableCell<>());
 
@@ -218,6 +217,7 @@ public class DashboardPanel extends AbstractPanel {
         colExpenseType.setCellValueFactory(new PropertyValueFactory<>("type"));
         colExpenseDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
         colExpenseAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        colExpenseAmount.setCellFactory(col -> new AmountTableCell<>());
         colExpenseDate.setCellValueFactory(new PropertyValueFactory<>("date"));
         colExpenseDate.setCellFactory(col -> new DateTableCell<>());
 
@@ -254,9 +254,13 @@ public class DashboardPanel extends AbstractPanel {
         colSummaryDate.setCellValueFactory(new PropertyValueFactory<>("date"));
         colSummaryDate.setCellFactory(col -> new DateTableCell<>());
         colSummaryForwarded.setCellValueFactory(new PropertyValueFactory<>("forwarded"));
+        colSummaryForwarded.setCellFactory(col -> new AmountTableCell<>());
         colSummaryRevenues.setCellValueFactory(new PropertyValueFactory<>("revenues"));
+        colSummaryRevenues.setCellFactory(col -> new AmountTableCell<>());
         colSummaryExpenses.setCellValueFactory(new PropertyValueFactory<>("expenses"));
+        colSummaryExpenses.setCellFactory(col -> new AmountTableCell<>());
         colSummaryBalance.setCellValueFactory(new PropertyValueFactory<>("balance"));
+        colSummaryBalance.setCellFactory(col -> new AmountTableCell<>());
     }
 
     @Override
@@ -267,7 +271,14 @@ public class DashboardPanel extends AbstractPanel {
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(summary -> {
                     hideProgress();
                     mSummary = summary;
-                    refreshSummary(this::refreshRevenues); // TODO change to recent sales
+                    refreshSummary(() -> {
+                        switch (tabPane.getSelectionModel().getSelectedIndex()) {
+                            case 1 -> refreshRevenues();
+                            case 2 -> refreshExpenses();
+                            case 3 -> refreshDailySummaries();
+                            default -> refreshProjections();
+                        }
+                    });
                 }, err -> {
                     hideProgress();
                     if (err.toString().contains("NullPointer")) {
@@ -354,6 +365,8 @@ public class DashboardPanel extends AbstractPanel {
                     lblRevenues.setText(ViewUtils.toStringMoneyFormat(mSummary.getRevenues()));
                     lblExpenses.setText(ViewUtils.toStringMoneyFormat(mSummary.getExpenses()));
                     lblBalances.setText(ViewUtils.toStringMoneyFormat(mSummary.getBalance()));
+
+                    if (onNext != null) onNext.run();
                 }, err -> {
                     hideProgress();
                     showErrorDialog("Database Error", "Error while updating summary details.\n" + err);
@@ -397,8 +410,9 @@ public class DashboardPanel extends AbstractPanel {
     private void displayProjections() {
         if (allRevenues != null && allExpenses != null) {
             // MONTHLY PROJECTIONS
-
-            monthlyXAxis.getCategories().addAll("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+            if (monthlyXAxis.getCategories().isEmpty()) {
+                monthlyXAxis.getCategories().addAll("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+            }
             LocalDate now = LocalDate.now();
 
             XYChart.Series<String, Number> monthlyRevenues = new XYChart.Series<>();
@@ -431,7 +445,9 @@ public class DashboardPanel extends AbstractPanel {
             }
 
             monthlyLineChart.getData().clear();
-            monthlyLineChart.getData().addAll(monthlyRevenues, monthlyExpenses, monthlyBalance);
+            monthlyLineChart.getData().add(monthlyRevenues);
+            monthlyLineChart.getData().add(monthlyExpenses);
+            monthlyLineChart.getData().add(monthlyBalance);
 
             // DAILY PROJECTIONS
             XYChart.Series<String, Number> dailyRevenues = new XYChart.Series<>();
@@ -442,6 +458,7 @@ public class DashboardPanel extends AbstractPanel {
             dailyBalance.setName("Cash Balance");
 
             YearMonth ym = YearMonth.now();
+            dailyXAxis.getCategories().clear();
             for (int d = 1; d <= ym.atEndOfMonth().getDayOfMonth(); d++) {
                 dailyXAxis.getCategories().add(d + "");
                 double revenues = 0;
@@ -466,7 +483,75 @@ public class DashboardPanel extends AbstractPanel {
             }
 
             dailyLineChart.getData().clear();
-            dailyLineChart.getData().addAll(dailyRevenues, dailyExpenses, dailyBalance);
+            dailyLineChart.getData().add(dailyRevenues);
+            dailyLineChart.getData().add(dailyExpenses);
+            dailyLineChart.getData().add(dailyBalance);
+
+            // PIE CHARTS
+            // Revenues
+            double billing = 0;
+            double purchase = 0;
+            double service = 0;
+            double vendo = 0;
+            double others = 0;
+            for (Revenue r : allRevenues) {
+                switch (r.getType()) {
+                    case Revenue.TYPE_BILLING -> billing += r.getAmount();
+                    case Revenue.TYPE_PURCHASE -> purchase += r.getAmount();
+                    case Revenue.TYPE_SERVICE -> service += r.getAmount();
+                    case Revenue.TYPE_WIFI_VENDO -> vendo += r.getAmount();
+                    default -> others += r.getAmount();
+                }
+            }
+            PieChart.Data revBilling = new PieChart.Data(Revenue.TYPE_BILLING, billing);
+            PieChart.Data revPurchase = new PieChart.Data(Revenue.TYPE_PURCHASE, purchase);
+            PieChart.Data revService = new PieChart.Data(Revenue.TYPE_SERVICE, service);
+            PieChart.Data revVendo = new PieChart.Data(Revenue.TYPE_WIFI_VENDO, vendo);
+            PieChart.Data revOthers = new PieChart.Data(Revenue.TYPE_OTHERS, others);
+            revenuesPieChart.getData().clear();
+            revenuesPieChart.getData().addAll(revBilling, revPurchase, revService, revVendo, revOthers);
+
+            // Expenses
+            double education = 0;
+            double electricity = 0;
+            double internet = 0;
+            double food = 0;
+            double repair = 0;
+            double maintenance = 0;
+            double payment = 0;
+            double transportation = 0;
+            double peripherals = 0;
+            double water = 0;
+            double otherExpenses = 0;
+            for (Expense e : allExpenses) {
+                switch (e.getType()) {
+                    case Expense.TYPE_EDUCATION -> education += e.getAmount();
+                    case Expense.TYPE_ELECTRICITY -> electricity += e.getAmount();
+                    case Expense.TYPE_INTERNET -> internet += e.getAmount();
+                    case Expense.TYPE_FOOD_GROCERY -> food += e.getAmount();
+                    case Expense.TYPE_REPAIR -> repair += e.getAmount();
+                    case Expense.TYPE_MAINTENANCE -> maintenance += e.getAmount();
+                    case Expense.TYPE_PAYMENT -> payment += e.getAmount();
+                    case Expense.TYPE_TRANSPORTATION -> transportation += e.getAmount();
+                    case Expense.TYPE_PERIPHERALS -> peripherals += e.getAmount();
+                    case Expense.TYPE_WATER -> water += e.getAmount();
+                    default -> otherExpenses += e.getAmount();
+                }
+            }
+            PieChart.Data expEducation = new PieChart.Data(Expense.TYPE_EDUCATION, education);
+            PieChart.Data expElectricity = new PieChart.Data(Expense.TYPE_ELECTRICITY, electricity);
+            PieChart.Data expInternet = new PieChart.Data(Expense.TYPE_INTERNET, internet);
+            PieChart.Data expFood = new PieChart.Data(Expense.TYPE_FOOD_GROCERY, food);
+            PieChart.Data expRepair = new PieChart.Data(Expense.TYPE_REPAIR, repair);
+            PieChart.Data expMaintenance = new PieChart.Data(Expense.TYPE_MAINTENANCE, maintenance);
+            PieChart.Data expPayment = new PieChart.Data(Expense.TYPE_PAYMENT, payment);
+            PieChart.Data expTransportation = new PieChart.Data(Expense.TYPE_TRANSPORTATION, transportation);
+            PieChart.Data expPeripherals = new PieChart.Data(Expense.TYPE_PERIPHERALS, peripherals);
+            PieChart.Data expWater = new PieChart.Data(Expense.TYPE_WATER, water);
+            PieChart.Data expOther = new PieChart.Data(Expense.TYPE_OTHERS, otherExpenses);
+            expensesPieChart.getData().clear();
+            expensesPieChart.getData().addAll(expEducation, expElectricity, expInternet, expFood, expRepair, expMaintenance,
+                    expPayment, expTransportation, expPeripherals, expWater, expOther);
         }
     }
 

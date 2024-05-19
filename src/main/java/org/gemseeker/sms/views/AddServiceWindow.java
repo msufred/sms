@@ -10,6 +10,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.Service;
@@ -27,10 +29,15 @@ public class AddServiceWindow extends AbstractWindow {
     private final ServiceController serviceController;
     private final CompositeDisposable disposables;
 
-    public AddServiceWindow(Database database) {
-        super("Add Service", AddServiceWindow.class.getResource("add_service.fxml"), null, null);
+    public AddServiceWindow(Database database, Stage owner) {
+        super("Add Service", AddServiceWindow.class.getResource("add_service.fxml"), null, owner);
         serviceController = new ServiceController(database);
         disposables = new CompositeDisposable();
+    }
+
+    @Override
+    protected void initWindow(Stage stage) {
+        stage.initModality(Modality.APPLICATION_MODAL);
     }
 
     @Override

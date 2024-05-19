@@ -9,6 +9,8 @@ import io.reactivex.schedulers.Schedulers;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.gemseeker.sms.data.*;
 import org.gemseeker.sms.data.controllers.*;
 
@@ -65,8 +67,8 @@ public class AcceptPaymentWindow extends AbstractWindow {
     private double amountPaid = 0;
     private double balance = 0;
 
-    public AcceptPaymentWindow(Database database, PrintWindow printWindow, SaveImageWindow saveImageWindow) {
-        super("Accept Payment", AcceptPaymentWindow.class.getResource("accept_payment.fxml"), null, null);
+    public AcceptPaymentWindow(Database database, PrintWindow printWindow, SaveImageWindow saveImageWindow, Stage owner) {
+        super("Accept Payment", AcceptPaymentWindow.class.getResource("accept_payment.fxml"), null, owner);
         this.billingController = new BillingController(database);
         this.accountController = new AccountController(database);
         this.billingStatementController = new BillingStatementController(database);
@@ -77,6 +79,11 @@ public class AcceptPaymentWindow extends AbstractWindow {
 
         this.printWindow = printWindow;
         this.saveImageWindow = saveImageWindow;
+    }
+
+    @Override
+    protected void initWindow(Stage stage) {
+        stage.initModality(Modality.APPLICATION_MODAL);
     }
 
     @Override

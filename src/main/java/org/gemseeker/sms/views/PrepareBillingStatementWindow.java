@@ -54,8 +54,8 @@ public class PrepareBillingStatementWindow extends AbstractWindow {
     // Windows
     private PrintWindow printWindow;
 
-    public PrepareBillingStatementWindow(Database database) {
-        super("Billing Statement", PrepareBillingStatementWindow.class.getResource("prepare_billing_statement.fxml"), null, null);
+    public PrepareBillingStatementWindow(Database database, Stage owner) {
+        super("Billing Statement", PrepareBillingStatementWindow.class.getResource("prepare_billing_statement.fxml"), null, owner);
         this.database = database;
         accountController = new AccountController(database);
         billingController = new BillingController(database);
@@ -245,7 +245,7 @@ public class PrepareBillingStatementWindow extends AbstractWindow {
         }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
             progressBar.setVisible(false);
             if (!success) showWarningDialog("Failed", "Failed to update Billing Statement.");
-            if (printWindow == null) printWindow = new PrintWindow(database);
+            if (printWindow == null) printWindow = new PrintWindow(database, getStage());
             printWindow.showAndWait(PrintWindow.Type.STATEMENT, mBillingNo);
             close();
         }, err -> {
@@ -290,7 +290,7 @@ public class PrepareBillingStatementWindow extends AbstractWindow {
         }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
             progressBar.setVisible(false);
             if (!success) showWarningDialog("Failed", "Failed to add new Billing Statement.");
-            if (printWindow == null) printWindow = new PrintWindow(database);
+            if (printWindow == null) printWindow = new PrintWindow(database, getStage());
             printWindow.showAndWait(PrintWindow.Type.STATEMENT, mBillingNo);
             close();
         }, err -> {

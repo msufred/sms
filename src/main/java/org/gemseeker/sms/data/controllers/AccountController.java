@@ -103,7 +103,8 @@ public class AccountController implements ModelController<Account> {
     }
 
     public ObservableList<AccountSubscription> getAccountsWithSubscription() throws SQLException {
-        String sql = "SELECT accounts.*, subscriptions.status, subscriptions.start_date, subscriptions.end_date FROM " +
+        String sql = "SELECT accounts.*, subscriptions.status, subscriptions.start_date, subscriptions.end_date, " +
+                "subscriptions.monthly_fee FROM " +
                 "accounts LEFT JOIN subscriptions ON subscriptions.account_no = accounts.account_no WHERE " +
                 "accounts.date_deleted IS NULL";
         ObservableList<AccountSubscription> list = FXCollections.observableArrayList();
@@ -134,6 +135,7 @@ public class AccountController implements ModelController<Account> {
         if (startDate != null) account.setStartDate(startDate.toLocalDate());
         Date endDate = rs.getDate(14);
         if (endDate != null) account.setEndDate(endDate.toLocalDate());
+        account.setMonthlyFee(rs.getDouble(15));
 
         return account;
     }

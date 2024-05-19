@@ -171,7 +171,7 @@ public class MapsPanel extends AbstractPanel {
     }
 
     private void addItem() {
-        if (addTowerWindow == null) addTowerWindow = new AddTowerWindow(database);
+        if (addTowerWindow == null) addTowerWindow = new AddTowerWindow(database, mainWindow.getStage());
         addTowerWindow.showAndWait();
         refreshList();
     }
@@ -180,7 +180,7 @@ public class MapsPanel extends AbstractPanel {
         if (selectedItem.get() == null) {
             showWarningDialog("Invalid Action", "No selected Tower entry. Try again.");
         } else {
-            if (editTowerWindow == null) editTowerWindow = new EditTowerWindow(database);
+            if (editTowerWindow == null) editTowerWindow = new EditTowerWindow(database, mainWindow.getStage());
             editTowerWindow.showAndWait(selectedItem.get().getAccountNo());
             refreshList();
         }

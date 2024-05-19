@@ -11,6 +11,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.gemseeker.sms.data.*;
 import org.gemseeker.sms.data.controllers.*;
 
@@ -84,8 +86,8 @@ public class AddBillingWindow extends AbstractWindow {
     private double vat = 0;
     private double total = 0;
 
-    public AddBillingWindow(Database database, PrintWindow printWindow, SaveImageWindow saveImageWindow) {
-        super("Add Billing Payment", AddBillingWindow.class.getResource("add_billing_2.fxml"), null, null);
+    public AddBillingWindow(Database database, PrintWindow printWindow, SaveImageWindow saveImageWindow, Stage owner) {
+        super("Add Billing Payment", AddBillingWindow.class.getResource("add_billing_2.fxml"), null, owner);
         this.database = database;
         this.printWindow = printWindow;
         this.saveImageWindow = saveImageWindow;
@@ -95,6 +97,11 @@ public class AddBillingWindow extends AbstractWindow {
         balanceController = new BalanceController(database);
         billingStatementController = new BillingStatementController(database);
         disposables = new CompositeDisposable();
+    }
+
+    @Override
+    protected void initWindow(Stage stage) {
+        stage.initModality(Modality.APPLICATION_MODAL);
     }
 
     @Override

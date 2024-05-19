@@ -36,8 +36,8 @@ public class EditTowerWindow extends AbstractWindow {
     private String mAccountNo;
     private Tower mTower;
 
-    public EditTowerWindow(Database database) {
-        super("Edit Tower Info", EditTowerWindow.class.getResource("edit_tower.fxml"), null, null);
+    public EditTowerWindow(Database database, Stage owner) {
+        super("Edit Tower Info", EditTowerWindow.class.getResource("edit_tower.fxml"), null, owner);
         towerController = new TowerController(database);
         disposables = new CompositeDisposable();
     }
