@@ -17,6 +17,7 @@ import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.Tower;
 import org.gemseeker.sms.data.controllers.AccountController;
 import org.gemseeker.sms.data.controllers.TowerController;
+import org.gemseeker.sms.views.panels.maps.SourceLayer;
 
 public class AddTowerWindow extends AbstractWindow {
 
@@ -62,7 +63,7 @@ public class AddTowerWindow extends AbstractWindow {
         });
 
         cbTowerTypes.setItems(FXCollections.observableArrayList(
-                Tower.TYPE_DEFAULT, Tower.TYPE_ACCESS_POINT, Tower.TYPE_RELAY
+                Tower.TYPE_SOURCE, Tower.TYPE_DEFAULT, Tower.TYPE_ACCESS_POINT, Tower.TYPE_RELAY
         ));
 
         btnSave.setOnAction(evt -> validateAndSave());
@@ -133,7 +134,10 @@ public class AddTowerWindow extends AbstractWindow {
             String elevStr = tfElevation.getText();
             tower.setElevation(elevStr.isBlank() ? 0.0f : Float.parseFloat(elevStr.trim()));
             Tower parent = cbParentTower.getValue();
-            if (parent != null) tower.setParentTowerId(parent.getId());
+            if (parent != null) {
+                tower.setParentTowerId(parent.getId());
+                tower.setParentName(parent.getName());
+            }
             return towerController.insert(tower);
         }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
             progressBar.setVisible(false);
@@ -155,8 +159,8 @@ public class AddTowerWindow extends AbstractWindow {
         cbTowerTypes.getSelectionModel().select(0);
         tfName.clear();
         tfTowerHeight.setText("0.0");
-        tfLatitude.setText("0.0");
-        tfLongitude.setText("0.0");
+        tfLatitude.setText(SourceLayer.LATITUDE + "");
+        tfLongitude.setText(SourceLayer.LONGITUDE + "");
         tfElevation.setText("0.0");
 
         lblErrAccount.setVisible(false);

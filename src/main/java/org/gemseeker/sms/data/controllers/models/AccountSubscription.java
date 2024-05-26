@@ -26,6 +26,9 @@ public class AccountSubscription {
     private LocalDate endDate;
     private double monthlyFee;
 
+    private String towerName;
+    private String parentTower;
+
     public int getId() {
         return id;
     }
@@ -144,5 +147,21 @@ public class AccountSubscription {
 
     public void setMonthlyFee(double monthlyFee) {
         this.monthlyFee = monthlyFee;
+    }
+
+    public String getTowerName() {
+        return towerName;
+    }
+
+    public void setTowerName(String towerName) {
+        this.towerName = towerName;
+    }
+
+    public String getParentTower() {
+        return parentTower;
+    }
+
+    public void setParentTower(String parentTower) {
+        this.parentTower = parentTower;
     }
 }

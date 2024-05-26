@@ -15,9 +15,8 @@ import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.commons.math3.analysis.function.Exp;
+import org.gemseeker.sms.ExportUtils;
 import org.gemseeker.sms.Utils;
 import org.gemseeker.sms.data.DailySummary;
 import org.gemseeker.sms.data.Database;
@@ -33,13 +32,11 @@ import org.gemseeker.sms.views.cells.TagTableCell;
 import org.gemseeker.sms.views.icons.PesoIcon;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoField;
+import java.util.Comparator;
 import java.util.Optional;
 
 public class DashboardPanel extends AbstractPanel {
@@ -92,6 +89,8 @@ public class DashboardPanel extends AbstractPanel {
     @FXML private TableColumn<Expense, LocalDate> colExpenseDate;
 
     // Summaries
+    @FXML private Button btnExportSummaries;
+    @FXML private Button btnRecalculate;
     @FXML private TableView<DailySummary> summariesTable;
     @FXML private TableColumn<DailySummary, String> colSummaryTag;
     @FXML private TableColumn<DailySummary, LocalDate> colSummaryDate;
@@ -122,6 +121,7 @@ public class DashboardPanel extends AbstractPanel {
     private EditRevenueWindow editRevenueWindow;
     private AddExpenseWindow addExpenseWindow;
     private EditExpenseWindow editExpenseWindow;
+    private RecalculateWindow recalculateWindow;
 
     // Summary Values
     private DailySummary mSummary;
@@ -131,6 +131,7 @@ public class DashboardPanel extends AbstractPanel {
     private ObservableList<Expense> expensesToday;
     private ObservableList<Revenue> allRevenues;
     private ObservableList<Expense> allExpenses;
+    private ObservableList<DailySummary> allSummaries;
 
     private double mCashForwarded = 0.0;
     private double mRevenues = 0.0;
@@ -182,6 +183,9 @@ public class DashboardPanel extends AbstractPanel {
         btnEditExpense.setGraphic(new Edit2Icon(14));
         btnDeleteExpense.setGraphic(new TrashIcon(14));
         btnExportExpenses.setGraphic(new UploadIcon(14));
+
+        btnExportSummaries.setGraphic(new UploadIcon(14));
+        btnRecalculate.setGraphic(new SettingsIcon(14));
     }
 
     private void setupRevenuesTab() {
@@ -277,6 +281,9 @@ public class DashboardPanel extends AbstractPanel {
     }
 
     private void setupSummariesTab() {
+        btnExportSummaries.setOnAction(evt -> exportSummaries());
+        btnRecalculate.setOnAction(evt -> recalculateSummaries());
+
         colSummaryTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
         colSummaryTag.setCellFactory(col -> new TagTableCell<>());
         colSummaryDate.setCellValueFactory(new PropertyValueFactory<>("date"));
@@ -289,6 +296,17 @@ public class DashboardPanel extends AbstractPanel {
         colSummaryExpenses.setCellFactory(col -> new AmountTableCell<>());
         colSummaryBalance.setCellValueFactory(new PropertyValueFactory<>("balance"));
         colSummaryBalance.setCellFactory(col -> new AmountTableCell<>());
+
+        MenuItem mRecalculate = new MenuItem("Recalculate");
+        mRecalculate.setGraphic(new SettingsIcon(12));
+        mRecalculate.setOnAction(evt -> recalculateSummaries());
+
+        MenuItem mExport = new MenuItem("Export");
+        mExport.setGraphic(new UploadIcon(12));
+        mExport.setOnAction(evt -> exportSummaries());
+
+        ContextMenu cm = new ContextMenu(mRecalculate, mExport);
+        summariesTable.setContextMenu(cm);
     }
 
     @Override
@@ -406,12 +424,19 @@ public class DashboardPanel extends AbstractPanel {
         disposables.add(Single.fromCallable(dailySummaryController::getAll)
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
                     hideProgress();
+                    FXCollections.sort(list, Comparator.comparing(DailySummary::getDate));
                     summariesList = new FilteredList<>(list);
                     summariesTable.setItems(summariesList);
                 }, err -> {
                     hideProgress();
                     showErrorDialog("Database Error", "Error while retrieving daily summary entries.\n" + err);
                 }));
+    }
+
+    private void recalculateSummaries() {
+        if (recalculateWindow == null) recalculateWindow = new RecalculateWindow(database, mainWindow.getStage());
+        recalculateWindow.showAndWait();
+        onResume();
     }
 
     @Override
@@ -425,9 +450,12 @@ public class DashboardPanel extends AbstractPanel {
                 .flatMap(revenues -> {
                     allRevenues = revenues;
                     return Single.fromCallable(expenseController::getAll);
-                }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(expenses -> {
-                    hideProgress();
+                }).flatMap(expenses -> {
                     allExpenses = expenses;
+                    return Single.fromCallable(dailySummaryController::getAll);
+                }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(summaries -> {
+                    hideProgress();
+                    allSummaries = summaries;
                     displayProjections();
                 }, err -> {
                     hideProgress();
@@ -436,7 +464,7 @@ public class DashboardPanel extends AbstractPanel {
     }
 
     private void displayProjections() {
-        if (allRevenues != null && allExpenses != null) {
+        if (allRevenues != null && allExpenses != null && allSummaries != null) {
             // MONTHLY PROJECTIONS
             if (monthlyXAxis.getCategories().isEmpty()) {
                 monthlyXAxis.getCategories().addAll("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
@@ -453,20 +481,16 @@ public class DashboardPanel extends AbstractPanel {
             for (int month = 1; month <= 12; month++) {
                 double revenues = 0;
                 double expenses = 0;
+                double balance = 0;
 
-                for (Revenue r : allRevenues) {
-                    if (r.getDate().getMonthValue() == month && r.getDate().getYear() == now.getYear()) {
-                        revenues += r.getAmount();
+                for (DailySummary s : allSummaries) {
+                    if (s.getDate().getMonthValue() == month && s.getDate().getYear() == now.getYear()) {
+                        revenues += s.getRevenues();
+                        expenses += s.getExpenses();
+                        balance += s.getBalance();
                     }
                 }
 
-                for (Expense e : allExpenses) {
-                    if (e.getDate().getMonthValue() == month && e.getDate().getYear() == now.getYear()) {
-                        expenses += e.getAmount();
-                    }
-                }
-
-                double balance = revenues - expenses;
                 monthlyRevenues.getData().add(new XYChart.Data<>(ViewUtils.shortMonthStringValue(month), revenues));
                 monthlyExpenses.getData().add(new XYChart.Data<>(ViewUtils.shortMonthStringValue(month), expenses));
                 monthlyBalance.getData().add(new XYChart.Data<>(ViewUtils.shortMonthStringValue(month), balance));
@@ -489,22 +513,19 @@ public class DashboardPanel extends AbstractPanel {
             dailyXAxis.getCategories().clear();
             for (int d = 1; d <= ym.atEndOfMonth().getDayOfMonth(); d++) {
                 dailyXAxis.getCategories().add(d + "");
+
                 double revenues = 0;
                 double expenses = 0;
+                double balance = 0;
 
-                for (Revenue r : allRevenues) {
-                    if (r.getDate().getDayOfMonth() == d && r.getDate().getYear() == ym.getYear()) {
-                        revenues += r.getAmount();
+                for (DailySummary s : allSummaries) {
+                    if (s.getDate().getDayOfMonth() == d && s.getDate().getMonthValue() == now.getMonthValue() && s.getDate().getYear() == ym.getYear()) {
+                        revenues += s.getRevenues();
+                        expenses += s.getExpenses();
+                        balance += s.getBalance();
                     }
                 }
 
-                for (Expense e : allExpenses) {
-                    if (e.getDate().getDayOfMonth() == d && e.getDate().getYear() == ym.getYear()) {
-                        expenses += e.getAmount();
-                    }
-                }
-
-                double balance = revenues - expenses;
                 dailyRevenues.getData().add(new XYChart.Data<>(d + "", revenues));
                 dailyExpenses.getData().add(new XYChart.Data<>(d + "", expenses));
                 dailyBalance.getData().add(new XYChart.Data<>(d + "", balance));
@@ -735,21 +756,14 @@ public class DashboardPanel extends AbstractPanel {
 
     private void exportRevenues() {
         if (revenueList == null) return;
-
-        if (directoryChooser == null) {
-            directoryChooser = new DirectoryChooser();
-            directoryChooser.setTitle("Set Destination Folder");
-        }
-        File dirFolder = directoryChooser.showDialog(mainWindow.getStage());
+        File dirFolder = getDirectoryChooser().showDialog(mainWindow.getStage());
         if (dirFolder != null) {
             String filename = String.format("revenues_%s.xls", LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMM-dd-yyyy_hh-mm-ss")));
             File outputFile = new File(dirFolder + Utils.FILE_SEPARATOR + filename);
             showProgress("Exporting Revenue list...");
             disposables.add(Completable.fromAction(() -> {
                 ExportUtils.exportRevenues(revenueList, outputFile);
-            }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(() -> {
-                hideProgress();
-            }, err -> {
+            }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(this::hideProgress, err -> {
                 hideProgress();
                 showErrorDialog("IOException", "Error while exporting Revenue list to file.\n" + err);
             }));
@@ -758,24 +772,42 @@ public class DashboardPanel extends AbstractPanel {
 
     private void exportExpenses() {
         if (expenseList == null) return;
-        if (directoryChooser == null) {
-            directoryChooser = new DirectoryChooser();
-            directoryChooser.setTitle("Set Destination Folder");
-        }
-        File dirFolder = directoryChooser.showDialog(mainWindow.getStage());
+        File dirFolder = getDirectoryChooser().showDialog(mainWindow.getStage());
         if (dirFolder != null) {
             String filename = String.format("expenses_%s.xls", LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMM-dd-yyyy_hh-mm-ss")));
             File outputFile = new File(dirFolder + Utils.FILE_SEPARATOR + filename);
             showProgress("Exporting Expense list...");
             disposables.add(Completable.fromAction(() -> {
-                ExportUtils.exportRevenues(revenueList, outputFile);
-            }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(() -> {
-                hideProgress();
-            }, err -> {
+                ExportUtils.exportExpenses(expenseList, outputFile);
+            }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(this::hideProgress, err -> {
                 hideProgress();
                 showErrorDialog("IOException", "Error while exporting Expense list to file.\n" + err);
             }));
         }
+    }
+
+    private void exportSummaries() {
+        if (summariesList == null) return;
+        File dirFolder = getDirectoryChooser().showDialog(mainWindow.getStage());
+        if (dirFolder != null) {
+            String filename = String.format("summaries_%s.xls", LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMM-dd-yyyy_hh-mm-ss")));
+            File outputFile = new File(dirFolder.getPath() + Utils.FILE_SEPARATOR + filename);
+            showProgress("Exporting Summaries list...");
+            disposables.add(Completable.fromAction(() -> {
+                ExportUtils.exportSummaries(summariesList, outputFile);
+            }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(this::hideProgress, err -> {
+                hideProgress();
+                showErrorDialog("IOException", "Error while exporting Summary list to file.\n" + err);
+            }));
+        }
+    }
+
+    private DirectoryChooser getDirectoryChooser() {
+        if (directoryChooser == null) {
+            directoryChooser = new DirectoryChooser();
+            directoryChooser.setTitle("Set Destination Folder");
+        }
+        return directoryChooser;
     }
 
     private void showProgress(String text) {
@@ -792,6 +824,7 @@ public class DashboardPanel extends AbstractPanel {
         if (editRevenueWindow != null) editRevenueWindow.dispose();
         if (addExpenseWindow != null) addExpenseWindow.dispose();
         if (editExpenseWindow != null) editExpenseWindow.dispose();
+        if (recalculateWindow != null) recalculateWindow.dispose();
         disposables.dispose();
     }
 }

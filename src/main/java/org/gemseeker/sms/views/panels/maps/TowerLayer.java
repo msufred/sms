@@ -15,6 +15,7 @@ import javafx.scene.shape.Circle;
 import org.gemseeker.sms.data.Tower;
 import org.gemseeker.sms.views.icons.CircleFilledIcon;
 import org.gemseeker.sms.views.icons.PentagonIcon;
+import org.gemseeker.sms.views.icons.StarFilledIcon;
 import org.gemseeker.sms.views.icons.TriangleFilledIcon;
 
 import java.util.LinkedHashMap;
@@ -53,9 +54,12 @@ public class TowerLayer extends MapLayer {
             } else if (Objects.equals(tower.getType(), Tower.TYPE_RELAY)) {
                 icon = new TriangleFilledIcon(SIZE);
                 icon.setStyle("-fx-background-color: #eab308");
-            } else {
+            } else if (Objects.equals(tower.getType(), Tower.TYPE_DEFAULT)){
                 icon = new CircleFilledIcon(SIZE);
                 icon.setStyle("-fx-background-color: #15803d");
+            } else {
+                icon = new StarFilledIcon(SIZE + 2);
+                icon.setStyle("-fx-background-color: #dc2626");
             }
             Tooltip.install(icon, new Tooltip(tower.getName()));
             getChildren().add(icon);

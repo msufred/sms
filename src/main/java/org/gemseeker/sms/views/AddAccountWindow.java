@@ -19,6 +19,7 @@ import org.gemseeker.sms.data.controllers.AccountController;
 import org.gemseeker.sms.data.controllers.DataPlanController;
 import org.gemseeker.sms.data.controllers.SubscriptionController;
 import org.gemseeker.sms.data.controllers.TowerController;
+import org.gemseeker.sms.views.panels.maps.SourceLayer;
 
 import javax.swing.text.View;
 import java.util.concurrent.Callable;
@@ -79,8 +80,6 @@ public class AddAccountWindow extends AbstractWindow {
     private final XCircleIcon xCircleIcon = new XCircleIcon(14);
     private final CheckCircleIcon checkCircleIcon = new CheckCircleIcon(14);
 
-    private final Tower source;
-
     public AddAccountWindow(Database database, Stage owner) {
         super("Add Account", AddAccountWindow.class.getResource("add_account.fxml"), null, owner);
         dataPlanController = new DataPlanController(database);
@@ -89,11 +88,6 @@ public class AddAccountWindow extends AbstractWindow {
         towerController = new TowerController(database);
         disposables = new CompositeDisposable();
         this.database = database;
-
-        source = new Tower();
-        source.setLatitude(6.34137f);
-        source.setLongitude(124.72314f);
-        source.setAccountNo("Main Tower");
     }
 
     @Override
@@ -125,7 +119,7 @@ public class AddAccountWindow extends AbstractWindow {
         });
 
         cbTowerTypes.setItems(FXCollections.observableArrayList(
-                Tower.TYPE_DEFAULT, Tower.TYPE_RELAY, Tower.TYPE_ACCESS_POINT
+                Tower.TYPE_SOURCE, Tower.TYPE_DEFAULT, Tower.TYPE_RELAY, Tower.TYPE_ACCESS_POINT
         ));
         cbTowerTypes.setValue(Tower.TYPE_DEFAULT);
 
@@ -153,7 +147,6 @@ public class AddAccountWindow extends AbstractWindow {
                     return Single.fromCallable(towerController::getAll);
                 }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(towers -> {
                     progressBar.setVisible(false);
-                    towers.add(0, source);
                     cbParentTower.setItems(towers);
                 }, err -> {
                     progressBar.setVisible(false);
@@ -297,7 +290,11 @@ public class AddAccountWindow extends AbstractWindow {
         String heightStr = tfTowerHeight.getText();
         tower.setTowerHeight(heightStr.isBlank() ? 0.0 : Double.parseDouble(heightStr.trim()));
         tower.setIpAddress(ViewUtils.normalize(tfIpAddress.getText()));
-        if (cbParentTower.getValue() != null) tower.setParentTowerId(cbParentTower.getValue().getId());
+        Tower parentTower = cbParentTower.getValue();
+        if (parentTower != null) {
+            tower.setParentTowerId(parentTower.getId());
+            tower.setParentName(parentTower.getName());
+        }
         return tower;
     }
 
@@ -319,7 +316,7 @@ public class AddAccountWindow extends AbstractWindow {
     private void clearFields() {
         tfName.clear();
         tfAccountNo.clear();
-        tfAddress.clear();
+        tfAddress.setText("Colongulo, Surallah, South Cotabato");
         tfEmail.clear();
         tfPhone.clear();
         cbAddSubscription.setSelected(false);
@@ -332,8 +329,8 @@ public class AddAccountWindow extends AbstractWindow {
         cbAddTowerInfo.setSelected(false);
         cbTowerTypes.getSelectionModel().select(0);
         tfTowerHeight.setText("0.0");
-        tfLatitude.setText("0.0");
-        tfLongitude.setText("0.0");
+        tfLatitude.setText(SourceLayer.LATITUDE + "");
+        tfLongitude.setText(SourceLayer.LONGITUDE + "");
         tfElevation.setText("0.0");
         cbParentTower.setValue(null);
 

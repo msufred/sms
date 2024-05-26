@@ -14,6 +14,7 @@ public final class DBTables {
                 createTowersTable(),
                 createBillingsTable(),
                 createBillingStatementsTable(),
+                createPurchaseBillingsTable(),
                 createPaymentsTable(),
                 createPaymentItemsTable(),
                 createBalancesTable(),
@@ -27,6 +28,7 @@ public final class DBTables {
     public static String[] updatesSql() {
         return new String[] {
                 updateTowersTable(),
+                updateTowersTable_050224()
         };
     }
 
@@ -203,6 +205,23 @@ public final class DBTables {
                 ")";
     }
 
+    private static String createPurchaseBillingsTable() {
+        return "CREATE TABLE IF NOT EXISTS purchase_billings (" +
+                "id INT NOT NULL AUTO_INCREMENT, " +
+                "billing_no VARCHAR(10) NOT NULL, " +
+                "name VARCHAR(255) NOT NULL, " +
+                "walk_in BOOLEAN DEFAULT 'false', " +
+                "to_pay DOUBLE DEFAULT '0.0', " +
+                "status VARCHAR(16) DEFAULT 'For Payment', " +
+                "payment_no VARCHAR(16) DEFAULT '', " +
+                "tag VARCHAR(16) DEFAULT 'normal', " +
+                "date_created TIMESTAMP, " +
+                "date_updated TIMESTAMP, " +
+                "date_deleted TIMESTAMP, " +
+                "PRIMARY KEY (id)" +
+                ")";
+    }
+
     private static String createPaymentsTable() {
         return "CREATE TABLE IF NOT EXISTS payments (" +
                 "id INT NOT NULL AUTO_INCREMENT, " +
@@ -325,5 +344,9 @@ public final class DBTables {
 
     private static String updateTowersTable() {
         return "ALTER TABLE towers ADD COLUMN IF NOT EXISTS name VARCHAR(255) DEFAULT '' AFTER type";
+    }
+
+    private static String updateTowersTable_050224() {
+        return "ALTER TABLE towers ADD COLUMN IF NOT EXISTS parent_name VARCHAR(255) DEFAULT '' AFTER parent_tower_id";
     }
 }

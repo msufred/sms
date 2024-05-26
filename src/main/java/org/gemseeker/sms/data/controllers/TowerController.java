@@ -21,22 +21,22 @@ public class TowerController implements ModelController<Tower> {
     @Override
     public boolean insert(Tower model) throws SQLException {
         String sql = String.format("INSERT INTO towers (account_no, type, name, latitude, longitude, elevation, " +
-                        "tower_height, ip_address, parent_tower_id, status, tag, date_created, date_updated) VALUES " +
-                        "('%s', '%s', '%s', '%f', '%f', '%f', '%f', '%s', '%d', '%s', '%s', '%s', '%s')",
+                        "tower_height, ip_address, parent_tower_id, parent_name, status, tag, date_created, date_updated) VALUES " +
+                        "('%s', '%s', '%s', '%f', '%f', '%f', '%f', '%s', '%d', '%s', '%s', '%s', '%s', '%s')",
                 model.getAccountNo(), model.getType(), model.getName(), model.getLatitude(), model.getLongitude(),
                 model.getElevation(), model.getTowerHeight(), model.getIpAddress(), model.getParentTowerId(),
-                model.getStatus(), model.getTag(), model.getDateCreated(), model.getDateUpdated());
+                model.getParentName(), model.getStatus(), model.getTag(), model.getDateCreated(), model.getDateUpdated());
         return database.executeQuery(sql);
     }
 
     @Override
     public boolean update(Tower model) throws SQLException {
         String sql = String.format("UPDATE towers SET type='%s', name='%s', latitude='%f', longitude='%f', " +
-                        "elevation='%f', tower_height='%f', ip_address='%s', parent_tower_id='%d', status='%s', " +
-                        "tag='%s', date_updated='%s' WHERE id='%d'",
+                        "elevation='%f', tower_height='%f', ip_address='%s', parent_tower_id='%d', parent_name='%s', " +
+                        "status='%s', tag='%s', date_updated='%s' WHERE id='%d'",
                 model.getType(), model.getName(), model.getLatitude(), model.getLongitude(), model.getElevation(),
-                model.getTowerHeight(), model.getIpAddress(), model.getParentTowerId(), model.getStatus(),
-                model.getTag(), LocalDateTime.now(), model.getId());
+                model.getTowerHeight(), model.getIpAddress(), model.getParentTowerId(), model.getParentName(),
+                model.getStatus(), model.getTag(), LocalDateTime.now(), model.getId());
         return database.executeQuery(sql);
     }
 
@@ -92,6 +92,7 @@ public class TowerController implements ModelController<Tower> {
         tower.setTowerHeight(rs.getDouble(index++));
         tower.setIpAddress(rs.getString(index++));
         tower.setParentTowerId(rs.getInt(index++));
+        tower.setParentName(rs.getString(index++));
         tower.setStatus(rs.getString(index++));
         tower.setTag(rs.getString(index++));
         tower.setDateCreated(rs.getTimestamp(index++).toLocalDateTime());
@@ -108,4 +109,5 @@ public class TowerController implements ModelController<Tower> {
         }
         return false;
     }
+
 }

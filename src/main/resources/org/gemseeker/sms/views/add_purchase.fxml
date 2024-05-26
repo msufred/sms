@@ -8,31 +8,48 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="500.0" prefWidth="500.0" spacing="8.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="500.0" prefWidth="800.0" spacing="8.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label styleClass="form-title" text="Add Purchase">
+      <Label styleClass="form-title" text="Purchase Order">
          <VBox.margin>
             <Insets left="16.0" top="16.0" />
          </VBox.margin>
       </Label>
-      <HBox alignment="CENTER_LEFT">
+      <HBox alignment="CENTER_LEFT" spacing="8.0">
          <children>
-            <RadioButton fx:id="rbAccount" minWidth="110.0" mnemonicParsing="false" selected="true" text="Account" />
-            <ComboBox fx:id="cbAccounts" prefWidth="500.0" promptText="Select Account" HBox.hgrow="ALWAYS" />
+            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <RadioButton fx:id="rbAccount" minWidth="110.0" mnemonicParsing="false" selected="true" text="Account">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="toggleGroup" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <ComboBox fx:id="cbAccounts" promptText="Select Account" />
+               </children>
+            </VBox>
+            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <RadioButton fx:id="rbWalkIn" minWidth="110.0" mnemonicParsing="false" text="Walk-in Client" toggleGroup="$toggleGroup" />
+                  <TextField fx:id="tfClientName" disable="true" promptText="Enter Client Name" />
+               </children>
+            </VBox>
+            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label text="Purchase No" />
+                  <TextField fx:id="tfPurchaseNo" />
+               </children>
+            </VBox>
          </children>
          <VBox.margin>
             <Insets left="16.0" right="16.0" />
          </VBox.margin>
       </HBox>
       <HBox alignment="CENTER_LEFT">
-         <children>
-            <RadioButton fx:id="rbWalkIn" minWidth="110.0" mnemonicParsing="false" text="Walk-in Client" />
-            <TextField fx:id="tfClientName" disable="true" promptText="Enter Client Name" HBox.hgrow="ALWAYS" />
-         </children>
          <VBox.margin>
             <Insets left="16.0" right="16.0" />
          </VBox.margin>
@@ -41,13 +58,27 @@
          <children>
             <VBox prefHeight="355.0" prefWidth="200.0" spacing="4.0" HBox.hgrow="ALWAYS">
                <children>
-                  <Label text="Purchased Item(s)s" />
-                  <ComboBox fx:id="cbPurchaseType" prefWidth="240.0" promptText="Select Purchase Type" />
-                  <ListView fx:id="purchaseList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                  <Label style="-fx-font-weight: bold; -fx-font-size: 16;" text="Purchased Item(s)s" />
+                  <HBox alignment="CENTER_LEFT" spacing="4.0">
+                     <children>
+                        <ComboBox fx:id="cbItems" prefWidth="200.0" promptText="Select Item" />
+                        <Label text="Qty">
+                           <HBox.margin>
+                              <Insets left="8.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="tfQty" prefWidth="50.0" text="1" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="btnAddItem" mnemonicParsing="false" styleClass="btn" text="Add">
+                           <HBox.margin>
+                              <Insets left="8.0" />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <ListView fx:id="productsList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
                   <HBox spacing="8.0">
                      <children>
-                        <Button fx:id="btnAddItem" disable="true" mnemonicParsing="false" prefWidth="200.0" styleClass="form-button-regular" text="Add Item" HBox.hgrow="ALWAYS" />
-                        <Button fx:id="btnDeleteItem" disable="true" mnemonicParsing="false" prefWidth="200.0" styleClass="form-button-regular" text="Remove Item" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="btnRemoveItem" mnemonicParsing="false" styleClass="btn" text="Remove Item" HBox.hgrow="ALWAYS" />
                      </children>
                   </HBox>
                </children>
@@ -57,7 +88,7 @@
             </VBox>
             <VBox styleClass="form-content-grey" HBox.hgrow="ALWAYS">
                <children>
-                  <Label text="Purchase Details" />
+                  <Label style="-fx-font-weight: bold; -fx-font-size: 16;" text="Purchase Details" />
                   <HBox spacing="8.0">
                      <children>
                         <Label styleClass="form-label" text="Total" />
@@ -104,8 +135,8 @@
       </HBox>
       <HBox alignment="CENTER_RIGHT" spacing="8.0">
          <children>
+            <Button fx:id="btnSave" mnemonicParsing="false" styleClass="form-button-positve" text="Accept Payment" />
             <Button fx:id="btnDiscard" mnemonicParsing="false" styleClass="form-button-regular" text="Discard" />
-            <Button fx:id="btnAcceptPayment" mnemonicParsing="false" styleClass="form-button-positve" text="Accept Payment" />
          </children>
          <VBox.margin>
             <Insets />

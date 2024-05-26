@@ -23,6 +23,7 @@ module org.gemseeker.sms {
 
     requires org.apache.poi.poi;
     requires org.apache.poi.ooxml;
+    requires commons.math3;
 
     opens org.gemseeker.sms.views to javafx.fxml;
     opens org.gemseeker.sms.views.panels to javafx.fxml;
@@ -33,4 +34,5 @@ module org.gemseeker.sms {
 
     exports org.gemseeker.sms;
     exports org.gemseeker.sms.data;
+    opens org.gemseeker.sms to javafx.fxml;
 }

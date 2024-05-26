@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.Tower;
 import org.gemseeker.sms.data.controllers.TowerController;
+import org.gemseeker.sms.views.panels.maps.SourceLayer;
 
 public class EditTowerWindow extends AbstractWindow {
 
@@ -143,6 +144,7 @@ public class EditTowerWindow extends AbstractWindow {
             Tower parent = cbParentTower.getValue();
             if (parent != null && parent.getId() != mTower.getId()) {
                 mTower.setParentTowerId(parent.getId());
+                mTower.setParentName(parent.getName());
             }
             return towerController.update(mTower);
         }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
@@ -166,8 +168,8 @@ public class EditTowerWindow extends AbstractWindow {
         cbTowerTypes.getSelectionModel().select(0);
         tfName.clear();
         tfTowerHeight.setText("0.0");
-        tfLatitude.setText("0.0");
-        tfLongitude.setText("0.0");
+        tfLatitude.setText(SourceLayer.LATITUDE + "");
+        tfLongitude.setText(SourceLayer.LONGITUDE + "");
         tfElevation.setText("0.0");
 
         lblErrName.setVisible(false);

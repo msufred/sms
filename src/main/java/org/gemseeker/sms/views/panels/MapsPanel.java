@@ -1,6 +1,5 @@
 package org.gemseeker.sms.views.panels;
 
-import com.gluonhq.attach.storage.StorageService;
 import com.gluonhq.maps.MapPoint;
 import com.gluonhq.maps.MapView;
 import io.github.msufred.feathericons.Edit2Icon;
@@ -17,6 +16,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import org.gemseeker.sms.data.Database;
@@ -25,8 +25,8 @@ import org.gemseeker.sms.data.controllers.TowerController;
 import org.gemseeker.sms.views.AddTowerWindow;
 import org.gemseeker.sms.views.EditTowerWindow;
 import org.gemseeker.sms.views.MainWindow;
+import org.gemseeker.sms.views.cells.TowerTypeTableCell;
 import org.gemseeker.sms.views.panels.maps.LineLayer;
-import org.gemseeker.sms.views.panels.maps.SourceLayer;
 import org.gemseeker.sms.views.panels.maps.TowerLayer;
 import org.gemseeker.sms.views.panels.maps.TowerPoint;
 
@@ -37,11 +37,16 @@ public class MapsPanel extends AbstractPanel {
     @FXML private Button btnAdd;
     @FXML private Button btnEdit;
     @FXML private Button btnDelete;
-    @FXML private ListView<Tower> listview;
     @FXML private StackPane stackPane;
     @FXML private Label lblCoordinate;
     @FXML private Label lblLatitude;
     @FXML private Label lblLongitude;
+
+    @FXML private TableView<Tower> tableView;
+    @FXML private TableColumn<Tower, String> colType;
+    @FXML private TableColumn<Tower, String> colName;
+    @FXML private TableColumn<Tower, String> colParent;
+
     private MapView mapView;
 
     private FilteredList<Tower> filteredList;
@@ -55,7 +60,6 @@ public class MapsPanel extends AbstractPanel {
     private AddTowerWindow addTowerWindow;
     private EditTowerWindow editTowerWindow;
 
-    private SourceLayer sourceLayer;
     private TowerLayer towerLayer;
     private LineLayer lineLayer;
 
@@ -70,32 +74,13 @@ public class MapsPanel extends AbstractPanel {
     @Override
     protected void onFxmlLoaded() {
         setupIcons();
+        setupTable();
 
         btnAdd.setOnAction(evt -> addItem());
         btnEdit.setOnAction(evt -> editSelected());
         btnDelete.setOnAction(evt -> deleteSelected());
 
-        setupListView();
         setupMapView();
-    }
-
-    private void setupListView() {
-        // ListView ContextMenu
-        MenuItem mAdd = new MenuItem("Add Tower");
-        mAdd.setGraphic(new PlusIcon(12));
-        mAdd.setOnAction(evt -> addItem());
-
-        MenuItem mEdit = new MenuItem("Edit");
-        mEdit.setGraphic(new Edit2Icon(12));
-        mEdit.setOnAction(evt -> editSelected());
-
-        MenuItem mDelete = new MenuItem("Delete");
-        mDelete.setGraphic(new TrashIcon(12));
-        mDelete.setOnAction(evt -> deleteSelected());
-
-        ContextMenu cm = new ContextMenu(mAdd, mEdit, mDelete);
-        listview.setContextMenu(cm);
-        selectedItem.bind(listview.getSelectionModel().selectedItemProperty());
     }
 
     private void setupMapView() {
@@ -121,7 +106,7 @@ public class MapsPanel extends AbstractPanel {
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
                     hideProgress();
                     filteredList = new FilteredList<>(list);
-                    listview.setItems(filteredList);
+                    tableView.setItems(filteredList);
                     refreshMap(list);
                 }, err -> {
                     hideProgress();
@@ -130,14 +115,9 @@ public class MapsPanel extends AbstractPanel {
     }
 
     private void refreshMap(ObservableList<Tower> list) {
-        if (sourceLayer == null) {
-            sourceLayer = new SourceLayer();
-        }
-
         // clear layers
         mapView.removeLayer(lineLayer);
         mapView.removeLayer(towerLayer);
-        mapView.removeLayer(sourceLayer);
 
         ObservableList<TowerPoint> towers = getTowerPoints(list);
 
@@ -145,7 +125,6 @@ public class MapsPanel extends AbstractPanel {
         towerLayer = new TowerLayer(list);
         mapView.addLayer(lineLayer);
         mapView.addLayer(towerLayer);
-        mapView.addLayer(sourceLayer);
     }
 
     private static ObservableList<TowerPoint> getTowerPoints(ObservableList<Tower> list) {
@@ -217,6 +196,42 @@ public class MapsPanel extends AbstractPanel {
         btnEdit.setGraphic(new Edit2Icon(14));
         btnDelete.setGraphic(new TrashIcon(14));
         lblCoordinate.setGraphic(new MapPinIcon(14));
+    }
+
+    private void setupTable() {
+        colType.setCellValueFactory(new PropertyValueFactory<>("type"));
+        colType.setCellFactory(col -> new TowerTypeTableCell());
+        colName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colParent.setCellValueFactory(new PropertyValueFactory<>("parentName"));
+        colParent.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String name, boolean empty) {
+                if (empty || name == null) {
+                    setText("");
+                    setGraphic(null);
+                } else if (name.equals("null")) {
+                    setText("N/A");
+                } else {
+                    setText(name);
+                }
+            }
+        });
+
+        MenuItem mAdd = new MenuItem("Add Tower");
+        mAdd.setGraphic(new PlusIcon(12));
+        mAdd.setOnAction(evt -> addItem());
+
+        MenuItem mEdit = new MenuItem("Edit");
+        mEdit.setGraphic(new Edit2Icon(12));
+        mEdit.setOnAction(evt -> editSelected());
+
+        MenuItem mDelete = new MenuItem("Delete");
+        mDelete.setGraphic(new TrashIcon(12));
+        mDelete.setOnAction(evt -> deleteSelected());
+
+        ContextMenu cm = new ContextMenu(mAdd, mEdit, mDelete);
+        tableView.setContextMenu(cm);
+        selectedItem.bind(tableView.getSelectionModel().selectedItemProperty());
     }
 
     private void showProgress(String text) {

@@ -68,6 +68,8 @@
                               <TableColumn fx:id="colStartDate" prefWidth="100.0" style="-fx-alignment: center;" text="Start Date" />
                               <TableColumn fx:id="colEndDate" prefWidth="100.0" style="-fx-alignment: center;" text="End Date" />
                               <TableColumn fx:id="colMonthlyFee" prefWidth="100.0" style="-fx-alignment: center;" text="Monthly Fee" />
+                              <TableColumn fx:id="colTower" prefWidth="100.0" style="-fx-alignment: center;" text="Tower" />
+                              <TableColumn fx:id="colParentTower" prefWidth="100.0" style="-fx-alignment: center;" text="Parent Tower" />
                           </columns>
                         </TableView>
                      </children>

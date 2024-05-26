@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="700.0" prefWidth="450.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="700.0" prefWidth="450.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ScrollPane fitToWidth="true" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
          <content>
@@ -36,7 +36,7 @@
                   <HBox alignment="CENTER_LEFT" spacing="8.0">
                      <children>
                         <Label alignment="CENTER_RIGHT" minWidth="90.0" styleClass="form-label" text="Address" />
-                        <TextField fx:id="tfAddress" prefWidth="250.0" promptText="Required" styleClass="form-field" />
+                        <TextField fx:id="tfAddress" prefWidth="250.0" promptText="Required" styleClass="form-field" text="Colongulo, Surallah, South Cotabato" />
                         <Label fx:id="lblErrAddress" styleClass="label-error" />
                      </children>
                   </HBox>
@@ -124,13 +124,13 @@
                         <HBox alignment="CENTER_LEFT" spacing="8.0">
                            <children>
                               <Label alignment="CENTER_RIGHT" minWidth="110.0" styleClass="form-label" text="Latitude" />
-                              <TextField fx:id="tfLatitude" prefWidth="250.0" styleClass="form-field" text="0.0" />
+                              <TextField fx:id="tfLatitude" prefWidth="250.0" styleClass="form-field" text="6.34137" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" spacing="8.0">
                            <children>
                               <Label alignment="CENTER_RIGHT" minWidth="110.0" styleClass="form-label" text="Longitude" />
-                              <TextField fx:id="tfLongitude" prefWidth="250.0" styleClass="form-field" text="0.0" />
+                              <TextField fx:id="tfLongitude" prefWidth="250.0" styleClass="form-field" text="124.72314" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" spacing="8.0">

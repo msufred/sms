@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 public class Tower {
 
+    public static final String TYPE_SOURCE = "Source";
     public static final String TYPE_DEFAULT = "Default";
     public static final String TYPE_RELAY = "Relay";
     public static final String TYPE_ACCESS_POINT = "Access Point";
@@ -18,6 +19,7 @@ public class Tower {
     private double towerHeight;
     private String ipAddress;
     private int parentTowerId;
+    private String parentName;
     private String status;
 
     private String tag;
@@ -113,6 +115,14 @@ public class Tower {
 
     public void setParentTowerId(int parentTowerId) {
         this.parentTowerId = parentTowerId;
+    }
+
+    public String getParentName() {
+        return parentName;
+    }
+
+    public void setParentName(String parentName) {
+        this.parentName = parentName;
     }
 
     public String getStatus() {

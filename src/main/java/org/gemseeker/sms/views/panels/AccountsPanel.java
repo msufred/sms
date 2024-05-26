@@ -56,6 +56,8 @@ public class AccountsPanel extends AbstractPanel {
     @FXML private TableColumn<AccountSubscription, LocalDate> colStartDate;
     @FXML private TableColumn<AccountSubscription, LocalDate> colEndDate;
     @FXML private TableColumn<AccountSubscription, Double> colMonthlyFee;
+    @FXML private TableColumn<AccountSubscription, String> colTower;
+    @FXML private TableColumn<AccountSubscription, String> colParentTower;
 
     // DataPlan
     @FXML private Button btnAddPlan;
@@ -380,6 +382,21 @@ public class AccountsPanel extends AbstractPanel {
         colEndDate.setCellFactory(col -> new DateTableCell<>());
         colMonthlyFee.setCellValueFactory(new PropertyValueFactory<>("monthlyFee"));
         colMonthlyFee.setCellFactory(col -> new AmountTableCell<>());
+        colTower.setCellValueFactory(new PropertyValueFactory<>("towerName"));
+        colParentTower.setCellValueFactory(new PropertyValueFactory<>("parentTower"));
+        colParentTower.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String name, boolean empty) {
+                if (empty || name == null) {
+                    setText("");
+                    setGraphic(null);
+                } else if (name.equals("null")) {
+                    setText("N/A");
+                } else {
+                    setText(name);
+                }
+            }
+        });
 
         MenuItem mAdd = new MenuItem("New Account");
         mAdd.setGraphic(new PlusIcon(12));

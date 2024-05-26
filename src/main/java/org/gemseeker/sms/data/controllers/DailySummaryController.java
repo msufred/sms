@@ -49,6 +49,11 @@ public class DailySummaryController implements ModelController<DailySummary> {
         return update(id, "date_deleted", LocalDateTime.now().toString());
     }
 
+    public boolean deleteAll() throws SQLException {
+        String sql = "DELETE FROM daily_summaries";
+        return database.executeQuery(sql);
+    }
+
     @Override
     public DailySummary get(int id) throws SQLException {
         String sql = String.format("SELECT * FROM daily_summaries WHERE date_deleted IS NULL AND id='%d'", id);
