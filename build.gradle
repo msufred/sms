@@ -3,7 +3,6 @@ plugins {
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.13'
     id 'org.beryx.jlink' version '3.0.1'
-    id 'com.gluonhq.gluonfx-gradle-plugin' version '1.0.3'
 }
 
 group 'org.gemseeker'
@@ -21,7 +20,7 @@ ext {
 sourceCompatibility = '21'
 targetCompatibility = '21'
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
@@ -51,9 +50,9 @@ dependencies {
     implementation("io.github.msufred:feathericons:1.0.0"){
         exclude group: 'org.openjfx'
     }
-    implementation("com.gluonhq:maps:2.0.0-ea+6"){
-        exclude group: 'org.openjfx'
-    }
+
+    // map
+    implementation group: 'org.jxmapviewer', name: 'jxmapviewer2', version: '2.8'
 
     // Apache POI and Dependencies
     implementation group: 'org.apache.poi', name: 'poi', version: '5.2.5'

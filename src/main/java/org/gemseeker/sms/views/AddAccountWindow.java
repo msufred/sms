@@ -19,12 +19,11 @@ import org.gemseeker.sms.data.controllers.AccountController;
 import org.gemseeker.sms.data.controllers.DataPlanController;
 import org.gemseeker.sms.data.controllers.SubscriptionController;
 import org.gemseeker.sms.data.controllers.TowerController;
-import org.gemseeker.sms.views.panels.maps.SourceLayer;
-
-import javax.swing.text.View;
-import java.util.concurrent.Callable;
 
 public class AddAccountWindow extends AbstractWindow {
+
+    public static final double LATITUDE = 6.34137;
+    public static final double LONGITUDE = 124.72314;
 
     // account info group
     @FXML private TextField tfAccountNo;
@@ -329,8 +328,8 @@ public class AddAccountWindow extends AbstractWindow {
         cbAddTowerInfo.setSelected(false);
         cbTowerTypes.getSelectionModel().select(0);
         tfTowerHeight.setText("0.0");
-        tfLatitude.setText(SourceLayer.LATITUDE + "");
-        tfLongitude.setText(SourceLayer.LONGITUDE + "");
+        tfLatitude.setText(LATITUDE + "");
+        tfLongitude.setText(LONGITUDE + "");
         tfElevation.setText("0.0");
         cbParentTower.setValue(null);
 

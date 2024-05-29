@@ -7,7 +7,6 @@ import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import io.reactivex.schedulers.Schedulers;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
@@ -17,9 +16,11 @@ import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.Tower;
 import org.gemseeker.sms.data.controllers.AccountController;
 import org.gemseeker.sms.data.controllers.TowerController;
-import org.gemseeker.sms.views.panels.maps.SourceLayer;
 
 public class AddTowerWindow extends AbstractWindow {
+
+    public static final double LATITUDE = 6.34137;
+    public static final double LONGITUDE = 124.72314;
 
     @FXML private ComboBox<Account> cbAccounts;
     @FXML private Label lblErrAccount;
@@ -159,8 +160,8 @@ public class AddTowerWindow extends AbstractWindow {
         cbTowerTypes.getSelectionModel().select(0);
         tfName.clear();
         tfTowerHeight.setText("0.0");
-        tfLatitude.setText(SourceLayer.LATITUDE + "");
-        tfLongitude.setText(SourceLayer.LONGITUDE + "");
+        tfLatitude.setText(LATITUDE + "");
+        tfLongitude.setText(LONGITUDE + "");
         tfElevation.setText("0.0");
 
         lblErrAccount.setVisible(false);

@@ -340,25 +340,18 @@ public class DashboardPanel extends AbstractPanel {
      */
     private void createSummary() {
         showProgress("Creating daily summary entry...");
-        disposables.add(Single.fromCallable(revenueController::getPrevRevenues) // get last day revenues
+        disposables.add(Single.fromCallable(revenueController::getRevenuesToday)
                 .flatMap(revenues -> {
-                    prevRevenuesList = revenues;
-                    return Single.fromCallable(expenseController::getPrevExpenses); // get last day expenses
-                }).flatMap(expenses -> {
-                    prevExpensesList = expenses;
-                    return Single.fromCallable(revenueController::getRevenuesToday); // get today's revenues
-                }).flatMap(revenues -> {
                     revenuesToday = revenues;
-                    return Single.fromCallable(expenseController::getExpensesToday); // get today's expenses
-                }).flatMap(expenses -> { // calculate and create DailySummary entry for today
+                    return Single.fromCallable(expenseController::getExpensesToday);
+                }).flatMap(expenses -> {
                     expensesToday = expenses;
-
-                    double prevRevenues = 0;
-                    for (Revenue r : prevRevenuesList) prevRevenues += r.getAmount();
-                    double prevExpenses = 0;
-                    for (Expense e : prevExpensesList) prevExpenses += e.getAmount();
-                    mCashForwarded = prevRevenues - prevExpenses;
-
+                    return Single.fromCallable(dailySummaryController::getAll);
+                }).flatMap(summaries -> {
+                    // sort summaries
+                    FXCollections.sort(summaries, Comparator.comparing(DailySummary::getDate));
+                    DailySummary latest = summaries.get(summaries.size() - 1);
+                    mCashForwarded = latest == null ? 0 : latest.getBalance();
                     mRevenues = 0;
                     for (Revenue r : revenuesToday) mRevenues += r.getAmount();
                     mExpenses = 0;

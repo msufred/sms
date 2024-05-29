@@ -13,9 +13,11 @@ import javafx.stage.Stage;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.Tower;
 import org.gemseeker.sms.data.controllers.TowerController;
-import org.gemseeker.sms.views.panels.maps.SourceLayer;
 
 public class EditTowerWindow extends AbstractWindow {
+
+    public static final double LATITUDE = 6.34137;
+    public static final double LONGITUDE = 124.72314;
 
     @FXML private TextField tfName;
     @FXML private Label lblErrName;
@@ -168,8 +170,8 @@ public class EditTowerWindow extends AbstractWindow {
         cbTowerTypes.getSelectionModel().select(0);
         tfName.clear();
         tfTowerHeight.setText("0.0");
-        tfLatitude.setText(SourceLayer.LATITUDE + "");
-        tfLongitude.setText(SourceLayer.LONGITUDE + "");
+        tfLatitude.setText(LATITUDE + "");
+        tfLongitude.setText(LONGITUDE + "");
         tfElevation.setText("0.0");
 
         lblErrName.setVisible(false);
