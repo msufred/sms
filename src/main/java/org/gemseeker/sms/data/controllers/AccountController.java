@@ -6,10 +6,7 @@ import org.gemseeker.sms.data.Account;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.controllers.models.AccountSubscription;
 
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.LocalDateTime;
 
 public class AccountController implements ModelController<Account> {
@@ -50,6 +47,10 @@ public class AccountController implements ModelController<Account> {
         return update(id, "date_deleted", LocalDateTime.now().toString());
     }
 
+    public boolean restore(int id) throws SQLException {
+        return database.restore(id, "date_deleted", "accounts");
+    }
+
     @Override
     public Account get(int id) throws SQLException {
         String sql = String.format("SELECT * FROM accounts WHERE id='%d' AND date_deleted IS NULL LIMIT 1", id);
@@ -60,7 +61,7 @@ public class AccountController implements ModelController<Account> {
     }
 
     public Account getByAccountNo(String accoutNo) throws SQLException {
-        String sql = String.format("SELECT * FROM accounts WHERE account_no='%s' AND date_deleted IS NULL LIMIT 1", accoutNo);
+        String sql = String.format("SELECT * FROM accounts WHERE account_no='%s' LIMIT 1", accoutNo);
         try (ResultSet rs = database.executeQueryWithResult(sql)) {
             if (rs.next()) return fetchInfo(rs);
         }
@@ -71,6 +72,15 @@ public class AccountController implements ModelController<Account> {
     public ObservableList<Account> getAll() throws SQLException {
         ObservableList<Account> list = FXCollections.observableArrayList();
         String sql = "SELECT * FROM accounts WHERE date_deleted IS NULL";
+        try (ResultSet rs = database.executeQueryWithResult(sql)) {
+            while (rs.next()) list.add(fetchInfo(rs));
+        }
+        return list;
+    }
+
+    public ObservableList<Account> getDeleted() throws SQLException {
+        ObservableList<Account> list = FXCollections.observableArrayList();
+        String sql = "SELECT * FROM accounts WHERE date_deleted IS NOT NULL";
         try (ResultSet rs = database.executeQueryWithResult(sql)) {
             while (rs.next()) list.add(fetchInfo(rs));
         }
