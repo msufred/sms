@@ -102,6 +102,36 @@
                   </VBox>
               </content>
             </Tab>
+            <Tab fx:id="tabDeleted" closable="false" styleClass="label-error" text="Deleted">
+              <content>
+                  <VBox>
+                     <children>
+                        <HBox prefWidth="200.0">
+                           <children>
+                              <Button fx:id="btnRestore" mnemonicParsing="false" styleClass="btn" text="Restore" />
+                           </children>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </HBox>
+                        <TableView fx:id="deletedAccountsTable" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+                           <columns>
+                              <TableColumn fx:id="colTag1" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" style="-fx-alignment: center;" />
+                              <TableColumn fx:id="colNo1" style="-fx-alignment: center;" text="Account No." />
+                              <TableColumn fx:id="colStatus1" minWidth="100.0" prefWidth="100.0" style="-fx-alignment: center;" text="Status" />
+                              <TableColumn fx:id="colName1" prefWidth="150.0" style="-fx-alignment: center;" text="Name" />
+                              <TableColumn fx:id="colContact1" prefWidth="120.0" style="-fx-alignment: center;" text="Contact No." />
+                              <TableColumn fx:id="colAddress1" prefWidth="150.0" style="-fx-alignment: center;" text="Address" />
+                              <TableColumn fx:id="colEmail1" prefWidth="150.0" style="-fx-alignment: center;" text="Email" />
+                               <TableColumn fx:id="colCreatedAt" prefWidth="100.0" style="-fx-alignment: center;" text="Created at" />
+                               <TableColumn fx:id="colUpdatedAt" prefWidth="100.0" style="-fx-alignment: center;" text="Updated at" />
+                               <TableColumn fx:id="colDeletedAt" prefWidth="100.0" style="-fx-alignment: center;" text="Deleted at" />
+                           </columns>
+                        </TableView>
+                     </children>
+                  </VBox>
+              </content>
+            </Tab>
          </tabs>
       </TabPane>
    </children>
