@@ -350,7 +350,7 @@ public class DashboardPanel extends AbstractPanel {
                 }).flatMap(summaries -> {
                     // sort summaries
                     FXCollections.sort(summaries, Comparator.comparing(DailySummary::getDate));
-                    DailySummary latest = summaries.get(summaries.size() - 1);
+                    DailySummary latest = summaries.isEmpty() ? null : summaries.getLast();
                     mCashForwarded = latest == null ? 0 : latest.getBalance();
                     mRevenues = 0;
                     for (Revenue r : revenuesToday) mRevenues += r.getAmount();
