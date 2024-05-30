@@ -235,4 +235,8 @@ public class MainWindow extends AbstractWindow {
         if (tasksPanel != null) tasksPanel.onDispose();
         disposables.dispose();
     }
+
+    public User getUser() {
+        return user;
+    }
 }
