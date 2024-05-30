@@ -39,7 +39,7 @@ public class SubscriptionController implements ModelController<Subscription> {
 
     @Override
     public boolean update(int id, String col, String value) throws SQLException {
-        String sql = String.format("UPDATE subsriptions SET %s='%s', date_updated='%s' WHERE id='%d'", col, value, LocalDateTime.now(), id);
+        String sql = String.format("UPDATE subscriptions SET %s='%s', date_updated='%s' WHERE id='%d'", col, value, LocalDateTime.now(), id);
         return database.executeQuery(sql);
     }
 

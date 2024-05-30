@@ -19,8 +19,8 @@
                   <HBox alignment="CENTER_LEFT" spacing="8.0">
                      <children>
                         <Label alignment="CENTER_RIGHT" minWidth="90.0" styleClass="form-label" text="Account No" />
-                        <TextField fx:id="tfAccountNo" editable="false" prefWidth="250.0" promptText="Required" styleClass="form-field" />
-                        <Label fx:id="lblAccountNo" />
+                        <TextField fx:id="tfAccountNo" prefWidth="250.0" promptText="Required" styleClass="form-field" />
+                        <Label fx:id="lblErrAccountNo" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" spacing="8.0">

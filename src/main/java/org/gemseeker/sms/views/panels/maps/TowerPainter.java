@@ -62,7 +62,7 @@ public class TowerPainter implements Painter<JXMapViewer> {
     }
 
     private void drawTriangle(Graphics2D g, Point2D point) {
-        drawPolygon(g, point, 3, 10, Color.decode("#eab308"));
+        drawPolygon(g, point, 3, 12, Color.decode("#eab308"));
     }
 
     private void drawCircle(Graphics2D g, Point2D point) {

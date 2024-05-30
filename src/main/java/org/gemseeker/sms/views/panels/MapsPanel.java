@@ -30,11 +30,9 @@ import org.gemseeker.sms.views.cells.TowerTypeTableCell;
 import org.gemseeker.sms.views.panels.maps.LinePainter;
 import org.gemseeker.sms.views.panels.maps.TowerPainter;
 import org.gemseeker.sms.views.panels.maps.TowerPoint;
-import org.gemseeker.sms.views.panels.maps.TowerWayPoint;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
 import org.jxmapviewer.VirtualEarthTileFactoryInfo;
-import org.jxmapviewer.WMSTileFactoryInfo;
 import org.jxmapviewer.cache.FileBasedLocalCache;
 import org.jxmapviewer.input.CenterMapListener;
 import org.jxmapviewer.input.PanKeyListener;
@@ -50,7 +48,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -143,22 +140,28 @@ public class MapsPanel extends AbstractPanel {
 
         rbDefault.selectedProperty().addListener((o, ov, selected) -> {
             if (selected && mapViewer != null) {
+                GeoPosition pos = mapViewer.getCenterPosition();
                 mapViewer.setTileFactory(getOsmTileFactory());
                 mapViewer.setZoom(mZoomLevel);
+                mapViewer.setCenterPosition(pos);
             }
         });
 
         rbVirtualEarth.selectedProperty().addListener((o, ov, selected) -> {
             if (selected && mapViewer != null) {
+                GeoPosition pos = mapViewer.getCenterPosition();
                 mapViewer.setTileFactory(getVeMapTileFactory());
                 mapViewer.setZoom(mZoomLevel);
+                mapViewer.setCenterPosition(pos);
             }
         });
 
         rbSatellite.selectedProperty().addListener((o, ov, selected) -> {
             if (selected && mapViewer != null) {
+                GeoPosition pos = mapViewer.getCenterPosition();
                 mapViewer.setTileFactory(getVeSatelliteTileFactory());
                 mapViewer.setZoom(mZoomLevel);
+                mapViewer.setCenterPosition(pos);
             }
         });
 
@@ -205,6 +208,9 @@ public class MapsPanel extends AbstractPanel {
         });
 
         SwingNode swingNode = new SwingNode();
+        swingNode.setOnMouseEntered(evt -> swingNode.setCursor(javafx.scene.Cursor.HAND));
+        swingNode.setOnMouseDragged(evt -> swingNode.setCursor(javafx.scene.Cursor.CLOSED_HAND));
+        swingNode.setOnMouseReleased(evt -> swingNode.setCursor(javafx.scene.Cursor.HAND));
         SwingUtilities.invokeLater(() -> {
             swingNode.setContent(mapViewer);
         });

@@ -32,8 +32,8 @@ public class AccountController implements ModelController<Account> {
     @Override
     public boolean update(Account model) throws SQLException {
         LocalDateTime now = LocalDateTime.now();
-        String sql = String.format("UPDATE accounts SET name='%s', address='%s', phone='%s', email='%s', status='%s', " +
-                "tag='%s', date_updated='%s' WHERE id='%d'", model.getName(), model.getAddress(), model.getPhone(),
+        String sql = String.format("UPDATE accounts SET account_no='%s', name='%s', address='%s', phone='%s', email='%s', status='%s', " +
+                "tag='%s', date_updated='%s' WHERE id='%d'", model.getAccountNo(), model.getName(), model.getAddress(), model.getPhone(),
                 model.getEmail(), model.getStatus(), model.getTag(), now, model.getId());
         return database.executeQuery(sql);
     }
