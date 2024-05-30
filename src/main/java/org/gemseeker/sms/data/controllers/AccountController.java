@@ -47,7 +47,7 @@ public class AccountController implements ModelController<Account> {
 
     @Override
     public boolean delete(int id) throws SQLException {
-        return update(id, "delete_deleted", LocalDateTime.now().toString());
+        return update(id, "date_deleted", LocalDateTime.now().toString());
     }
 
     @Override
