@@ -2,18 +2,12 @@ package org.gemseeker.sms.views.panels.maps;
 
 import javafx.collections.ObservableList;
 import org.gemseeker.sms.data.Tower;
-import org.gemseeker.sms.views.icons.CircleFilledIcon;
-import org.gemseeker.sms.views.icons.PentagonIcon;
-import org.gemseeker.sms.views.icons.StarFilledIcon;
-import org.gemseeker.sms.views.icons.TriangleFilledIcon;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.viewer.GeoPosition;
 
 import java.awt.*;
-import java.awt.font.GlyphVector;
 import java.awt.geom.Point2D;
-import java.util.Objects;
 
 public class TowerPainter implements Painter<JXMapViewer> {
 
@@ -79,9 +73,6 @@ public class TowerPainter implements Painter<JXMapViewer> {
         double spikiness = 0.5;
         int spikes = 5;
         int nPoints = spikes * 2 + 1; // 5 spikes
-
-        int centerX = (int) (point.getX() - (radius / 2));
-        int centerY = (int) (point.getY() - (radius / 2));
 
         int[] x = new int[nPoints];
         int[] y = new int[nPoints];
