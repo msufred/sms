@@ -382,6 +382,18 @@
                   <Image url="@../watermark.png" />
                </image>
             </ImageView>
+            <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@qr.png" />
+                     </image>
+                     <HBox.margin>
+                        <Insets right="160.0" top="380.0" />
+                     </HBox.margin>
+                  </ImageView>
+               </children>
+            </HBox>
          </children>
       </StackPane>
    </children>
