@@ -75,6 +75,16 @@ public final class Database {
         }
     }
 
+    public boolean restore(int id, String column, String table) throws SQLException {
+        if (connection == null) throw new NullPointerException("Connection is null");
+        String sql = String.format("UPDATE %s SET %s=? WHERE id=?", table, column);
+        try (PreparedStatement s = connection.prepareStatement(sql)) {
+            s.setString(1, null);
+            s.setInt(2, id);
+            return s.executeUpdate() > 0;
+        }
+    }
+
     public void close() throws SQLException {
         if (connection != null) connection.close();
     }
