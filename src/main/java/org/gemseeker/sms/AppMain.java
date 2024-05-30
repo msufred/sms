@@ -24,16 +24,6 @@ import java.util.Optional;
 
 public class AppMain extends Application {
 
-    private static final String javafxVersion = System.getProperty("javafx.version");
-
-    static {
-        String httpAgent = System.getProperty("http.agent");
-        if (httpAgent == null) {
-            httpAgent = "(" + System.getProperty("os.name") + " / " + System.getProperty("os.version") + " / " + System.getProperty("os.arch") + ")";
-        }
-        System.setProperty("http.agent", "Gluon Mobile/1.0.3 " + httpAgent);
-    }
-
     @Override
     public void start(Stage primaryStage) throws Exception {
         SplashWindow splashWindow = new SplashWindow();
