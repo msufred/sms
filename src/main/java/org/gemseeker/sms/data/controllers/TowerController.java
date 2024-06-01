@@ -52,6 +52,10 @@ public class TowerController implements ModelController<Tower> {
         return update(id, "date_deleted", LocalDateTime.now().toString());
     }
 
+    public boolean restore(int id) throws SQLException {
+        return database.restore(id, "date_deleted", "towers");
+    }
+
     @Override
     public Tower get(int id) throws SQLException {
         String sql = String.format("SELECT * FROM towers WHERE id='%d' AND date_deleted IS NULL LIMIT 1", id);
@@ -73,6 +77,15 @@ public class TowerController implements ModelController<Tower> {
     public ObservableList<Tower> getAll() throws SQLException {
         ObservableList<Tower> list = FXCollections.observableArrayList();
         String sql = "SELECT * FROM towers WHERE date_deleted IS NULL";
+        try (ResultSet rs = database.executeQueryWithResult(sql)) {
+            while (rs.next()) list.add(fetchInfo(rs));
+        }
+        return list;
+    }
+
+    public ObservableList<Tower> getDeleted() throws SQLException {
+        ObservableList<Tower> list = FXCollections.observableArrayList();
+        String sql = "SELECT * FROM towers WHERE date_deleted IS NOT NULL";
         try (ResultSet rs = database.executeQueryWithResult(sql)) {
             while (rs.next()) list.add(fetchInfo(rs));
         }
