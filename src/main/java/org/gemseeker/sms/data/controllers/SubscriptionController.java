@@ -93,4 +93,12 @@ public class SubscriptionController implements ModelController<Subscription> {
         if (dateDeleted != null) sub.setDateDeleted(dateDeleted.toLocalDateTime());
         return sub;
     }
+
+    public boolean hasSubscription(String accountNo) throws SQLException {
+        String sql = String.format("SELECT COUNT(*) FROM subscriptions WHERE account_no='%s'", accountNo);
+        try (ResultSet rs = database.executeQueryWithResult(sql)) {
+            if (rs.next()) return rs.getInt(1) > 0;
+        }
+        return false;
+    }
 }
