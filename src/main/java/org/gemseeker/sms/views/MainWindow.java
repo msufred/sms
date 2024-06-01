@@ -6,10 +6,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import io.reactivex.schedulers.Schedulers;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.layout.StackPane;
@@ -25,9 +22,18 @@ import org.gemseeker.sms.views.panels.*;
 import javax.xml.transform.TransformerException;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.Optional;
 
 public class MainWindow extends AbstractWindow {
 
+    // Menus
+    @FXML private MenuItem menuFilePreferences;
+    @FXML private MenuItem menuFileClose;
+    @FXML private MenuItem menuShowDeleted;
+    @FXML private MenuItem menuShowHistory;
+    @FXML private MenuItem menuHelpAbout;
+
+    // Sidebar
     @FXML private ToggleButton btnDashboard;
     @FXML private ToggleButton btnCustomers;
     @FXML private ToggleButton btnHotspots;
@@ -67,6 +73,9 @@ public class MainWindow extends AbstractWindow {
     private TasksPanel tasksPanel;
     private AbstractPanel mCurrPanel = null;
 
+    // windows
+    private DeletedWindow deletedWindow;
+
     public MainWindow(Settings settings, Database database, Stage stage) {
         super("SMS", MainWindow.class.getResource("main.fxml"), stage, null);
         this.settings = settings;
@@ -87,6 +96,22 @@ public class MainWindow extends AbstractWindow {
     protected void onFxmlLoaded() {
         setupIcons();
         setupToggles(btnDashboard, btnPayments, btnCustomers, btnHotspots, btnInventory, btnMaps, btnTasks);
+
+        menuFilePreferences.setOnAction(evt -> {
+            // TODO
+        });
+
+        menuFileClose.setOnAction(evt -> close());
+        menuShowDeleted.setOnAction(evt -> {
+            if (deletedWindow == null) deletedWindow = new DeletedWindow(database, getStage());
+            deletedWindow.show();
+        });
+        menuShowHistory.setOnAction(evt -> {
+            // TODO
+        });
+        menuHelpAbout.setOnAction(evt -> {
+            // TODO
+        });
     }
 
     public void setUserId(long id) {
@@ -106,6 +131,13 @@ public class MainWindow extends AbstractWindow {
                         return Single.fromCallable(scheduleController::getUpcomingCount);
                     }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(count -> {
                         hideProgress();
+
+                        // enable/disable actions depending on the user role
+                        if (!user.getRole().equals("admin")) {
+                            menuShowDeleted.setDisable(true);
+                            menuShowHistory.setDisable(true);
+                        }
+
                         pendingTasks = count;
                         if (user != null) {
                             lblAuthority.setText(String.format("%s [%s]", user.getUsername(), ViewUtils.capitalize(user.getRole())));
@@ -177,6 +209,11 @@ public class MainWindow extends AbstractWindow {
     }
 
     private void setupIcons() {
+        menuFilePreferences.setGraphic(new SettingsIcon(12));
+        menuShowHistory.setGraphic(new TrashIcon(12));
+        menuShowDeleted.setGraphic(new ClockIcon(12));
+        menuHelpAbout.setGraphic(new HelpCircleIcon(12));
+
         btnDashboard.setGraphic(new GridIcon(14));
         btnPayments.setGraphic(new PesoIcon(14));
         btnCustomers.setGraphic(new UsersIcon(14));
@@ -233,6 +270,8 @@ public class MainWindow extends AbstractWindow {
         if (inventoryPanel != null) inventoryPanel.onDispose();
         if (mapsPanel != null) mapsPanel.onDispose();
         if (tasksPanel != null) tasksPanel.onDispose();
+
+        if (deletedWindow != null) deletedWindow.dispose();
         disposables.dispose();
     }
 
