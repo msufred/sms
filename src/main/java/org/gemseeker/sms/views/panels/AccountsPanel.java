@@ -16,6 +16,7 @@ import org.gemseeker.sms.data.DataPlan;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.controllers.AccountController;
 import org.gemseeker.sms.data.controllers.DataPlanController;
+import org.gemseeker.sms.data.controllers.SubscriptionController;
 import org.gemseeker.sms.data.controllers.TowerController;
 import org.gemseeker.sms.data.controllers.models.AccountSubscription;
 import org.gemseeker.sms.views.*;
@@ -31,7 +32,6 @@ public class AccountsPanel extends AbstractPanel {
     @FXML private TabPane tabPane;
     @FXML private Tab tabAccounts;
     @FXML private Tab tabPlans;
-    @FXML private Tab tabDeleted;
 
     @FXML private Button btnAdd;
     @FXML private MenuButton mEdit;
@@ -69,20 +69,6 @@ public class AccountsPanel extends AbstractPanel {
     @FXML private TableColumn<DataPlan, Integer> colPlanSpeed;
     @FXML private TableColumn<DataPlan, Double> colPlanFee;
 
-    // Deleted
-    @FXML private Button btnRestore;
-    @FXML private TableView<Account> deletedAccountsTable;
-    @FXML private TableColumn<Account, String> colTag1;
-    @FXML private TableColumn<Account, String> colNo1;
-    @FXML private TableColumn<Account, String> colStatus1;
-    @FXML private TableColumn<Account, String> colName1;
-    @FXML private TableColumn<Account, String> colContact1;
-    @FXML private TableColumn<Account, String> colAddress1;
-    @FXML private TableColumn<Account, String> colEmail1;
-    @FXML private TableColumn<Account, LocalDateTime> colCreatedAt;
-    @FXML private TableColumn<Account, LocalDateTime> colUpdatedAt;
-    @FXML private TableColumn<Account, LocalDateTime> colDeletedAt;
-
     // Tag Icons
     private final LinkedHashMap<String, SVGIcon> tags = ViewUtils.getTags();
 
@@ -96,6 +82,7 @@ public class AccountsPanel extends AbstractPanel {
     private final MainWindow mainWindow;
     private final Database database;
     private final AccountController accountController;
+    private final SubscriptionController subscriptionController;
     private final DataPlanController dataPlanController;
     private final TowerController towerController;
     private final CompositeDisposable disposables;
@@ -113,10 +100,11 @@ public class AccountsPanel extends AbstractPanel {
         super(AccountsPanel.class.getResource("accounts.fxml"));
         this.mainWindow = mainWindow;
         this.database = database;
-        this.accountController = new AccountController(database);
-        this.dataPlanController = new DataPlanController(database);
-        this.towerController = new TowerController(database);
-        this.disposables = new CompositeDisposable();
+        accountController = new AccountController(database);
+        subscriptionController = new SubscriptionController(database);
+        dataPlanController = new DataPlanController(database);
+        towerController = new TowerController(database);
+        disposables = new CompositeDisposable();
     }
 
     @Override
@@ -124,13 +112,12 @@ public class AccountsPanel extends AbstractPanel {
         setupIcons();
         setupTable();
         setupDataPlanTable();
-        setupDeletedAccountsTable();
 
         tabPane.getSelectionModel().selectedIndexProperty().addListener((o, oldVal, newVal) -> {
-            switch (newVal.intValue()) {
-                case 1 -> refreshPlans();
-                case 2 -> refreshDeleted();
-                default -> refresh();
+            if (newVal.intValue() == 1) {
+                refreshPlans();
+            } else {
+                refresh();
             }
         });
 
@@ -165,21 +152,14 @@ public class AccountsPanel extends AbstractPanel {
         btnAddPlan.setOnAction(evt -> addPlan());
         btnEditPlan.setOnAction(evt -> editPlan());
         btnDeletePlan.setOnAction(evt -> deletePlan());
-
-        // Deleted
-        btnRestore.setOnAction(evt -> restoreAccount());
     }
 
     @Override
     public void onResume() {
-        // check user
-        if (!mainWindow.getUser().getRole().equals("admin")) {
-            tabPane.getTabs().remove(tabDeleted);
-        }
-        switch (tabPane.getSelectionModel().getSelectedIndex()) {
-            case 1 -> refreshPlans();
-            case 2 -> refreshDeleted();
-            default -> refresh();
+        if (tabPane.getSelectionModel().getSelectedIndex() == 1) {
+            refreshPlans();
+        } else {
+            refresh();
         }
 
     }
@@ -216,19 +196,6 @@ public class AccountsPanel extends AbstractPanel {
                 }));
     }
 
-    private void refreshDeleted() {
-        showProgress("Retrieving deleted Account entries...");
-        disposables.add(Single.fromCallable(accountController::getDeleted)
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
-                    hideProgress();
-                    deletedAccountsList = new FilteredList<>(list);
-                    deletedAccountsTable.setItems(deletedAccountsList);
-                }, err -> {
-                    hideProgress();
-                    showErrorDialog("Database Error", "Error while retrieving deleted Account entries.\n" + err);
-                }));
-    }
-
     private void addItem() {
         if (addAccountWindow == null) addAccountWindow = new AddAccountWindow(database, mainWindow.getStage());
         addAccountWindow.showAndWait();
@@ -249,9 +216,21 @@ public class AccountsPanel extends AbstractPanel {
         if (selectedItem.get() == null) {
             showWarningDialog("Invalid", "No selected Account. Try again.");
         } else {
-            if (editSubscriptionWindow == null) editSubscriptionWindow = new EditSubscriptionWindow(database, mainWindow.getStage());
-            editSubscriptionWindow.showAndWait(selectedItem.get().getAccountNo());
-            refresh();
+            showProgress("Checking subscription...");
+            disposables.add(Single.fromCallable(() -> subscriptionController.hasSubscription(selectedItem.get().getAccountNo()))
+                    .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(hasSub -> {
+                        hideProgress();
+                        if (hasSub) {
+                            if (editSubscriptionWindow == null) editSubscriptionWindow = new EditSubscriptionWindow(database, mainWindow.getStage());
+                            editSubscriptionWindow.showAndWait(selectedItem.get().getAccountNo());
+                            refresh();
+                        } else {
+                            showInfoDialog("Invalid Action", "Subscription for this account does not exist.");
+                        }
+                    }, err -> {
+                        hideProgress();
+                        showErrorDialog("Database Error", "Error while checking Subscription.\n" + err);
+                    }));
         }
     }
 
@@ -390,38 +369,9 @@ public class AccountsPanel extends AbstractPanel {
         }
     }
 
-    // Deleted
-    private void editDeletedAccount() {
-        if (selectedAccount.get() == null) {
-            showWarningDialog("Invalid Action", "No selected Account entry. Try again.");
-        } else {
-            if (editAccountInfoWindow == null) editAccountInfoWindow = new EditAccountInfoWindow(database, mainWindow.getStage());
-            editAccountInfoWindow.showAndWait(selectedAccount.get().getAccountNo());
-            refreshDeleted();
-        }
-    }
-
-    private void restoreAccount() {
-        if (selectedAccount.get() == null) {
-            showWarningDialog("Invalid Action", "No selected Account entry. Try again.");
-        } else {
-            showProgress("Restoring Account...");
-            disposables.add(Single.fromCallable(() -> accountController.restore(selectedAccount.get().getId()))
-                    .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
-                        hideProgress();
-                        if (!success) showWarningDialog("Failed", "Failed to restore Account entry.");
-                        refreshDeleted();
-                    }, err -> {
-                        hideProgress();
-                        showErrorDialog("Database Error", "Error while restoring Account entry.\n" + err);
-                    }));
-        }
-    }
-
     private void setupIcons() {
         tabAccounts.setGraphic(new UsersIcon(14));
         tabPlans.setGraphic(new WifiIcon(14));
-        tabDeleted.setGraphic(new TrashIcon(12));
 
         btnAdd.setGraphic(new PlusIcon(14));
         mEdit.setGraphic(new Edit2Icon(14));
@@ -436,8 +386,6 @@ public class AccountsPanel extends AbstractPanel {
         btnAddPlan.setGraphic(new PlusIcon(14));
         btnEditPlan.setGraphic(new Edit2Icon(14));
         btnDeletePlan.setGraphic(new TrashIcon(14));
-
-        btnRestore.setGraphic(new RefreshCcwIcon(14));
     }
 
     private void setupTable() {
@@ -560,36 +508,6 @@ public class AccountsPanel extends AbstractPanel {
         ContextMenu cm = new ContextMenu(mAdd, mEdit, mDelete, mTag);
         dataPlansTable.setContextMenu(cm);
         selectedPlan.bind(dataPlansTable.getSelectionModel().selectedItemProperty());
-    }
-
-    private void setupDeletedAccountsTable() {
-        colTag1.setCellValueFactory(new PropertyValueFactory<>("tag"));
-        colTag1.setCellFactory(col -> new TagTableCell<>());
-        colNo1.setCellValueFactory(new PropertyValueFactory<>("accountNo"));
-        colStatus1.setCellValueFactory(new PropertyValueFactory<>("status"));
-        colStatus1.setCellFactory(col -> new StatusTableCell<>());
-        colName1.setCellValueFactory(new PropertyValueFactory<>("name"));
-        colAddress1.setCellValueFactory(new PropertyValueFactory<>("address"));
-        colContact1.setCellValueFactory(new PropertyValueFactory<>("phone"));
-        colEmail1.setCellValueFactory(new PropertyValueFactory<>("email"));
-        colCreatedAt.setCellValueFactory(new PropertyValueFactory<>("dateCreated"));
-        colCreatedAt.setCellFactory(col -> new DateTimeTableCell<>());
-        colUpdatedAt.setCellValueFactory(new PropertyValueFactory<>("dateUpdated"));
-        colUpdatedAt.setCellFactory(col -> new DateTimeTableCell<>());
-        colDeletedAt.setCellValueFactory(new PropertyValueFactory<>("dateDeleted"));
-        colDeletedAt.setCellFactory(col -> new DateTimeTableCell<>());
-
-        MenuItem mRestore = new MenuItem("Restore");
-        mRestore.setGraphic(new RefreshCcwIcon(12));
-        mRestore.setOnAction(evt -> restoreAccount());
-
-        MenuItem mEdit = new MenuItem("Edit");
-        mEdit.setGraphic(new Edit2Icon(12));
-        mEdit.setOnAction(evt -> editDeletedAccount());
-
-        ContextMenu cm = new ContextMenu(mEdit, mRestore);
-        deletedAccountsTable.setContextMenu(cm);
-        selectedAccount.bind(deletedAccountsTable.getSelectionModel().selectedItemProperty());
     }
 
     private void showProgress(String text) {
