@@ -156,7 +156,12 @@ public class ViewUtils {
             sb.append(str.charAt(i));
             decimalCount++;
         }
-        return sb.reverse().append(str.substring(startIndex)).toString();
+        String output = sb.reverse().append(str.substring(startIndex)).toString();
+        // if output is like `-,500.00`, remove first two characters
+        if (output.charAt(0) == '-' && output.charAt(1) == ',') {
+            output = output.substring(2);
+        }
+        return output;
     }
 
     public static String shortMonthStringValue(int value) {
