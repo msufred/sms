@@ -214,6 +214,9 @@ public class MainWindow extends AbstractWindow {
         menuShowDeleted.setGraphic(new ClockIcon(12));
         menuHelpAbout.setGraphic(new HelpCircleIcon(12));
 
+        lblAuthority.setGraphic(new UserIcon(14));
+        btnLogout.setGraphic(new LogOutIcon(14));
+
         btnDashboard.setGraphic(new GridIcon(14));
         btnPayments.setGraphic(new PesoIcon(14));
         btnCustomers.setGraphic(new UsersIcon(14));
