@@ -130,7 +130,7 @@ public class AcceptPaymentWindow extends AbstractWindow {
     private void calculate() {
         String paidStr = tfAmount.getText();
         amountPaid = paidStr.isBlank() ? 0 : Double.parseDouble(paidStr.trim());
-        balance = amountToPay + prevBalance - amountPaid;
+        balance = amountToPay + prevBalance - amountPaid - discount;
         lblBalance.setText(String.format("%.2f", balance));
     }
 
