@@ -124,7 +124,7 @@ public class DashboardPanel extends AbstractPanel {
     private RecalculateWindow recalculateWindow;
 
     // Summary Values
-    private DailySummary mSummary;
+    private DailySummary mPrevSummary, mSummary;
     private ObservableList<Revenue> prevRevenuesList;
     private ObservableList<Expense> prevExpensesList;
     private ObservableList<Revenue> revenuesToday;
@@ -168,147 +168,6 @@ public class DashboardPanel extends AbstractPanel {
         });
     }
 
-    private void setupIcons() {
-        tabProjections.setGraphic(new TrendingUpIcon(14));
-        tabRevenues.setGraphic(new PesoIcon(14));
-        tabExpenses.setGraphic(new PesoIcon(14));
-        tabSummaries.setGraphic(new FileTextIcon(14));
-
-        btnAddRevenue.setGraphic(new PlusIcon(14));
-        btnEditRevenue.setGraphic(new Edit2Icon(14));
-        btnDeleteRevenue.setGraphic(new TrashIcon(14));
-        btnExportRevenues.setGraphic(new UploadIcon(14));
-
-        btnAddExpense.setGraphic(new PlusIcon(14));
-        btnEditExpense.setGraphic(new Edit2Icon(14));
-        btnDeleteExpense.setGraphic(new TrashIcon(14));
-        btnExportExpenses.setGraphic(new UploadIcon(14));
-
-        btnExportSummaries.setGraphic(new UploadIcon(14));
-        btnRecalculate.setGraphic(new SettingsIcon(14));
-    }
-
-    private void setupRevenuesTab() {
-        btnAddRevenue.setOnAction(evt -> addRevenue());
-        btnEditRevenue.setOnAction(evt -> editRevenue());
-        btnDeleteRevenue.setOnAction(evt -> deleteRevenue());
-        btnExportRevenues.setOnAction(evt -> exportRevenues());
-
-        colRevenueTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
-        colRevenueTag.setCellFactory(col -> new TagTableCell<>());
-        colRevenueType.setCellValueFactory(new PropertyValueFactory<>("type"));
-        colRevenueDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
-        colRevenueAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
-        colRevenueAmount.setCellFactory(col -> new AmountTableCell<>());
-        colRevenueDate.setCellValueFactory(new PropertyValueFactory<>("date"));
-        colRevenueDate.setCellFactory(col -> new DateTableCell<>());
-
-        MenuItem mAdd = new MenuItem("Add");
-        mAdd.setGraphic(new PlusIcon(12));
-        mAdd.setOnAction(evt -> addRevenue());
-
-        MenuItem mEdit = new MenuItem("Edit");
-        mEdit.setGraphic(new Edit2Icon(12));
-        mEdit.setOnAction(evt -> editRevenue());
-
-        MenuItem mExport = new MenuItem("Export List");
-        mExport.setGraphic(new UploadIcon(12));
-        mExport.setOnAction(evt -> exportRevenues());
-
-        Menu mTag = new Menu("Change Tag");
-        mTag.setGraphic(new CircleIcon(12));
-        ViewUtils.getTags().forEach((tag, icon) -> {
-            MenuItem item = new MenuItem(ViewUtils.capitalize(tag));
-            item.setGraphic(icon);
-            item.setOnAction(evt -> updateRevenueTag(tag));
-            mTag.getItems().add(item);
-        });
-
-        MenuItem mDelete = new MenuItem("Delete");
-        mDelete.setGraphic(new TrashIcon(12));
-        mDelete.setOnAction(evt -> deleteRevenue());
-
-        ContextMenu cm = new ContextMenu(mAdd, mEdit, mExport, mTag, new SeparatorMenuItem(), mDelete);
-        revenuesTable.setContextMenu(cm);
-
-        selectedRevenueItem.bind(revenuesTable.getSelectionModel().selectedItemProperty());
-    }
-
-    private void setupExpensesTab() {
-        btnAddExpense.setOnAction(evt -> addExpense());
-        btnEditExpense.setOnAction(evt -> editExpense());
-        btnDeleteExpense.setOnAction(evt -> deleteExpense());
-        btnExportExpenses.setOnAction(evt -> exportExpenses());
-
-        colExpenseTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
-        colExpenseTag.setCellFactory(col -> new TagTableCell<>());
-        colExpenseType.setCellValueFactory(new PropertyValueFactory<>("type"));
-        colExpenseDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
-        colExpenseAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
-        colExpenseAmount.setCellFactory(col -> new AmountTableCell<>());
-        colExpenseDate.setCellValueFactory(new PropertyValueFactory<>("date"));
-        colExpenseDate.setCellFactory(col -> new DateTableCell<>());
-
-        MenuItem mAdd = new MenuItem("Add");
-        mAdd.setGraphic(new PlusIcon(12));
-        mAdd.setOnAction(evt -> addExpense());
-
-        MenuItem mEdit = new MenuItem("Edit");
-        mEdit.setGraphic(new Edit2Icon(12));
-        mEdit.setOnAction(evt -> editExpense());
-
-        MenuItem mExport = new MenuItem("Export List");
-        mExport.setGraphic(new UploadIcon(12));
-        mExport.setOnAction(evt -> exportExpenses());
-
-        Menu mTag = new Menu("Change Tag");
-        mTag.setGraphic(new CircleIcon(12));
-        ViewUtils.getTags().forEach((tag, icon) -> {
-            MenuItem item = new MenuItem(ViewUtils.capitalize(tag));
-            item.setGraphic(icon);
-            item.setOnAction(evt -> updateExpenseTag(tag));
-            mTag.getItems().add(item);
-        });
-
-        MenuItem mDelete = new MenuItem("Delete");
-        mDelete.setGraphic(new TrashIcon(12));
-        mDelete.setOnAction(evt -> deleteExpense());
-
-        ContextMenu cm = new ContextMenu(mAdd, mEdit, mExport, mTag, new SeparatorMenuItem(), mDelete);
-        expensesTable.setContextMenu(cm);
-
-        selectedExpenseItem.bind(expensesTable.getSelectionModel().selectedItemProperty());
-    }
-
-    private void setupSummariesTab() {
-        btnExportSummaries.setOnAction(evt -> exportSummaries());
-        btnRecalculate.setOnAction(evt -> recalculateSummaries());
-
-        colSummaryTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
-        colSummaryTag.setCellFactory(col -> new TagTableCell<>());
-        colSummaryDate.setCellValueFactory(new PropertyValueFactory<>("date"));
-        colSummaryDate.setCellFactory(col -> new DateTableCell<>());
-        colSummaryForwarded.setCellValueFactory(new PropertyValueFactory<>("forwarded"));
-        colSummaryForwarded.setCellFactory(col -> new AmountTableCell<>());
-        colSummaryRevenues.setCellValueFactory(new PropertyValueFactory<>("revenues"));
-        colSummaryRevenues.setCellFactory(col -> new AmountTableCell<>());
-        colSummaryExpenses.setCellValueFactory(new PropertyValueFactory<>("expenses"));
-        colSummaryExpenses.setCellFactory(col -> new AmountTableCell<>());
-        colSummaryBalance.setCellValueFactory(new PropertyValueFactory<>("balance"));
-        colSummaryBalance.setCellFactory(col -> new AmountTableCell<>());
-
-        MenuItem mRecalculate = new MenuItem("Recalculate");
-        mRecalculate.setGraphic(new SettingsIcon(12));
-        mRecalculate.setOnAction(evt -> recalculateSummaries());
-
-        MenuItem mExport = new MenuItem("Export");
-        mExport.setGraphic(new UploadIcon(12));
-        mExport.setOnAction(evt -> exportSummaries());
-
-        ContextMenu cm = new ContextMenu(mRecalculate, mExport);
-        summariesTable.setContextMenu(cm);
-    }
-
     @Override
     public void onResume() {
         // Check if there exist a DailySummary for today. If there is none, create and refresh summary.
@@ -350,8 +209,8 @@ public class DashboardPanel extends AbstractPanel {
                 }).flatMap(summaries -> {
                     // sort summaries
                     FXCollections.sort(summaries, Comparator.comparing(DailySummary::getDate));
-                    DailySummary latest = summaries.isEmpty() ? null : summaries.getLast();
-                    mCashForwarded = latest == null ? 0 : latest.getBalance();
+                    mPrevSummary = summaries.isEmpty() ? null : summaries.getLast();
+                    mCashForwarded = mPrevSummary == null ? 0 : mPrevSummary.getBalance();
                     mRevenues = 0;
                     for (Revenue r : revenuesToday) mRevenues += r.getAmount();
                     mExpenses = 0;
@@ -387,6 +246,16 @@ public class DashboardPanel extends AbstractPanel {
                     return Single.fromCallable(revenueController::getRevenuesToday);
                 }).flatMap(revenues -> {
                     revenuesToday = revenues;
+                    return Single.fromCallable(dailySummaryController::getAll);
+                }).flatMap(summaries -> {
+                    // sort summaries
+                    FXCollections.sort(summaries, Comparator.comparing(DailySummary::getDate));
+                    if (!summaries.isEmpty() && summaries.size() > 1) {
+                        mPrevSummary = summaries.get(summaries.size() - 2);
+                    } else {
+                        mPrevSummary = null;
+                    }
+
                     mRevenues = 0;
                     for (Revenue r : revenuesToday) mRevenues += r.getAmount();
                     mExpenses = 0;
@@ -400,11 +269,7 @@ public class DashboardPanel extends AbstractPanel {
                 }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
                     hideProgress();
                     if (!success) showWarningDialog("Failed", "Failed to update daily summary.");
-                    lblForwarded.setText(ViewUtils.toStringMoneyFormat(mSummary.getForwarded()));
-                    lblRevenues.setText(ViewUtils.toStringMoneyFormat(mSummary.getRevenues()));
-                    lblExpenses.setText(ViewUtils.toStringMoneyFormat(mSummary.getExpenses()));
-                    lblBalances.setText(ViewUtils.toStringMoneyFormat(mSummary.getBalance()));
-
+                    displaySummary();
                     if (onNext != null) onNext.run();
                 }, err -> {
                     hideProgress();
@@ -426,17 +291,6 @@ public class DashboardPanel extends AbstractPanel {
                 }));
     }
 
-    private void recalculateSummaries() {
-        if (recalculateWindow == null) recalculateWindow = new RecalculateWindow(database, mainWindow.getStage());
-        recalculateWindow.showAndWait();
-        onResume();
-    }
-
-    @Override
-    public void onPause() {
-
-    }
-
     private void refreshProjections() {
         showProgress("Retrieving data...");
         disposables.add(Single.fromCallable(revenueController::getAll)
@@ -454,6 +308,64 @@ public class DashboardPanel extends AbstractPanel {
                     hideProgress();
                     showErrorDialog("Database Error", "Error while retrieving data.\n" + err);
                 }));
+    }
+
+    private void recalculateSummaries() {
+        if (recalculateWindow == null) recalculateWindow = new RecalculateWindow(database, mainWindow.getStage());
+        recalculateWindow.showAndWait();
+        onResume();
+    }
+
+    @Override
+    public void onPause() {
+
+    }
+
+    private void displaySummary() {
+        if (mSummary != null) {
+            lblForwarded.setText(ViewUtils.toStringMoneyFormat(mSummary.getForwarded()));
+            lblRevenues.setText(ViewUtils.toStringMoneyFormat(mSummary.getRevenues()));
+            lblExpenses.setText(ViewUtils.toStringMoneyFormat(mSummary.getExpenses()));
+            lblBalances.setText(ViewUtils.toStringMoneyFormat(mSummary.getBalance()));
+
+            // clear styles first
+            lblRevenues.getStyleClass().removeAll("positive-up", "negative-down");
+            lblExpenses.getStyleClass().removeAll("negative-up", "positive-down");
+            lblBalances.getStyleClass().removeAll("positive-up", "negative-down");
+
+            if (mPrevSummary != null) {
+                int iconSize = 16;
+                if (mPrevSummary.getRevenues() > mSummary.getRevenues()) {
+                    lblRevenues.setGraphic(new ArrowDownIcon(iconSize));
+                    lblRevenues.getStyleClass().add("negative-down");
+                } else if (mPrevSummary.getRevenues() < mSummary.getRevenues()) {
+                    lblRevenues.setGraphic(new ArrowUpIcon(iconSize));
+                    lblRevenues.getStyleClass().add("positive-up");
+                } else {
+                    lblRevenues.setGraphic(null);
+                }
+
+                if (mPrevSummary.getExpenses() > mSummary.getExpenses()) {
+                    lblExpenses.setGraphic(new ArrowDownIcon(iconSize));
+                    lblExpenses.getStyleClass().add("positive-down");
+                } else if (mPrevSummary.getExpenses() < mSummary.getExpenses()) {
+                    lblExpenses.setGraphic(new ArrowUpIcon(iconSize));
+                    lblExpenses.getStyleClass().add("negative-up");
+                } else {
+                    lblExpenses.setGraphic(null);
+                }
+
+                if (mPrevSummary.getBalance() > mSummary.getBalance()) {
+                    lblBalances.setGraphic(new ArrowDownIcon(iconSize));
+                    lblBalances.getStyleClass().add("negative-down");
+                } else if (mPrevSummary.getBalance() < mSummary.getBalance()) {
+                    lblBalances.setGraphic(new ArrowUpIcon(iconSize));
+                    lblBalances.getStyleClass().add("positive-up");
+                } else {
+                    lblBalances.setGraphic(null);
+                }
+            }
+        }
     }
 
     private void displayProjections() {
@@ -480,7 +392,7 @@ public class DashboardPanel extends AbstractPanel {
                     if (s.getDate().getMonthValue() == month && s.getDate().getYear() == now.getYear()) {
                         revenues += s.getRevenues();
                         expenses += s.getExpenses();
-                        balance += s.getBalance();
+                        balance = s.getBalance();
                     }
                 }
 
@@ -515,7 +427,7 @@ public class DashboardPanel extends AbstractPanel {
                     if (s.getDate().getDayOfMonth() == d && s.getDate().getMonthValue() == now.getMonthValue() && s.getDate().getYear() == ym.getYear()) {
                         revenues += s.getRevenues();
                         expenses += s.getExpenses();
-                        balance += s.getBalance();
+                        balance = s.getBalance();
                     }
                 }
 
@@ -793,6 +705,147 @@ public class DashboardPanel extends AbstractPanel {
                 showErrorDialog("IOException", "Error while exporting Summary list to file.\n" + err);
             }));
         }
+    }
+
+    private void setupIcons() {
+        tabProjections.setGraphic(new TrendingUpIcon(14));
+        tabRevenues.setGraphic(new PesoIcon(14));
+        tabExpenses.setGraphic(new PesoIcon(14));
+        tabSummaries.setGraphic(new FileTextIcon(14));
+
+        btnAddRevenue.setGraphic(new PlusIcon(14));
+        btnEditRevenue.setGraphic(new Edit2Icon(14));
+        btnDeleteRevenue.setGraphic(new TrashIcon(14));
+        btnExportRevenues.setGraphic(new UploadIcon(14));
+
+        btnAddExpense.setGraphic(new PlusIcon(14));
+        btnEditExpense.setGraphic(new Edit2Icon(14));
+        btnDeleteExpense.setGraphic(new TrashIcon(14));
+        btnExportExpenses.setGraphic(new UploadIcon(14));
+
+        btnExportSummaries.setGraphic(new UploadIcon(14));
+        btnRecalculate.setGraphic(new SettingsIcon(14));
+    }
+
+    private void setupRevenuesTab() {
+        btnAddRevenue.setOnAction(evt -> addRevenue());
+        btnEditRevenue.setOnAction(evt -> editRevenue());
+        btnDeleteRevenue.setOnAction(evt -> deleteRevenue());
+        btnExportRevenues.setOnAction(evt -> exportRevenues());
+
+        colRevenueTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
+        colRevenueTag.setCellFactory(col -> new TagTableCell<>());
+        colRevenueType.setCellValueFactory(new PropertyValueFactory<>("type"));
+        colRevenueDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
+        colRevenueAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        colRevenueAmount.setCellFactory(col -> new AmountTableCell<>());
+        colRevenueDate.setCellValueFactory(new PropertyValueFactory<>("date"));
+        colRevenueDate.setCellFactory(col -> new DateTableCell<>());
+
+        MenuItem mAdd = new MenuItem("Add");
+        mAdd.setGraphic(new PlusIcon(12));
+        mAdd.setOnAction(evt -> addRevenue());
+
+        MenuItem mEdit = new MenuItem("Edit");
+        mEdit.setGraphic(new Edit2Icon(12));
+        mEdit.setOnAction(evt -> editRevenue());
+
+        MenuItem mExport = new MenuItem("Export List");
+        mExport.setGraphic(new UploadIcon(12));
+        mExport.setOnAction(evt -> exportRevenues());
+
+        Menu mTag = new Menu("Change Tag");
+        mTag.setGraphic(new CircleIcon(12));
+        ViewUtils.getTags().forEach((tag, icon) -> {
+            MenuItem item = new MenuItem(ViewUtils.capitalize(tag));
+            item.setGraphic(icon);
+            item.setOnAction(evt -> updateRevenueTag(tag));
+            mTag.getItems().add(item);
+        });
+
+        MenuItem mDelete = new MenuItem("Delete");
+        mDelete.setGraphic(new TrashIcon(12));
+        mDelete.setOnAction(evt -> deleteRevenue());
+
+        ContextMenu cm = new ContextMenu(mAdd, mEdit, mExport, mTag, new SeparatorMenuItem(), mDelete);
+        revenuesTable.setContextMenu(cm);
+
+        selectedRevenueItem.bind(revenuesTable.getSelectionModel().selectedItemProperty());
+    }
+
+    private void setupExpensesTab() {
+        btnAddExpense.setOnAction(evt -> addExpense());
+        btnEditExpense.setOnAction(evt -> editExpense());
+        btnDeleteExpense.setOnAction(evt -> deleteExpense());
+        btnExportExpenses.setOnAction(evt -> exportExpenses());
+
+        colExpenseTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
+        colExpenseTag.setCellFactory(col -> new TagTableCell<>());
+        colExpenseType.setCellValueFactory(new PropertyValueFactory<>("type"));
+        colExpenseDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
+        colExpenseAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        colExpenseAmount.setCellFactory(col -> new AmountTableCell<>());
+        colExpenseDate.setCellValueFactory(new PropertyValueFactory<>("date"));
+        colExpenseDate.setCellFactory(col -> new DateTableCell<>());
+
+        MenuItem mAdd = new MenuItem("Add");
+        mAdd.setGraphic(new PlusIcon(12));
+        mAdd.setOnAction(evt -> addExpense());
+
+        MenuItem mEdit = new MenuItem("Edit");
+        mEdit.setGraphic(new Edit2Icon(12));
+        mEdit.setOnAction(evt -> editExpense());
+
+        MenuItem mExport = new MenuItem("Export List");
+        mExport.setGraphic(new UploadIcon(12));
+        mExport.setOnAction(evt -> exportExpenses());
+
+        Menu mTag = new Menu("Change Tag");
+        mTag.setGraphic(new CircleIcon(12));
+        ViewUtils.getTags().forEach((tag, icon) -> {
+            MenuItem item = new MenuItem(ViewUtils.capitalize(tag));
+            item.setGraphic(icon);
+            item.setOnAction(evt -> updateExpenseTag(tag));
+            mTag.getItems().add(item);
+        });
+
+        MenuItem mDelete = new MenuItem("Delete");
+        mDelete.setGraphic(new TrashIcon(12));
+        mDelete.setOnAction(evt -> deleteExpense());
+
+        ContextMenu cm = new ContextMenu(mAdd, mEdit, mExport, mTag, new SeparatorMenuItem(), mDelete);
+        expensesTable.setContextMenu(cm);
+
+        selectedExpenseItem.bind(expensesTable.getSelectionModel().selectedItemProperty());
+    }
+
+    private void setupSummariesTab() {
+        btnExportSummaries.setOnAction(evt -> exportSummaries());
+        btnRecalculate.setOnAction(evt -> recalculateSummaries());
+
+        colSummaryTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
+        colSummaryTag.setCellFactory(col -> new TagTableCell<>());
+        colSummaryDate.setCellValueFactory(new PropertyValueFactory<>("date"));
+        colSummaryDate.setCellFactory(col -> new DateTableCell<>());
+        colSummaryForwarded.setCellValueFactory(new PropertyValueFactory<>("forwarded"));
+        colSummaryForwarded.setCellFactory(col -> new AmountTableCell<>());
+        colSummaryRevenues.setCellValueFactory(new PropertyValueFactory<>("revenues"));
+        colSummaryRevenues.setCellFactory(col -> new AmountTableCell<>());
+        colSummaryExpenses.setCellValueFactory(new PropertyValueFactory<>("expenses"));
+        colSummaryExpenses.setCellFactory(col -> new AmountTableCell<>());
+        colSummaryBalance.setCellValueFactory(new PropertyValueFactory<>("balance"));
+        colSummaryBalance.setCellFactory(col -> new AmountTableCell<>());
+
+        MenuItem mRecalculate = new MenuItem("Recalculate");
+        mRecalculate.setGraphic(new SettingsIcon(12));
+        mRecalculate.setOnAction(evt -> recalculateSummaries());
+
+        MenuItem mExport = new MenuItem("Export");
+        mExport.setGraphic(new UploadIcon(12));
+        mExport.setOnAction(evt -> exportSummaries());
+
+        ContextMenu cm = new ContextMenu(mRecalculate, mExport);
+        summariesTable.setContextMenu(cm);
     }
 
     private DirectoryChooser getDirectoryChooser() {
