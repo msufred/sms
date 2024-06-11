@@ -189,14 +189,14 @@
     -fx-font-size: 14px;
     -fx-text-fill: #ffffff;
 }
-.main-toggle .material-icon {
+.main-toggle .feather-icon {
     -fx-background-color: #ffffff;
 }
 .main-toggle:selected {
     -fx-background-color: #cccccc;
     -fx-text-fill: #000000;
 }
-.main-toggle:selected .material-icon {
+.main-toggle:selected .feather-icon {
     -fx-background-color: #000000;
 }
 .main-toggle-v1 {
@@ -339,6 +339,22 @@
     -fx-font-family: 'Montserrat';
     -fx-font-weight: bold;
     -fx-font-size: 28;
+}
+
+.positive-up .feather-icon {
+    -fx-background-color: "#047857";
+}
+
+.negative-up .feather-icon {
+    -fx-background-color: "#e74c3c";
+}
+
+.positive-down .feather-icon {
+    -fx-background-color: "#047857";
+}
+
+.negative-down .feather-icon {
+    -fx-background-color: "#e74c3c";
 }
 
 /*
