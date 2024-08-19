@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
 import org.apache.commons.math3.analysis.function.Exp;
 import org.gemseeker.sms.ExportUtils;
@@ -98,6 +99,8 @@ public class DashboardPanel extends AbstractPanel {
     @FXML private TableColumn<DailySummary, Double> colSummaryRevenues;
     @FXML private TableColumn<DailySummary, Double> colSummaryExpenses;
     @FXML private TableColumn<DailySummary, Double> colSummaryBalance;
+
+    private Label pieLabel;
 
     private DirectoryChooser directoryChooser;
 
@@ -406,6 +409,21 @@ public class DashboardPanel extends AbstractPanel {
             monthlyLineChart.getData().add(monthlyExpenses);
             monthlyLineChart.getData().add(monthlyBalance);
 
+            for (XYChart.Data<String, Number> data : monthlyRevenues.getData()) {
+                String text = String.format("%s\n%s", "Revenues", ViewUtils.toStringMoneyFormat(data.getYValue().doubleValue()));
+                Tooltip.install(data.getNode(), new Tooltip(text));
+            }
+
+            for (XYChart.Data<String, Number> data : monthlyExpenses.getData()) {
+                String text = String.format("%s\n%s", "Expenses", ViewUtils.toStringMoneyFormat(data.getYValue().doubleValue()));
+                Tooltip.install(data.getNode(), new Tooltip(text));
+            }
+
+            for (XYChart.Data<String, Number> data : monthlyBalance.getData()) {
+                String text = String.format("%s\n%s", "Balance", ViewUtils.toStringMoneyFormat(data.getYValue().doubleValue()));
+                Tooltip.install(data.getNode(), new Tooltip(text));
+            }
+
             // DAILY PROJECTIONS
             XYChart.Series<String, Number> dailyRevenues = new XYChart.Series<>();
             XYChart.Series<String, Number> dailyExpenses = new XYChart.Series<>();
@@ -441,6 +459,21 @@ public class DashboardPanel extends AbstractPanel {
             dailyLineChart.getData().add(dailyExpenses);
             dailyLineChart.getData().add(dailyBalance);
 
+            for (XYChart.Data<String, Number> data : dailyRevenues.getData()) {
+                String text = String.format("%s\n%s", "Revenues", ViewUtils.toStringMoneyFormat(data.getYValue().doubleValue()));
+                Tooltip.install(data.getNode(), new Tooltip(text));
+            }
+
+            for (XYChart.Data<String, Number> data : dailyExpenses.getData()) {
+                String text = String.format("%s\n%s", "Expenses", ViewUtils.toStringMoneyFormat(data.getYValue().doubleValue()));
+                Tooltip.install(data.getNode(), new Tooltip(text));
+            }
+
+            for (XYChart.Data<String, Number> data : dailyBalance.getData()) {
+                String text = String.format("%s\n%s", "Balance", ViewUtils.toStringMoneyFormat(data.getYValue().doubleValue()));
+                Tooltip.install(data.getNode(), new Tooltip(text));
+            }
+
             // PIE CHARTS
             // Revenues
             double billing = 0;
@@ -464,6 +497,11 @@ public class DashboardPanel extends AbstractPanel {
             PieChart.Data revOthers = new PieChart.Data(Revenue.TYPE_OTHERS, others);
             revenuesPieChart.getData().clear();
             revenuesPieChart.getData().addAll(revBilling, revPurchase, revService, revVendo, revOthers);
+            // show value (tooltip) on hover
+            for (PieChart.Data data : revenuesPieChart.getData()) {
+                String text = String.format("%s\n%s", data.getName(), ViewUtils.toStringMoneyFormat(data.getPieValue()));
+                Tooltip.install(data.getNode(), new Tooltip(text));
+            }
 
             // Expenses
             double education = 0;
@@ -506,6 +544,11 @@ public class DashboardPanel extends AbstractPanel {
             expensesPieChart.getData().clear();
             expensesPieChart.getData().addAll(expEducation, expElectricity, expInternet, expFood, expRepair, expMaintenance,
                     expPayment, expTransportation, expPeripherals, expWater, expOther);
+            // show value (tooltip) on hover
+            for (PieChart.Data data : expensesPieChart.getData()) {
+                String text = String.format("%s\n%s", data.getName(), ViewUtils.toStringMoneyFormat(data.getPieValue()));
+                Tooltip.install(data.getNode(), new Tooltip(text));
+            }
         }
     }
 
@@ -862,6 +905,22 @@ public class DashboardPanel extends AbstractPanel {
 
     private void hideProgress() {
         mainWindow.hideProgress();
+    }
+
+    private void showPieLabel(double x, double y, double value) {
+        if (pieLabel == null) {
+            pieLabel = new Label();
+            pieLabel.getStyleClass().add("pie-label");
+
+        }
+
+        pieLabel.setTranslateX(x);
+        pieLabel.setTranslateY(y);
+        pieLabel.setText(ViewUtils.toStringMoneyFormat(value));
+
+        if (!pieLabel.isVisible()) {
+            pieLabel.setVisible(true);
+        }
     }
 
     @Override
