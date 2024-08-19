@@ -22,6 +22,13 @@ public class AcceptPaymentWindow extends AbstractWindow {
     @FXML private DatePicker dpPaymentDate;
     @FXML private TextField tfPaymentNo;
     @FXML private Label lblErrPaymentNo;
+
+    @FXML private TextField tfFee;
+    @FXML private TextField tfPrevBalance;
+    @FXML private TextField tfDiscount;
+    @FXML private TextField tfPenalty;
+    @FXML private TextField tfVat;
+
     @FXML private Label lblFee;
     @FXML private Label lblPrevBalance;
     @FXML private Label lblDiscount;
@@ -88,7 +95,29 @@ public class AcceptPaymentWindow extends AbstractWindow {
 
     @Override
     protected void onFxmlLoaded() {
-        ViewUtils.setAsNumericalTextField(tfAmount);
+        ViewUtils.setAsNumericalTextField(tfFee, tfPrevBalance, tfDiscount, tfPenalty, tfVat, tfAmount);
+
+        tfDiscount.textProperty().addListener((o, oldVal, newVal) -> {
+            double dscnt = 0;
+            if (newVal != null && !newVal.isBlank()) dscnt = Double.parseDouble(newVal.trim());
+            discount = dscnt;
+            calculate();
+        });
+
+        tfPenalty.textProperty().addListener((o, oldVal, newVal) -> {
+            double pnlty = 0;
+            if (newVal != null && !newVal.isBlank()) pnlty = Double.parseDouble(newVal.trim());
+            penalty = pnlty;
+            calculate();
+        });
+
+        tfVat.textProperty().addListener((o, oldVal, newVal) -> {
+            double vt = 0;
+            if (newVal != null && !newVal.isBlank()) vt = Double.parseDouble(newVal.trim());
+            vat = vt;
+            calculate();
+        });
+
         tfAmount.textProperty().addListener((o, oldVal, newVal) -> calculate());
         btnConfirm.setOnAction(evt -> validateAndSave(this::saveAndPrint));
         btnExport.setOnAction(evt -> validateAndSave(this::saveAndExport));
@@ -130,7 +159,9 @@ public class AcceptPaymentWindow extends AbstractWindow {
     private void calculate() {
         String paidStr = tfAmount.getText();
         amountPaid = paidStr.isBlank() ? 0 : Double.parseDouble(paidStr.trim());
-        balance = amountToPay + prevBalance - amountPaid - discount;
+        totalAmount = amountToPay + prevBalance + penalty + vat - discount;
+        lblTotalDue.setText(String.format("%.2f", totalAmount));
+        balance = totalAmount - amountPaid;
         lblBalance.setText(String.format("%.2f", balance));
     }
 
@@ -263,6 +294,13 @@ public class AcceptPaymentWindow extends AbstractWindow {
         lblDiscount.setText(String.format("%.2f", discount));
         lblPenalty.setText(String.format("%.2f", penalty));
         lblVat.setText(String.format("%.2f", vat));
+
+        tfFee.setText(String.format("%.2f", amountToPay));
+        tfPrevBalance.setText(String.format("%.2f", prevBalance));
+        tfDiscount.setText(String.format("%.2f", discount));
+        tfPenalty.setText(String.format("%.2f", penalty));
+        tfVat.setText(String.format("%.2f", vat));
+
         lblTotalDue.setText(String.format("%.2f", totalAmount));
     }
 
