@@ -65,6 +65,11 @@ public class DashboardPanel extends AbstractPanel {
     @FXML private PieChart expensesPieChart;
 
     // Revenues
+    @FXML private Label lblBilling;
+    @FXML private Label lblPurchase;
+    @FXML private Label lblService;
+    @FXML private Label lblVendo;
+    @FXML private Label lblOthers;
     @FXML private Button btnAddRevenue;
     @FXML private Button btnEditRevenue;
     @FXML private Button btnDeleteRevenue;
@@ -559,11 +564,34 @@ public class DashboardPanel extends AbstractPanel {
                     hideProgress();
                     revenueList = new FilteredList<>(list);
                     revenuesTable.setItems(revenueList);
+                    tallyRevenues(list);
                     refreshSummary(null);
                 }, err -> {
                     hideProgress();
                     showErrorDialog("Database Error", "Error while retrieving Revenue entries.\n" + err);
                 }));
+    }
+
+    private void tallyRevenues(ObservableList<Revenue> revenues) {
+        double billing = 0;
+        double purchase = 0;
+        double service = 0;
+        double vendo = 0;
+        double others = 0;
+        for (Revenue rev : revenues) {
+            switch (rev.getType()) {
+                case Revenue.TYPE_BILLING -> billing += rev.getAmount();
+                case Revenue.TYPE_PURCHASE -> purchase += rev.getAmount();
+                case Revenue.TYPE_SERVICE -> service += rev.getAmount();
+                case Revenue.TYPE_WIFI_VENDO -> vendo += rev.getAmount();
+                default -> others += rev.getAmount();
+            }
+        }
+        lblBilling.setText(ViewUtils.toStringMoneyFormat(billing));
+        lblPurchase.setText(ViewUtils.toStringMoneyFormat(purchase));
+        lblService.setText(ViewUtils.toStringMoneyFormat(service));
+        lblVendo.setText(ViewUtils.toStringMoneyFormat(vendo));
+        lblOthers.setText(ViewUtils.toStringMoneyFormat(others));
     }
 
     private void refreshExpenses() {

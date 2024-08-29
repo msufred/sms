@@ -142,6 +142,63 @@
                               <TableColumn fx:id="colRevenueDate" prefWidth="120.0" style="-fx-alignment: center;" text="Date" />
                            </columns>
                         </TableView>
+                        <ScrollPane fitToHeight="true" prefWidth="200.0" vbarPolicy="NEVER">
+                           <content>
+                              <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                 <children>
+                                    <Label styleClass="form-title" text="SUMMARY" />
+                                    <HBox alignment="CENTER" spacing="8.0" styleClass="summary-card-pane">
+                                       <children>
+                                          <Label text="BILLING:" />
+                                          <Label fx:id="lblBilling" styleClass="summary-number-small" text="0.00" />
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="4.0" left="8.0" right="8.0" top="4.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="CENTER" spacing="8.0" styleClass="summary-card-pane">
+                                       <children>
+                                          <Label text="PURCHASE:" />
+                                          <Label fx:id="lblPurchase" styleClass="summary-number-small" text="0.00" />
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="4.0" left="8.0" right="8.0" top="4.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="CENTER" spacing="8.0" styleClass="summary-card-pane">
+                                       <children>
+                                          <Label text="SERVICE:" />
+                                          <Label fx:id="lblService" styleClass="summary-number-small" text="0.00" />
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="4.0" left="8.0" right="8.0" top="4.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="CENTER" spacing="8.0" styleClass="summary-card-pane">
+                                       <children>
+                                          <Label text="WIFI VENDO:" />
+                                          <Label fx:id="lblVendo" styleClass="summary-number-small" text="0.00" />
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="4.0" left="8.0" right="8.0" top="4.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="CENTER" spacing="8.0" styleClass="summary-card-pane">
+                                       <children>
+                                          <Label text="OTHERS:" />
+                                          <Label fx:id="lblOthers" styleClass="summary-number-small" text="0.00" />
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="4.0" left="8.0" right="8.0" top="4.0" />
+                                       </padding>
+                                    </HBox>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                 </padding>
+                              </HBox>
+                           </content>
+                        </ScrollPane>
                      </children></VBox>
                </content>
             </Tab>

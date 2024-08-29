@@ -341,6 +341,12 @@
     -fx-font-size: 28;
 }
 
+.summary-number-small {
+    -fx-font-family: 'Montserrat';
+    -fx-font-weight: bold;
+    -fx-font-size: 20;
+}
+
 .positive-up .feather-icon {
     -fx-background-color: "#047857";
 }
