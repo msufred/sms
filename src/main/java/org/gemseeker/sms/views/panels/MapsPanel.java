@@ -53,6 +53,8 @@ import java.util.Optional;
 
 public class MapsPanel extends AbstractPanel {
 
+    // comment no function
+
     private static final int ZOOM_MAX = 11;
     private static final int ZOOM_MIN = 0;
 
