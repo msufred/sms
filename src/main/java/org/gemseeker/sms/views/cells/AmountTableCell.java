@@ -7,12 +7,14 @@ import org.gemseeker.sms.views.icons.PesoIcon;
 public class AmountTableCell<T> extends TableCell<T, Double> {
     @Override
     protected void updateItem(Double amount, boolean empty) {
-        if (empty) {
+        if (empty || amount == 0) {
             setText("");
             setGraphic(null);
         } else {
             setText(ViewUtils.toStringMoneyFormat(amount));
-            setGraphic(new PesoIcon(12));
+            PesoIcon pesoIcon = new PesoIcon(12);
+            pesoIcon.getStyleClass().add("tag-normal");
+            setGraphic(pesoIcon);
         }
     }
 }

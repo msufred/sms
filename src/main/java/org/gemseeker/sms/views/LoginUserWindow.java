@@ -71,7 +71,8 @@ public class LoginUserWindow extends AbstractWindow {
             mainWindow.show();
         }, err -> {
             // Error is thrown if User is null. Inform user.
-            lblError.setText("Invalid Username and/or Password. Try again.");
+            lblError.setText("Invalid Username and/or Password. Try again.\n" + err);
+            showErrorDialog("Login Error", err.toString());
         }));
     }
 

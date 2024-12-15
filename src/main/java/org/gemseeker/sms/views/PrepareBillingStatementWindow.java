@@ -36,6 +36,7 @@ public class PrepareBillingStatementWindow extends AbstractWindow {
     @FXML private Button btnCancel;
 
     //private final Settings settings;
+    private final MainWindow mainWindow;
     private final Database database;
     private final AccountController accountController;
     private final BillingController billingController;
@@ -54,8 +55,9 @@ public class PrepareBillingStatementWindow extends AbstractWindow {
     // Windows
     private PrintWindow printWindow;
 
-    public PrepareBillingStatementWindow(Database database, Stage owner) {
-        super("Billing Statement", PrepareBillingStatementWindow.class.getResource("prepare_billing_statement.fxml"), null, owner);
+    public PrepareBillingStatementWindow(MainWindow mainWindow, Database database) {
+        super("Billing Statement", PrepareBillingStatementWindow.class.getResource("prepare_billing_statement.fxml"), null, mainWindow.getStage());
+        this.mainWindow = mainWindow;
         this.database = database;
         accountController = new AccountController(database);
         billingController = new BillingController(database);
@@ -99,6 +101,13 @@ public class PrepareBillingStatementWindow extends AbstractWindow {
     @Override
     protected void onShow() {
         clearFields();
+
+        User user = mainWindow.getUser();
+        if (user != null) {
+            tfPreparedBy.setText(user.getFullname());
+            tfDesignation.setText(user.getDesignation());
+        }
+
         progressBar.setVisible(true);
         disposables.add(Single.fromCallable(() -> billingStatementController.getByBillingNo(mBillingNo))
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(statement -> {
@@ -174,8 +183,9 @@ public class PrepareBillingStatementWindow extends AbstractWindow {
             calculateTotal();
         }
 
-        tfPreparedBy.setText(mBillingStatement == null ? "" : mBillingStatement.getPreparedBy());
-        tfDesignation.setText(mBillingStatement == null ? "" : mBillingStatement.getDesignation());
+        User user = mainWindow.getUser();
+        tfPreparedBy.setText(user.getFullname());
+        tfDesignation.setText(user.getDesignation());
         tfReceivedBy.setText(mBillingStatement == null ? "" : mBillingStatement.getReceivedBy());
     }
 
@@ -245,7 +255,7 @@ public class PrepareBillingStatementWindow extends AbstractWindow {
         }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
             progressBar.setVisible(false);
             if (!success) showWarningDialog("Failed", "Failed to update Billing Statement.");
-            if (printWindow == null) printWindow = new PrintWindow(database, getStage());
+            if (printWindow == null) printWindow = new PrintWindow(mainWindow, database);
             printWindow.showAndWait(PrintWindow.Type.STATEMENT, mBillingNo);
             close();
         }, err -> {
@@ -290,7 +300,7 @@ public class PrepareBillingStatementWindow extends AbstractWindow {
         }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
             progressBar.setVisible(false);
             if (!success) showWarningDialog("Failed", "Failed to add new Billing Statement.");
-            if (printWindow == null) printWindow = new PrintWindow(database, getStage());
+            if (printWindow == null) printWindow = new PrintWindow(mainWindow, database);
             printWindow.showAndWait(PrintWindow.Type.STATEMENT, mBillingNo);
             close();
         }, err -> {

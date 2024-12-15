@@ -21,19 +21,19 @@ public class DailySummaryController implements ModelController<DailySummary> {
 
     @Override
     public boolean insert(DailySummary model) throws SQLException {
-        String sql = String.format("INSERT INTO daily_summaries (date, forwarded, revenues, expenses, " +
-                "balance, tag, date_created, date_updated) VALUES ('%s', '%f', '%f', '%f', '%f', '%s', '%s', '%s')",
-                model.getDate(), model.getForwarded(), model.getRevenues(), model.getExpenses(), model.getBalance(),
-                model.getTag(), model.getDateCreated(), model.getDateUpdated());
+        String sql = String.format("INSERT INTO daily_summaries (date, forwarded, revenues, expenses, cash_in, cash_out, " +
+                "balance, tag, date_created, date_updated) VALUES ('%s', '%f', '%f', '%f', '%f', '%f', '%f', '%s', '%s', '%s')",
+                model.getDate(), model.getForwarded(), model.getRevenues(), model.getExpenses(), model.getCashIn(),
+                model.getCashOut(), model.getBalance(), model.getTag(), model.getDateCreated(), model.getDateUpdated());
         return database.executeQuery(sql);
     }
 
     @Override
     public boolean update(DailySummary model) throws SQLException {
         String sql = String.format("UPDATE daily_summaries SET date='%s', forwarded='%f', revenues='%f', " +
-                "expenses='%f', balance='%f', tag='%s', date_updated='%s' WHERE id='%d'",
-                model.getDate(), model.getForwarded(), model.getRevenues(), model.getExpenses(), model.getBalance(),
-                model.getTag(), LocalDateTime.now(), model.getId());
+                "expenses='%f', cash_in='%f', cash_out='%f', balance='%f', tag='%s', date_updated='%s' WHERE id='%d'",
+                model.getDate(), model.getForwarded(), model.getRevenues(), model.getExpenses(), model.getCashIn(),
+                model.getCashOut(), model.getBalance(), model.getTag(), LocalDateTime.now(), model.getId());
         return database.executeQuery(sql);
     }
 
@@ -82,17 +82,20 @@ public class DailySummaryController implements ModelController<DailySummary> {
     }
 
     private DailySummary fetchInfo(ResultSet rs) throws SQLException {
+        int index = 1;
         DailySummary dailySummary = new DailySummary();
-        dailySummary.setId(rs.getInt(1));
-        dailySummary.setDate(rs.getDate(2).toLocalDate());
-        dailySummary.setForwarded(rs.getDouble(3));
-        dailySummary.setRevenues(rs.getDouble(4));
-        dailySummary.setExpenses(rs.getDouble(5));
-        dailySummary.setBalance(rs.getDouble(6));
-        dailySummary.setTag(rs.getString(7));
-        dailySummary.setDateCreated(rs.getTimestamp(8).toLocalDateTime());
-        dailySummary.setDateUpdated(rs.getTimestamp(9).toLocalDateTime());
-        Timestamp dateDeleted = rs.getTimestamp(10);
+        dailySummary.setId(rs.getInt(index++));
+        dailySummary.setDate(rs.getDate(index++).toLocalDate());
+        dailySummary.setForwarded(rs.getDouble(index++));
+        dailySummary.setRevenues(rs.getDouble(index++));
+        dailySummary.setExpenses(rs.getDouble(index++));
+        dailySummary.setCashIn(rs.getDouble(index++));
+        dailySummary.setCashOut(rs.getDouble(index++));
+        dailySummary.setBalance(rs.getDouble(index++));
+        dailySummary.setTag(rs.getString(index++));
+        dailySummary.setDateCreated(rs.getTimestamp(index++).toLocalDateTime());
+        dailySummary.setDateUpdated(rs.getTimestamp(index++).toLocalDateTime());
+        Timestamp dateDeleted = rs.getTimestamp(index);
         if (dateDeleted != null) dailySummary.setDateDeleted(dateDeleted.toLocalDateTime());
         return dailySummary;
     }

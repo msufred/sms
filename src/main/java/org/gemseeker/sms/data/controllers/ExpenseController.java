@@ -21,17 +21,19 @@ public class ExpenseController implements ModelController<Expense> {
 
     @Override
     public boolean insert(Expense model) throws SQLException {
-        String sql = String.format("INSERT INTO expenses (type, description, amount, date, tag, date_created, " +
-                "date_updated) VALUES ('%s', '%s', '%f', '%s', '%s', '%s', '%s')", model.getType(), model.getDescription(),
-                model.getAmount(), model.getDate(), model.getTag(), model.getDateCreated(), model.getDateUpdated());
+        String sql = String.format("INSERT INTO expenses (category, type, description, amount, mode, ref, date, attachment, tag, date_created, " +
+                "date_updated) VALUES ('%s', '%s', '%s', '%f', '%s', '%s', '%s', '%s', '%s', '%s', '%s')", model.getCategory(), model.getType(),
+                model.getDescription(), model.getAmount(), model.getMode(), model.getRef(), model.getDate(), model.getAttachment(),
+                model.getTag(), model.getDateCreated(), model.getDateUpdated());
         return database.executeQuery(sql);
     }
 
     @Override
     public boolean update(Expense model) throws SQLException {
-        String sql = String.format("UPDATE expenses SET type='%s', description='%s', amount='%f', date='%s', tag='%s', " +
-                "date_updated='%s' WHERE id='%d'", model.getType(), model.getDescription(), model.getAmount(), model.getDate(),
-                model.getTag(), LocalDateTime.now(), model.getId());
+        String sql = String.format("UPDATE expenses SET category='%s', type='%s', description='%s', amount='%f', mode='%s', " +
+                        "ref='%s', date='%s', attachment='%s', tag='%s', date_updated='%s' WHERE id='%d'", model.getCategory(),
+                model.getType(), model.getDescription(), model.getAmount(), model.getMode(), model.getRef(), model.getDate(),
+                model.getAttachment(), model.getTag(), LocalDateTime.now(), model.getId());
         return database.executeQuery(sql);
     }
 
@@ -86,17 +88,31 @@ public class ExpenseController implements ModelController<Expense> {
         return list;
     }
 
+    public ObservableList<Expense> getByDate(LocalDate date) throws SQLException {
+        String sql = String.format("SELECT * FROM expenses WHERE date='%s' AND date_deleted IS NULL", date);
+        ObservableList<Expense> list = FXCollections.observableArrayList();
+        try (ResultSet rs = database.executeQueryWithResult(sql)) {
+            while (rs.next()) list.add(fetchInfo(rs));
+        }
+        return list;
+    }
+
     private Expense fetchInfo(ResultSet rs) throws SQLException {
+        int index = 1;
         Expense expense = new Expense();
-        expense.setId(rs.getInt(1));
-        expense.setType(rs.getString(2));
-        expense.setDescription(rs.getString(3));
-        expense.setAmount(rs.getDouble(4));
-        expense.setDate(rs.getDate(5).toLocalDate());
-        expense.setTag(rs.getString(6));
-        expense.setDateCreated(rs.getTimestamp(7).toLocalDateTime());
-        expense.setDateUpdated(rs.getTimestamp(8).toLocalDateTime());
-        Timestamp dateDeleted = rs.getTimestamp(9);
+        expense.setId(rs.getInt(index++));
+        expense.setCategory(rs.getString(index++));
+        expense.setType(rs.getString(index++));
+        expense.setDescription(rs.getString(index++));
+        expense.setAmount(rs.getDouble(index++));
+        expense.setMode(rs.getString(index++));
+        expense.setRef(rs.getString(index++));
+        expense.setDate(rs.getDate(index++).toLocalDate());
+        expense.setAttachment(rs.getString(index++));
+        expense.setTag(rs.getString(index++));
+        expense.setDateCreated(rs.getTimestamp(index++).toLocalDateTime());
+        expense.setDateUpdated(rs.getTimestamp(index++).toLocalDateTime());
+        Timestamp dateDeleted = rs.getTimestamp(index);
         if (dateDeleted != null) expense.setDateDeleted(dateDeleted.toLocalDateTime());
         return expense;
     }

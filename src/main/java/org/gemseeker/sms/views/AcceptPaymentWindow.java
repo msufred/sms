@@ -1,19 +1,26 @@
 package org.gemseeker.sms.views;
 
 import io.github.msufred.feathericons.CheckCircleIcon;
+import io.github.msufred.feathericons.PaperClipIcon;
 import io.github.msufred.feathericons.XCircleIcon;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import io.reactivex.schedulers.Schedulers;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.apache.commons.io.FileUtils;
+import org.gemseeker.sms.Utils;
 import org.gemseeker.sms.data.*;
 import org.gemseeker.sms.data.controllers.*;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.util.concurrent.Callable;
 
@@ -22,6 +29,12 @@ public class AcceptPaymentWindow extends AbstractWindow {
     @FXML private DatePicker dpPaymentDate;
     @FXML private TextField tfPaymentNo;
     @FXML private Label lblErrPaymentNo;
+    @FXML private ComboBox<String> cbModes;
+    @FXML private HBox refGroup;
+    @FXML private Label lblRef;
+    @FXML private TextField tfRef;
+    @FXML private Button btnUpload;
+    @FXML private Label lblAttachment;
 
     @FXML private TextField tfFee;
     @FXML private TextField tfPrevBalance;
@@ -56,8 +69,12 @@ public class AcceptPaymentWindow extends AbstractWindow {
     private final RevenueController revenueController;
     private final CompositeDisposable disposables;
 
+    private final User user;
     private final PrintWindow printWindow;
     private final SaveImageWindow saveImageWindow;
+
+    private FileChooser fileChooser;
+    private File imageFile;
 
     private String mBillingNo;
     private Billing mBilling;
@@ -74,8 +91,10 @@ public class AcceptPaymentWindow extends AbstractWindow {
     private double amountPaid = 0;
     private double balance = 0;
 
-    public AcceptPaymentWindow(Database database, PrintWindow printWindow, SaveImageWindow saveImageWindow, Stage owner) {
+    public AcceptPaymentWindow(User user, Database database, PrintWindow printWindow, SaveImageWindow saveImageWindow, Stage owner) {
         super("Accept Payment", AcceptPaymentWindow.class.getResource("accept_payment.fxml"), null, owner);
+        this.user = user;
+
         this.billingController = new BillingController(database);
         this.accountController = new AccountController(database);
         this.billingStatementController = new BillingStatementController(database);
@@ -96,6 +115,25 @@ public class AcceptPaymentWindow extends AbstractWindow {
     @Override
     protected void onFxmlLoaded() {
         ViewUtils.setAsNumericalTextField(tfFee, tfPrevBalance, tfDiscount, tfPenalty, tfVat, tfAmount);
+        btnUpload.setGraphic(new PaperClipIcon(14));
+
+        cbModes.setItems(Revenue.modes);
+        cbModes.valueProperty().addListener((o, oldVal, newVal) -> {
+            refGroup.setDisable(newVal.equals(Revenue.MODE_CASH));
+            if (newVal.equals(Revenue.MODE_BANK_CASH)) {
+                String ref = String.format("%s (%s)", mAccount.getBankAccountName(), mAccount.getBankAccountNo());
+                lblRef.setText("Account No.");
+                tfRef.setText(ref);
+            } else {
+                lblRef.setText("Reference No.");
+                tfRef.clear();
+            }
+        });
+        cbModes.setValue(Revenue.MODE_CASH);
+
+        btnUpload.setOnAction(evt -> {
+            uploadFile();
+        });
 
         tfDiscount.textProperty().addListener((o, oldVal, newVal) -> {
             double dscnt = 0;
@@ -122,6 +160,8 @@ public class AcceptPaymentWindow extends AbstractWindow {
         btnConfirm.setOnAction(evt -> validateAndSave(this::saveAndPrint));
         btnExport.setOnAction(evt -> validateAndSave(this::saveAndExport));
         btnCancel.setOnAction(evt -> close());
+
+        tfCashier.setText(user.getFullname());
     }
 
     public void showAndWait(String billingNo) {
@@ -170,7 +210,7 @@ public class AcceptPaymentWindow extends AbstractWindow {
         lblErrPaymentNo.setGraphic(null);
 
         boolean mValid = true;
-        if (tfPaymentNo.getText().isBlank()) {
+        if (tfPaymentNo.getText().isBlank() || tfPaymentNo.getText().equals("0.00")) {
             lblErrPaymentNo.getStyleClass().add("label-error");
             lblErrPaymentNo.setGraphic(xCircleIcon);
             mValid = false;
@@ -190,6 +230,8 @@ public class AcceptPaymentWindow extends AbstractWindow {
                         progressBar.setVisible(false);
                         showErrorDialog("Database Error", "Error while querying database.\n" + err);
                     }));
+        } else {
+            showInfoDialog("Invalid Action", "Please enter payment amount.");
         }
     }
 
@@ -242,9 +284,16 @@ public class AcceptPaymentWindow extends AbstractWindow {
                 Revenue revenue = new Revenue();
                 revenue.setType(Revenue.TYPE_BILLING);
                 revenue.setAmount(amountPaid);
+                revenue.setMode(cbModes.getValue());
+                revenue.setReference(tfRef.getText());
                 revenue.setDescription("Payment for Billing No" + mBillingNo);
                 revenue.setDate(LocalDate.now());
                 revenueController.insert(revenue);
+
+                if (imageFile != null) {
+                    File dest = new File(Utils.IMAGE_FOLDER + Utils.FILE_SEPARATOR + tfPaymentNo.getText() + "." + ViewUtils.getFileExtension(imageFile));
+                    FileUtils.copyFile(imageFile, dest);
+                }
             }
             return success;
         })).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
@@ -263,6 +312,8 @@ public class AcceptPaymentWindow extends AbstractWindow {
     private Payment fetchPaymentData() {
         Payment payment = new Payment();
         payment.setPaymentNo(ViewUtils.normalize(tfPaymentNo.getText()));
+        payment.setMode(cbModes.getValue());
+        payment.setRef(tfRef.getText());
         payment.setName(mAccount.getName());
         payment.setPaymentFor(Payment.TYPE_BILLING);
         payment.setExtraInfo(mBillingNo);
@@ -304,9 +355,21 @@ public class AcceptPaymentWindow extends AbstractWindow {
         lblTotalDue.setText(String.format("%.2f", totalAmount));
     }
 
+    private void uploadFile() {
+        if (fileChooser == null) {
+            fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image", "*.png", "*.jpg", "*.jpeg"));
+        }
+        imageFile = fileChooser.showOpenDialog(getStage().getOwner());
+        if (imageFile !=  null) {
+            lblAttachment.setText(imageFile.getPath());
+        }
+    }
+
     @Override
     protected void onClose() {
         clearFields();
+        imageFile = null;
         mBillingNo = null;
         mBilling = null;
         mBillingStatement = null;
@@ -323,6 +386,9 @@ public class AcceptPaymentWindow extends AbstractWindow {
 
     private void clearFields() {
         lblErrPaymentNo.setGraphic(null);
+        cbModes.setValue("Cash");
+        refGroup.setDisable(true);
+        lblAttachment.setText("No File Attached");
         lblFee.setText("0.00");
         lblPrevBalance.setText("0.00");
         lblDiscount.setText("0.00");

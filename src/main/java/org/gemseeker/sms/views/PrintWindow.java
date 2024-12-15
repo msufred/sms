@@ -44,6 +44,8 @@ public class PrintWindow extends AbstractWindow {
     @FXML private TextField tfCopies;
     @FXML private Button btnPrint;
 
+    private final MainWindow mainWindow;
+
     private final Scale scale = new Scale();
 
     private final AccountController accountController;
@@ -71,8 +73,9 @@ public class PrintWindow extends AbstractWindow {
     private AbstractPanel mForm = null;
     private Node mContent = null;
 
-    public PrintWindow(Database database, Stage owner) {
-        super("Print", PrintWindow.class.getResource("print_window.fxml"), null, owner);
+    public PrintWindow(MainWindow mainWindow, Database database) {
+        super("Print", PrintWindow.class.getResource("print_window.fxml"), null, mainWindow.getStage());
+        this.mainWindow = mainWindow;
         this.accountController = new AccountController(database);
         this.subscriptionController = new SubscriptionController(database);
         this.billingController = new BillingController(database);
@@ -153,7 +156,7 @@ public class PrintWindow extends AbstractWindow {
         mContent = statementForm.getView();
         contentPane.getChildren().clear();
         contentPane.getChildren().add(mContent);
-        statementForm.setData(account, subscription, billing, billingStatement);
+        statementForm.setData(mainWindow.getUser(), account, subscription, billing, billingStatement);
         statementForm.onResume();
     }
 
@@ -182,7 +185,7 @@ public class PrintWindow extends AbstractWindow {
         mContent = billingReceiptForm.getView();
         contentPane.getChildren().clear();
         contentPane.getChildren().add(mContent);
-        billingReceiptForm.setData(account, payment);
+        billingReceiptForm.setData(mainWindow.getUser(), account, payment);
         billingReceiptForm.onResume();
     }
 

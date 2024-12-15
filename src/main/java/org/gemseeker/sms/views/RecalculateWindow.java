@@ -2,8 +2,6 @@ package org.gemseeker.sms.views;
 
 import io.github.msufred.feathericons.XCircleIcon;
 import io.reactivex.Completable;
-import io.reactivex.Observable;
-import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import io.reactivex.schedulers.Schedulers;
@@ -13,10 +11,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
-import org.gemseeker.sms.data.DailySummary;
-import org.gemseeker.sms.data.Database;
-import org.gemseeker.sms.data.Expense;
-import org.gemseeker.sms.data.Revenue;
+import org.gemseeker.sms.data.*;
+import org.gemseeker.sms.data.controllers.CashTransactionController;
 import org.gemseeker.sms.data.controllers.DailySummaryController;
 import org.gemseeker.sms.data.controllers.ExpenseController;
 import org.gemseeker.sms.data.controllers.RevenueController;
@@ -32,6 +28,7 @@ public class RecalculateWindow extends AbstractWindow {
     private final DailySummaryController summaryController;
     private final RevenueController revenueController;
     private final ExpenseController expenseController;
+    private final CashTransactionController cashTransactionController;
     private final CompositeDisposable disposables;
 
     public RecalculateWindow(Database database, Stage owner) {
@@ -39,6 +36,7 @@ public class RecalculateWindow extends AbstractWindow {
         summaryController = new DailySummaryController(database);
         revenueController = new RevenueController(database);
         expenseController = new ExpenseController(database);
+        cashTransactionController = new CashTransactionController(database);
         disposables = new CompositeDisposable();
     }
 
@@ -73,12 +71,16 @@ public class RecalculateWindow extends AbstractWindow {
             // get all expenses and revenues
             ObservableList<Revenue> revenues = revenueController.getAll();
             ObservableList<Expense> expenses = expenseController.getAll();
+            ObservableList<CashTransaction> cashTransactions = cashTransactionController.getAll();
 
             LocalDate curDate = startDate;
             double lastBalance = 0;
-            while (!curDate.isAfter(now)) {
+
+            while (!curDate.isEqual(now)) {
                 double totalRevenues = 0;
                 double totalExpenses = 0;
+                double totalCashIn = 0;
+                double totalCashOut = 0;
                 double balance = 0;
 
                 for (Revenue r : revenues) {
@@ -89,13 +91,22 @@ public class RecalculateWindow extends AbstractWindow {
                     if (e.getDate().isEqual(curDate)) totalExpenses += e.getAmount();
                 }
 
-                balance = lastBalance + totalRevenues - totalExpenses;
+                for (CashTransaction ct : cashTransactions)  {
+                    if (ct.getDate().equals(curDate)) {
+                        if (ct.getType().equals(CashTransaction.TYPE_CASH_IN)) totalCashIn += ct.getAmount();
+                        else totalCashOut += ct.getAmount();
+                    }
+                }
+
+                balance = lastBalance + totalRevenues - totalExpenses + totalCashIn - totalCashOut;
 
                 DailySummary summary = new DailySummary();
                 summary.setDate(curDate);
                 summary.setForwarded(lastBalance);
                 summary.setRevenues(totalRevenues);
                 summary.setExpenses(totalExpenses);
+                summary.setCashIn(totalCashIn);
+                summary.setCashOut(totalCashOut);
                 summary.setBalance(balance);
                 summaryController.insert(summary);
 
@@ -103,7 +114,7 @@ public class RecalculateWindow extends AbstractWindow {
                 curDate = curDate.plusDays(1);
             }
         }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(this::close, err -> {
-            showErrorDialog("Database Error", "Error while recalculating Daily Summaries");
+            showErrorDialog("Database Error", "Error while recalculating Daily Summaries\n" + err);
         }));
     }
 

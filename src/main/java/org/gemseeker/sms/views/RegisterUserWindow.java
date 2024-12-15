@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.User;
 import org.gemseeker.sms.data.controllers.UserController;
+import org.w3c.dom.Text;
 
 import java.util.Objects;
 
@@ -23,6 +24,8 @@ import java.util.Objects;
 public class RegisterUserWindow extends AbstractWindow {
 
     @FXML private TextField tfUsername;
+    @FXML private TextField tfFullname;
+    @FXML private TextField tfDesignation;
     @FXML private TextField tfPassword;
     @FXML private TextField tfRePassword;
     @FXML private Label lblError;
@@ -56,8 +59,9 @@ public class RegisterUserWindow extends AbstractWindow {
         lblError.setText("");
         boolean valid = false;
 
-        if (tfUsername.getText().isBlank() || tfPassword.getText().isBlank() || tfRePassword.getText().isBlank()) {
-            lblError.setText("Empty Username and/or Password field.");
+        if (tfUsername.getText().isBlank() || tfFullname.getText().isBlank() || tfDesignation.getText().isBlank() ||
+                tfPassword.getText().isBlank() || tfRePassword.getText().isBlank()) {
+            lblError.setText("Empty Username, Full Name, Designation, and/or Password field.");
         } else if (!tfPassword.getText().equals(tfRePassword.getText())) {
             lblError.setText("Password doesn't match.");
         } else {
@@ -70,6 +74,8 @@ public class RegisterUserWindow extends AbstractWindow {
         disposables.add(Single.fromCallable(() -> {
             User user = new User();
             user.setUsername(ViewUtils.normalize(tfUsername.getText()));
+            user.setFullname(ViewUtils.normalize(tfFullname.getText()));
+            user.setDesignation(ViewUtils.normalize(tfDesignation.getText()));
             user.setPassword(ViewUtils.normalize(tfPassword.getText()));
             if (!userController.hasUsers()) {
                 user.setRole("admin");
@@ -99,6 +105,8 @@ public class RegisterUserWindow extends AbstractWindow {
 
     private void clearFields() {
         tfUsername.clear();
+        tfFullname.clear();
+        tfDesignation.clear();
         tfPassword.clear();
         tfRePassword.clear();
         lblError.setText("");

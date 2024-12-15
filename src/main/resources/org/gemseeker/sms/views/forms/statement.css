@@ -1,3 +1,7 @@
+.label {
+    -fx-text-fill: black;
+}
+
 .text-8pt {
     -fx-font-size: 32;
 }

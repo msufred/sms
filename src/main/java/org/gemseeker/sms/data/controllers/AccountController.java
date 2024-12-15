@@ -19,9 +19,9 @@ public class AccountController implements ModelController<Account> {
 
     @Override
     public boolean insert(Account model) throws SQLException {
-        String sql = String.format("INSERT INTO accounts (account_no, name, address, phone, email, status, tag, " +
-                "date_created, date_updated) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
-                model.getAccountNo(), model.getName(), model.getAddress(), model.getPhone(), model.getEmail(),
+        String sql = String.format("INSERT INTO accounts (account_no, name, address, phone, email, bank_account_name, " +
+                        "bank_account_no, status, tag, date_created, date_updated) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+                model.getAccountNo(), model.getName(), model.getAddress(), model.getPhone(), model.getEmail(), model.getBankAccountName(), model.getBankAccountNo(),
                 model.getStatus(), model.getTag(), model.getDateCreated(), model.getDateUpdated());
         return database.executeQuery(sql);
     }
@@ -29,9 +29,10 @@ public class AccountController implements ModelController<Account> {
     @Override
     public boolean update(Account model) throws SQLException {
         LocalDateTime now = LocalDateTime.now();
-        String sql = String.format("UPDATE accounts SET account_no='%s', name='%s', address='%s', phone='%s', email='%s', status='%s', " +
-                "tag='%s', date_updated='%s' WHERE id='%d'", model.getAccountNo(), model.getName(), model.getAddress(), model.getPhone(),
-                model.getEmail(), model.getStatus(), model.getTag(), now, model.getId());
+        String sql = String.format("UPDATE accounts SET account_no='%s', name='%s', address='%s', phone='%s', email='%s', " +
+                        "bank_account_name='%s', bank_account_no='%s', status='%s', tag='%s', date_updated='%s' WHERE id='%d'",
+                model.getAccountNo(), model.getName(), model.getAddress(), model.getPhone(), model.getEmail(),
+                model.getBankAccountName(), model.getBankAccountNo(), model.getStatus(), model.getTag(), now, model.getId());
         return database.executeQuery(sql);
     }
 
@@ -78,6 +79,15 @@ public class AccountController implements ModelController<Account> {
         return list;
     }
 
+    public ObservableList<Account> getAllActive() throws SQLException {
+        ObservableList<Account> list = FXCollections.observableArrayList();
+        String sql = "SELECT * FROM accounts WHERE status='Active' AND date_deleted IS NULL";
+        try (ResultSet rs = database.executeQueryWithResult(sql)) {
+            while(rs.next()) list.add(fetchInfo(rs));
+        }
+        return list;
+    }
+
     public ObservableList<Account> getDeleted() throws SQLException {
         ObservableList<Account> list = FXCollections.observableArrayList();
         String sql = "SELECT * FROM accounts WHERE date_deleted IS NOT NULL";
@@ -88,18 +98,21 @@ public class AccountController implements ModelController<Account> {
     }
 
     private Account fetchInfo(ResultSet rs) throws SQLException {
+        int index = 1;
         Account account = new Account();
-        account.setId(rs.getInt(1));
-        account.setAccountNo(rs.getString(2));
-        account.setName(rs.getString(3));
-        account.setAddress(rs.getString(4));
-        account.setPhone(rs.getString(5));
-        account.setEmail(rs.getString(6));
-        account.setStatus(rs.getString(7));
-        account.setTag(rs.getString(8));
-        account.setDateCreated(rs.getTimestamp(9).toLocalDateTime());
-        account.setDateUpdated(rs.getTimestamp(10).toLocalDateTime());
-        Timestamp dateDeleted = rs.getTimestamp(11);
+        account.setId(rs.getInt(index++));
+        account.setAccountNo(rs.getString(index++));
+        account.setName(rs.getString(index++));
+        account.setAddress(rs.getString(index++));
+        account.setPhone(rs.getString(index++));
+        account.setEmail(rs.getString(index++));
+        account.setBankAccountName(rs.getString(index++));
+        account.setBankAccountNo(rs.getString(index++));
+        account.setStatus(rs.getString(index++));
+        account.setTag(rs.getString(index++));
+        account.setDateCreated(rs.getTimestamp(index++).toLocalDateTime());
+        account.setDateUpdated(rs.getTimestamp(index++).toLocalDateTime());
+        Timestamp dateDeleted = rs.getTimestamp(index);
         if (dateDeleted != null) account.setDateDeleted(dateDeleted.toLocalDateTime());
         return account;
     }
@@ -126,30 +139,33 @@ public class AccountController implements ModelController<Account> {
     }
 
     private AccountSubscription fetchAccountWithSubscriptionInfo(ResultSet rs) throws SQLException {
+        int index = 1;
         AccountSubscription account = new AccountSubscription();
-        account.setId(rs.getInt(1));
-        account.setAccountNo(rs.getString(2));
-        account.setName(rs.getString(3));
-        account.setAddress(rs.getString(4));
-        account.setPhone(rs.getString(5));
-        account.setEmail(rs.getString(6));
-        account.setStatus(rs.getString(7));
-        account.setTag(rs.getString(8));
-        account.setDateCreated(rs.getTimestamp(9).toLocalDateTime());
-        account.setDateUpdated(rs.getTimestamp(10).toLocalDateTime());
-        Timestamp dateDeleted = rs.getTimestamp(11);
+        account.setId(rs.getInt(index++));
+        account.setAccountNo(rs.getString(index++));
+        account.setName(rs.getString(index++));
+        account.setAddress(rs.getString(index++));
+        account.setPhone(rs.getString(index++));
+        account.setEmail(rs.getString(index++));
+        account.setBankAccountName(rs.getString(index++));
+        account.setBankAccountNo(rs.getString(index++));
+        account.setStatus(rs.getString(index++));
+        account.setTag(rs.getString(index++));
+        account.setDateCreated(rs.getTimestamp(index++).toLocalDateTime());
+        account.setDateUpdated(rs.getTimestamp(index++).toLocalDateTime());
+        Timestamp dateDeleted = rs.getTimestamp(index++);
         if (dateDeleted != null) account.setDateDeleted(dateDeleted.toLocalDateTime());
 
         // sub
-        account.setSubscriptionStatus(rs.getString(12));
-        Date startDate = rs.getDate(13);
+        account.setSubscriptionStatus(rs.getString(index++));
+        Date startDate = rs.getDate(index++);
         if (startDate != null) account.setStartDate(startDate.toLocalDate());
-        Date endDate = rs.getDate(14);
+        Date endDate = rs.getDate(index++);
         if (endDate != null) account.setEndDate(endDate.toLocalDate());
-        account.setMonthlyFee(rs.getDouble(15));
+        account.setMonthlyFee(rs.getDouble(index++));
 
-        account.setTowerName(rs.getString(16));
-        account.setParentTower(rs.getString(17));
+        account.setTowerName(rs.getString(index++));
+        account.setParentTower(rs.getString(index));
 
         return account;
     }

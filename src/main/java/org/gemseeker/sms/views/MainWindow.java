@@ -11,6 +11,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import org.gemseeker.sms.AppMain;
 import org.gemseeker.sms.Settings;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.User;
@@ -33,6 +34,10 @@ public class MainWindow extends AbstractWindow {
     @FXML private MenuItem menuShowHistory;
     @FXML private MenuItem menuHelpAbout;
 
+    @FXML private MenuButton btnUser;
+    @FXML private MenuItem btnEditInfo;
+    @FXML private MenuItem btnLogout;
+
     // Sidebar
     @FXML private ToggleButton btnDashboard;
     @FXML private ToggleButton btnCustomers;
@@ -41,9 +46,8 @@ public class MainWindow extends AbstractWindow {
     @FXML private ToggleButton btnInventory;
     @FXML private ToggleButton btnMaps;
     @FXML private ToggleButton btnTasks;
+    @FXML private ToggleButton btnCashFlow;
     @FXML private StackPane contentPane;
-    @FXML private Label lblAuthority;
-    @FXML private Button btnLogout;
 
     // Upcoming and Outdated Schedule Label
     @FXML private Label lblUpcoming;
@@ -52,6 +56,7 @@ public class MainWindow extends AbstractWindow {
     @FXML private ProgressBar progressBar;
     @FXML private Label progressLabel;
 
+    private final AppMain appMain;
     private final Settings settings;
     private final Database database;
     private final UserController userController;
@@ -71,13 +76,18 @@ public class MainWindow extends AbstractWindow {
     private InventoryPanel inventoryPanel;
     private MapsPanel mapsPanel;
     private TasksPanel tasksPanel;
+    private CashFlowPanel cashFlowPanel;
     private AbstractPanel mCurrPanel = null;
 
     // windows
+    private EditUserWindow editUserWindow;
     private DeletedWindow deletedWindow;
 
-    public MainWindow(Settings settings, Database database, Stage stage) {
+    private boolean isLogout = false;
+
+    public MainWindow(AppMain appMain, Settings settings, Database database, Stage stage) {
         super("SMS", MainWindow.class.getResource("main.fxml"), stage, null);
+        this.appMain = appMain;
         this.settings = settings;
         this.database = database;
         this.userController = new UserController(database);
@@ -95,7 +105,7 @@ public class MainWindow extends AbstractWindow {
     @Override
     protected void onFxmlLoaded() {
         setupIcons();
-        setupToggles(btnDashboard, btnPayments, btnCustomers, btnHotspots, btnInventory, btnMaps, btnTasks);
+        setupToggles(btnDashboard, btnPayments, btnCustomers, btnHotspots, btnInventory, btnMaps, btnTasks, btnCashFlow);
 
         menuFilePreferences.setOnAction(evt -> {
             // TODO
@@ -112,10 +122,28 @@ public class MainWindow extends AbstractWindow {
         menuHelpAbout.setOnAction(evt -> {
             // TODO
         });
+
+        btnEditInfo.setOnAction(evt -> {
+            if (user != null) {
+                if (editUserWindow == null) editUserWindow = new EditUserWindow(this, database);
+                editUserWindow.show(user);
+            }
+        });
+
+        btnLogout.setOnAction(evt -> {
+            isLogout = true;
+            close();
+            appMain.showLoginWindow();
+        });
     }
 
     public void setUserId(long id) {
         this.userId = id;
+    }
+
+    public void updateUser(int userId) {
+        this.userId = userId;
+        onShow();
     }
 
     @Override
@@ -140,8 +168,9 @@ public class MainWindow extends AbstractWindow {
 
                         pendingTasks = count;
                         if (user != null) {
-                            lblAuthority.setText(String.format("%s [%s]", user.getUsername(), ViewUtils.capitalize(user.getRole())));
+                            btnUser.setText(user.getUsername());
                         }
+
                         lblOutdated.setText(outdatedTasks + "");
                         lblUpcoming.setText(pendingTasks + "");
                         setupPanels();
@@ -160,26 +189,14 @@ public class MainWindow extends AbstractWindow {
                 if (toggle.isSelected()) event.consume();
                 else {
                     switch (toggle.getText()) {
-                        case "Payments":
-                            changePanel(paymentsPanel);
-                            break;
-                        case "Accounts":
-                            changePanel(accountsPanel);
-                            break;
-                        case "WiFi Hotspots":
-                            changePanel(wiFiHotspotsPanel);
-                            break;
-                        case "Services & Products":
-                            changePanel(inventoryPanel);
-                            break;
-                        case "Maps":
-                            changePanel(mapsPanel);
-                            break;
-                        case "Tasks & Schedules":
-                            changePanel(tasksPanel);
-                            break;
-                        default:
-                            changePanel(dashboardPanel);
+                        case "Payments" -> changePanel(paymentsPanel);
+                        case "Accounts" ->changePanel(accountsPanel);
+                        case "WiFi Hotspots" -> changePanel(wiFiHotspotsPanel);
+                        case "Services & Products" -> changePanel(inventoryPanel);
+                        case "Maps" -> changePanel(mapsPanel);
+                        case "Tasks & Schedules" -> changePanel(tasksPanel);
+                        case "Cash Flow" -> changePanel(cashFlowPanel);
+                        default -> changePanel(dashboardPanel);
                     }
                 }
             });
@@ -194,6 +211,7 @@ public class MainWindow extends AbstractWindow {
         if (inventoryPanel == null) inventoryPanel = new InventoryPanel(this, database);
         if (mapsPanel == null) mapsPanel = new MapsPanel(this, database);
         if (tasksPanel == null) tasksPanel = new TasksPanel(this, database);
+        if (cashFlowPanel == null) cashFlowPanel = new CashFlowPanel(this, database);
         changePanel(dashboardPanel);
     }
 
@@ -214,8 +232,9 @@ public class MainWindow extends AbstractWindow {
         menuShowDeleted.setGraphic(new ClockIcon(12));
         menuHelpAbout.setGraphic(new HelpCircleIcon(12));
 
-        lblAuthority.setGraphic(new UserIcon(14));
-        btnLogout.setGraphic(new LogOutIcon(14));
+        btnUser.setGraphic(new UserIcon(14));
+        btnEditInfo.setGraphic(new Edit2Icon(12));
+        btnLogout.setGraphic(new LogOutIcon(12));
 
         btnDashboard.setGraphic(new GridIcon(14));
         btnPayments.setGraphic(new PesoIcon(14));
@@ -224,6 +243,7 @@ public class MainWindow extends AbstractWindow {
         btnInventory.setGraphic(new BoxIcon(14));
         btnMaps.setGraphic(new MapIcon(14));
         btnTasks.setGraphic(new TagIcon(14));
+        btnCashFlow.setGraphic(new PesoIcon(14));
     }
 
     public void showProgress(double progress, String text) {
@@ -254,28 +274,35 @@ public class MainWindow extends AbstractWindow {
     protected void onClose() {
         if (mCurrPanel != null) mCurrPanel.onPause();
 
-        try {
-            settings.save();
-        } catch (TransformerException e) {
-            System.err.println("failed to save settings.xml");
+        if (!isLogout) {
+            try {
+                settings.save();
+            } catch (TransformerException e) {
+                System.err.println("failed to save settings.xml");
+            }
+
+            try {
+                database.close();
+            } catch (SQLException e) {
+                System.err.println("failed to close database");
+            }
+
+            if (dashboardPanel != null) dashboardPanel.onDispose();
+            if (paymentsPanel != null) paymentsPanel.onDispose();
+            if (accountsPanel != null) accountsPanel.onDispose();
+            if (wiFiHotspotsPanel != null) wiFiHotspotsPanel.onDispose();
+            if (inventoryPanel != null) inventoryPanel.onDispose();
+            if (mapsPanel != null) mapsPanel.onDispose();
+            if (tasksPanel != null) tasksPanel.onDispose();
+            if (cashFlowPanel != null) cashFlowPanel.onDispose();
+
+            if (deletedWindow != null) deletedWindow.dispose();
+            disposables.dispose();
         }
 
-        try {
-            database.close();
-        } catch (SQLException e) {
-            System.err.println("failed to close database");
-        }
-
-        if (dashboardPanel != null) dashboardPanel.onDispose();
-        if (paymentsPanel != null) paymentsPanel.onDispose();
-        if (accountsPanel != null) accountsPanel.onDispose();
-        if (wiFiHotspotsPanel != null) wiFiHotspotsPanel.onDispose();
-        if (inventoryPanel != null) inventoryPanel.onDispose();
-        if (mapsPanel != null) mapsPanel.onDispose();
-        if (tasksPanel != null) tasksPanel.onDispose();
-
-        if (deletedWindow != null) deletedWindow.dispose();
-        disposables.dispose();
+        userId = -1;
+        user = null;
+        isLogout = false;
     }
 
     public User getUser() {

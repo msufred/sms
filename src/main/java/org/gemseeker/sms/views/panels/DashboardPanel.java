@@ -1,28 +1,18 @@
 package org.gemseeker.sms.views.panels;
 
 import io.github.msufred.feathericons.*;
-import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import io.reactivex.schedulers.Schedulers;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
-import javafx.stage.DirectoryChooser;
-import org.apache.commons.math3.analysis.function.Exp;
-import org.gemseeker.sms.ExportUtils;
-import org.gemseeker.sms.Utils;
-import org.gemseeker.sms.data.DailySummary;
-import org.gemseeker.sms.data.Database;
-import org.gemseeker.sms.data.Expense;
-import org.gemseeker.sms.data.Revenue;
+import org.gemseeker.sms.data.*;
+import org.gemseeker.sms.data.controllers.CashTransactionController;
 import org.gemseeker.sms.data.controllers.DailySummaryController;
 import org.gemseeker.sms.data.controllers.ExpenseController;
 import org.gemseeker.sms.data.controllers.RevenueController;
@@ -31,14 +21,10 @@ import org.gemseeker.sms.views.cells.AmountTableCell;
 import org.gemseeker.sms.views.cells.DateTableCell;
 import org.gemseeker.sms.views.cells.TagTableCell;
 import org.gemseeker.sms.views.icons.PesoIcon;
+import org.gemseeker.sms.views.panels.dashboard.*;
 
-import java.io.File;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
-import java.util.Optional;
+import java.util.*;
 
 public class DashboardPanel extends AbstractPanel {
 
@@ -46,53 +32,82 @@ public class DashboardPanel extends AbstractPanel {
     @FXML private Label lblForwarded;
     @FXML private Label lblRevenues;
     @FXML private Label lblExpenses;
+    @FXML private Label lblCashIn;
+    @FXML private Label lblCashOut;
     @FXML private Label lblBalances;
 
+    // Tabs
     @FXML private TabPane tabPane;
     @FXML private Tab tabProjections;
     @FXML private Tab tabRevenues;
     @FXML private Tab tabExpenses;
+    @FXML private Tab tabTransactions;
     @FXML private Tab tabSummaries;
 
     // Projections
+    @FXML private PieChart expensesPieChart; // Operational vs Non-Operational
+    @FXML private BarChart<String, Number> operationalBarChart;
+    @FXML private BarChart<String, Number> nonOperationalBarChart;
+    @FXML private BarChart<String, Number> revenuesBarChart;
+    @FXML private PieChart expensesRevenuesPieChart; // Expenses vs Revenues
     @FXML private LineChart<String, Number> monthlyLineChart;
     @FXML private CategoryAxis monthlyXAxis;
     @FXML private NumberAxis monthlyYAxis;
     @FXML private LineChart<String, Number> dailyLineChart;
     @FXML private CategoryAxis dailyXAxis;
     @FXML private NumberAxis dailyYAxis;
-    @FXML private PieChart revenuesPieChart;
-    @FXML private PieChart expensesPieChart;
 
     // Revenues
-    @FXML private Label lblBilling;
-    @FXML private Label lblPurchase;
-    @FXML private Label lblService;
-    @FXML private Label lblVendo;
-    @FXML private Label lblOthers;
     @FXML private Button btnAddRevenue;
     @FXML private Button btnEditRevenue;
     @FXML private Button btnDeleteRevenue;
     @FXML private Button btnExportRevenues;
+    @FXML private ComboBox<String> cbRevenueModes;
 
     @FXML private TableView<Revenue> revenuesTable;
     @FXML private TableColumn<Revenue, String> colRevenueTag;
+    @FXML private TableColumn<Revenue, LocalDate> colRevenueDate;
+    @FXML private TableColumn<Revenue, Double> colRevenueAmount;
     @FXML private TableColumn<Revenue, String> colRevenueType;
     @FXML private TableColumn<Revenue, String> colRevenueDescription;
-    @FXML private TableColumn<Revenue, Double> colRevenueAmount;
-    @FXML private TableColumn<Revenue, LocalDate> colRevenueDate;
+    @FXML private TableColumn<Revenue, String> colRevenueMode;
+    @FXML private TableColumn<Revenue, String> colRevenueRef;
+    @FXML private TableColumn<Revenue, String> colRevenueAttachment;
 
     // Expenses
     @FXML private Button btnAddExpense;
     @FXML private Button btnEditExpense;
     @FXML private Button btnDeleteExpense;
     @FXML private Button btnExportExpenses;
+    @FXML private ComboBox<String> cbExpensesModes;
+
     @FXML private TableView<Expense> expensesTable;
     @FXML private TableColumn<Expense, String> colExpenseTag;
+    @FXML private TableColumn<Expense, LocalDate> colExpenseDate;
+    @FXML private TableColumn<Expense, Double> colExpenseAmount;
+    @FXML private TableColumn<Expense, String> colExpenseCategory;
     @FXML private TableColumn<Expense, String> colExpenseType;
     @FXML private TableColumn<Expense, String> colExpenseDescription;
-    @FXML private TableColumn<Expense, Double> colExpenseAmount;
-    @FXML private TableColumn<Expense, LocalDate> colExpenseDate;
+    @FXML private TableColumn<Expense, String> colExpenseMode;
+    @FXML private TableColumn<Expense, String> colExpenseReference;
+    @FXML private TableColumn<Expense, String> colExpenseAttachment;
+
+    // Transactions
+    @FXML private Button btnAddTransaction;
+    @FXML private Button btnEditTransaction;
+    @FXML private Button btnDeleteTransaction;
+    @FXML private Button btnExportTransactions;
+    @FXML private ComboBox<String> cbTransactionsMode;
+
+    @FXML private TableView<CashTransaction> transactionsTable;
+    @FXML private TableColumn<CashTransaction, String> colTransactionsTag;
+    @FXML private TableColumn<CashTransaction, LocalDate> colTransactionsDate;
+    @FXML private TableColumn<CashTransaction, String> colTransactionsType;
+    @FXML private TableColumn<CashTransaction, Double> colTransactionsAmount;
+    @FXML private TableColumn<CashTransaction, String> colTransactionsDescription;
+    @FXML private TableColumn<CashTransaction, String> colTransactionsMode;
+    @FXML private TableColumn<CashTransaction, String> colTransactionsReference;
+    @FXML private TableColumn<CashTransaction, String> colTransactionsAttachment;
 
     // Summaries
     @FXML private Button btnExportSummaries;
@@ -103,17 +118,9 @@ public class DashboardPanel extends AbstractPanel {
     @FXML private TableColumn<DailySummary, Double> colSummaryForwarded;
     @FXML private TableColumn<DailySummary, Double> colSummaryRevenues;
     @FXML private TableColumn<DailySummary, Double> colSummaryExpenses;
+    @FXML private TableColumn<DailySummary, Double> colSummaryCashIn;
+    @FXML private TableColumn<DailySummary, Double> colSummaryCashOut;
     @FXML private TableColumn<DailySummary, Double> colSummaryBalance;
-
-    private Label pieLabel;
-
-    private DirectoryChooser directoryChooser;
-
-    private FilteredList<Revenue> revenueList;
-    private FilteredList<Expense> expenseList;
-    private FilteredList<DailySummary> summariesList;
-    private final SimpleObjectProperty<Revenue> selectedRevenueItem = new SimpleObjectProperty<>();
-    private final SimpleObjectProperty<Expense> selectedExpenseItem = new SimpleObjectProperty<>();
 
     private final MainWindow mainWindow;
     private final Database database;
@@ -122,28 +129,27 @@ public class DashboardPanel extends AbstractPanel {
     // ModelControllers
     private final RevenueController revenueController;
     private final ExpenseController expenseController;
+    private final CashTransactionController cashTransactionController;
     private final DailySummaryController dailySummaryController;
-
-    // Windows
-    private AddRevenueWindow addRevenueWindow;
-    private EditRevenueWindow editRevenueWindow;
-    private AddExpenseWindow addExpenseWindow;
-    private EditExpenseWindow editExpenseWindow;
-    private RecalculateWindow recalculateWindow;
 
     // Summary Values
     private DailySummary mPrevSummary, mSummary;
-    private ObservableList<Revenue> prevRevenuesList;
-    private ObservableList<Expense> prevExpensesList;
     private ObservableList<Revenue> revenuesToday;
     private ObservableList<Expense> expensesToday;
-    private ObservableList<Revenue> allRevenues;
-    private ObservableList<Expense> allExpenses;
-    private ObservableList<DailySummary> allSummaries;
+    private ObservableList<CashTransaction> cashTransactionsToday;
+
+    // View Controllers
+    private ProjectionsViewController projectionsViewController;
+    private RevenuesViewController revenuesViewController;
+    private ExpensesViewController expensesViewController;
+    private CashTransactionsViewController cashTransactionsViewController;
+    private DailySummariesViewController dailySummariesViewController;
 
     private double mCashForwarded = 0.0;
     private double mRevenues = 0.0;
     private double mExpenses = 0.0;
+    private double mCashIn = 0.0;
+    private double mCashOut = 0.0;
     private double mCashBalance = 0.0;
 
     public DashboardPanel(MainWindow mainWindow, Database database) {
@@ -154,25 +160,21 @@ public class DashboardPanel extends AbstractPanel {
 
         revenueController = new RevenueController(database);
         expenseController = new ExpenseController(database);
+        cashTransactionController = new CashTransactionController(database);
         dailySummaryController = new DailySummaryController(database);
     }
 
     @Override
     protected void onFxmlLoaded() {
         setupIcons();
+        setupProjectionsTab();
         setupRevenuesTab();
         setupExpensesTab();
         setupSummariesTab();
+        setupTransactionsTab();
 
-        tabPane.getSelectionModel().selectedItemProperty().addListener((o, oldVal, newVal) -> {
-            if (newVal != null) {
-                switch (newVal.getText()) {
-                    case "Revenues" -> refreshRevenues();
-                    case "Expenses" -> refreshExpenses();
-                    case "Summaries" -> refreshDailySummaries();
-                    default -> refreshProjections();
-                }
-            }
+        tabPane.getSelectionModel().selectedIndexProperty().addListener((o, oldVal, newVal) -> {
+            onTabSelected(newVal.intValue());
         });
     }
 
@@ -185,12 +187,7 @@ public class DashboardPanel extends AbstractPanel {
                     hideProgress();
                     mSummary = summary;
                     refreshSummary(() -> {
-                        switch (tabPane.getSelectionModel().getSelectedIndex()) {
-                            case 1 -> refreshRevenues();
-                            case 2 -> refreshExpenses();
-                            case 3 -> refreshDailySummaries();
-                            default -> refreshProjections();
-                        }
+                        onTabSelected(tabPane.getSelectionModel().getSelectedIndex());
                     });
                 }, err -> {
                     hideProgress();
@@ -199,6 +196,93 @@ public class DashboardPanel extends AbstractPanel {
                     } else {
                         showErrorDialog("Database Error", "Error while checking summary.\n" + err);
                     }
+                }));
+    }
+
+    private void onTabSelected(int index) {
+        switch (index) {
+            case 1 -> {
+                if (revenuesViewController != null) {
+                    revenuesViewController.refresh();
+                }
+            }
+            case 2 -> {
+                if (expensesViewController != null) {
+                    expensesViewController.refresh();
+                }
+            }
+            case 3 -> {
+                if (cashTransactionsViewController != null) {
+                    cashTransactionsViewController.refresh();
+                }
+            }
+            case 4 -> {
+                if (dailySummariesViewController != null) {
+                    dailySummariesViewController.refresh();
+                }
+            }
+            default -> {
+                if (projectionsViewController != null) {
+                    projectionsViewController.refresh();
+                }
+            }
+        }
+    }
+
+    /**
+     * Recalculate today's summary and save it to database.
+     * @param onNext Task to execute after updating daily summary. Can be null.
+     */
+    public void refreshSummary(Runnable onNext) {
+        showProgress("Fetching summary details...");
+        disposables.add(Single.fromCallable(expenseController::getExpensesToday)
+                .flatMap(expenses -> {
+                    expensesToday = expenses;
+                    return Single.fromCallable(revenueController::getRevenuesToday);
+                }).flatMap(revenues -> {
+                    revenuesToday = revenues;
+                    return Single.fromCallable(cashTransactionController::getCashTransactionsToday);
+                }).flatMap(cashTransactions -> {
+                    cashTransactionsToday = cashTransactions;
+                    return Single.fromCallable(dailySummaryController::getAll);
+                }).flatMap(summaries -> {
+                    // sort summaries
+                    FXCollections.sort(summaries, Comparator.comparing(DailySummary::getDate));
+                    if (!summaries.isEmpty() && summaries.size() > 1) {
+                        mPrevSummary = summaries.get(summaries.size() - 2);
+                    } else {
+                        mPrevSummary = null;
+                    }
+
+                    mRevenues = 0;
+                    for (Revenue r : revenuesToday) mRevenues += r.getAmount();
+
+                    mExpenses = 0;
+                    for (Expense e : expensesToday) mExpenses += e.getAmount();
+
+                    mCashIn = 0;
+                    mCashOut = 0;
+                    for (CashTransaction ct : cashTransactionsToday) {
+                        if (ct.getType().equals(CashTransaction.TYPE_CASH_IN)) mCashIn += ct.getAmount();
+                        else mCashOut += ct.getAmount();
+                    }
+
+                    mCashBalance = mSummary.getForwarded() + mRevenues - mExpenses + mCashIn - mCashOut;
+
+                    mSummary.setRevenues(mRevenues);
+                    mSummary.setExpenses(mExpenses);
+                    mSummary.setCashIn(mCashIn);
+                    mSummary.setCashOut(mCashOut);
+                    mSummary.setBalance(mCashBalance);
+                    return Single.fromCallable(() -> dailySummaryController.update(mSummary));
+                }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
+                    hideProgress();
+                    if (!success) showWarningDialog("Failed", "Failed to update daily summary.");
+                    displaySummary();
+                    if (onNext != null) onNext.run();
+                }, err -> {
+                    hideProgress();
+                    showErrorDialog("Database Error", "Error while updating summary details.\n" + err);
                 }));
     }
 
@@ -213,23 +297,38 @@ public class DashboardPanel extends AbstractPanel {
                     return Single.fromCallable(expenseController::getExpensesToday);
                 }).flatMap(expenses -> {
                     expensesToday = expenses;
-                    return Single.fromCallable(dailySummaryController::getAll);
+                    return Single.fromCallable(cashTransactionController::getCashTransactionsToday);
+                }).flatMap(cashTransactions -> {
+                    cashTransactionsToday = cashTransactions;
+                    return Single.fromCallable((dailySummaryController::getAll));
                 }).flatMap(summaries -> {
                     // sort summaries
                     FXCollections.sort(summaries, Comparator.comparing(DailySummary::getDate));
                     mPrevSummary = summaries.isEmpty() ? null : summaries.getLast();
                     mCashForwarded = mPrevSummary == null ? 0 : mPrevSummary.getBalance();
+
                     mRevenues = 0;
                     for (Revenue r : revenuesToday) mRevenues += r.getAmount();
+
                     mExpenses = 0;
                     for (Expense e : expensesToday) mExpenses += e.getAmount();
-                    mCashBalance = mCashForwarded + mRevenues - mExpenses;
+
+                    mCashIn = 0;
+                    mCashOut = 0;
+                    for (CashTransaction ct : cashTransactionsToday) {
+                        if (ct.getType().equals(CashTransaction.TYPE_CASH_IN)) mCashIn += ct.getAmount();
+                        else mCashOut += ct.getAmount();
+                    }
+
+                    mCashBalance = mCashForwarded + mRevenues - mExpenses + mCashIn - mCashOut;
 
                     DailySummary summary = new DailySummary();
                     summary.setDate(LocalDate.now());
                     summary.setForwarded(mCashForwarded);
                     summary.setRevenues(mRevenues);
                     summary.setExpenses(mExpenses);
+                    summary.setCashIn(mCashIn);
+                    summary.setCashOut(mCashOut);
                     summary.setBalance(mCashBalance);
                     return Single.fromCallable(() -> dailySummaryController.insert(summary));
                 }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
@@ -242,88 +341,6 @@ public class DashboardPanel extends AbstractPanel {
                 }));
     }
 
-    /**
-     * Recalculate today's summary and save it to database.
-     * @param onNext Task to execute after updating daily summary. Can be null.
-     */
-    private void refreshSummary(Runnable onNext) {
-        showProgress("Fetching summary details...");
-        disposables.add(Single.fromCallable(expenseController::getExpensesToday)
-                .flatMap(expenses -> {
-                    expensesToday = expenses;
-                    return Single.fromCallable(revenueController::getRevenuesToday);
-                }).flatMap(revenues -> {
-                    revenuesToday = revenues;
-                    return Single.fromCallable(dailySummaryController::getAll);
-                }).flatMap(summaries -> {
-                    // sort summaries
-                    FXCollections.sort(summaries, Comparator.comparing(DailySummary::getDate));
-                    if (!summaries.isEmpty() && summaries.size() > 1) {
-                        mPrevSummary = summaries.get(summaries.size() - 2);
-                    } else {
-                        mPrevSummary = null;
-                    }
-
-                    mRevenues = 0;
-                    for (Revenue r : revenuesToday) mRevenues += r.getAmount();
-                    mExpenses = 0;
-                    for (Expense e : expensesToday) mExpenses += e.getAmount();
-                    mCashBalance = mSummary.getForwarded() + mRevenues - mExpenses;
-
-                    mSummary.setRevenues(mRevenues);
-                    mSummary.setExpenses(mExpenses);
-                    mSummary.setBalance(mCashBalance);
-                    return Single.fromCallable(() -> dailySummaryController.update(mSummary));
-                }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
-                    hideProgress();
-                    if (!success) showWarningDialog("Failed", "Failed to update daily summary.");
-                    displaySummary();
-                    if (onNext != null) onNext.run();
-                }, err -> {
-                    hideProgress();
-                    showErrorDialog("Database Error", "Error while updating summary details.\n" + err);
-                }));
-    }
-
-    private void refreshDailySummaries() {
-        showProgress("Retrieving daily summary entries...");
-        disposables.add(Single.fromCallable(dailySummaryController::getAll)
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
-                    hideProgress();
-                    FXCollections.sort(list, Comparator.comparing(DailySummary::getDate));
-                    summariesList = new FilteredList<>(list);
-                    summariesTable.setItems(summariesList);
-                }, err -> {
-                    hideProgress();
-                    showErrorDialog("Database Error", "Error while retrieving daily summary entries.\n" + err);
-                }));
-    }
-
-    private void refreshProjections() {
-        showProgress("Retrieving data...");
-        disposables.add(Single.fromCallable(revenueController::getAll)
-                .flatMap(revenues -> {
-                    allRevenues = revenues;
-                    return Single.fromCallable(expenseController::getAll);
-                }).flatMap(expenses -> {
-                    allExpenses = expenses;
-                    return Single.fromCallable(dailySummaryController::getAll);
-                }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(summaries -> {
-                    hideProgress();
-                    allSummaries = summaries;
-                    displayProjections();
-                }, err -> {
-                    hideProgress();
-                    showErrorDialog("Database Error", "Error while retrieving data.\n" + err);
-                }));
-    }
-
-    private void recalculateSummaries() {
-        if (recalculateWindow == null) recalculateWindow = new RecalculateWindow(database, mainWindow.getStage());
-        recalculateWindow.showAndWait();
-        onResume();
-    }
-
     @Override
     public void onPause() {
 
@@ -334,11 +351,15 @@ public class DashboardPanel extends AbstractPanel {
             lblForwarded.setText(ViewUtils.toStringMoneyFormat(mSummary.getForwarded()));
             lblRevenues.setText(ViewUtils.toStringMoneyFormat(mSummary.getRevenues()));
             lblExpenses.setText(ViewUtils.toStringMoneyFormat(mSummary.getExpenses()));
+            lblCashIn.setText(ViewUtils.toStringMoneyFormat(mSummary.getCashIn()));
+            lblCashOut.setText(ViewUtils.toStringMoneyFormat(mSummary.getCashOut()));
             lblBalances.setText(ViewUtils.toStringMoneyFormat(mSummary.getBalance()));
 
             // clear styles first
             lblRevenues.getStyleClass().removeAll("positive-up", "negative-down");
             lblExpenses.getStyleClass().removeAll("negative-up", "positive-down");
+            lblCashIn.getStyleClass().removeAll("negative-up", "positive-down");
+            lblCashOut.getStyleClass().removeAll("negative-up", "positive-down");
             lblBalances.getStyleClass().removeAll("positive-up", "negative-down");
 
             if (mPrevSummary != null) {
@@ -363,6 +384,26 @@ public class DashboardPanel extends AbstractPanel {
                     lblExpenses.setGraphic(null);
                 }
 
+                if (mPrevSummary.getCashIn() > mSummary.getCashIn()) {
+                    lblCashIn.setGraphic(new ArrowDownIcon(iconSize));
+                    lblCashIn.getStyleClass().add("negative-down");
+                } else if (mPrevSummary.getCashIn() < mSummary.getCashIn()) {
+                    lblCashIn.setGraphic(new ArrowUpIcon(iconSize));
+                    lblCashIn.getStyleClass().add("positive-up");
+                } else {
+                    lblCashIn.setGraphic(null);
+                }
+
+                if (mPrevSummary.getCashOut() > mSummary.getCashOut()) {
+                    lblCashOut.setGraphic(new ArrowDownIcon(iconSize));
+                    lblCashOut.getStyleClass().add("positive-down");
+                } else if (mPrevSummary.getCashOut() < mSummary.getCashOut()) {
+                    lblCashOut.setGraphic(new ArrowUpIcon(iconSize));
+                    lblCashOut.getStyleClass().add("negative-up");
+                } else {
+                    lblCashOut.setGraphic(null);
+                }
+
                 if (mPrevSummary.getBalance() > mSummary.getBalance()) {
                     lblBalances.setGraphic(new ArrowDownIcon(iconSize));
                     lblBalances.getStyleClass().add("negative-down");
@@ -376,555 +417,139 @@ public class DashboardPanel extends AbstractPanel {
         }
     }
 
-    private void displayProjections() {
-        if (allRevenues != null && allExpenses != null && allSummaries != null) {
-            // MONTHLY PROJECTIONS
-            if (monthlyXAxis.getCategories().isEmpty()) {
-                monthlyXAxis.getCategories().addAll("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-            }
-            LocalDate now = LocalDate.now();
-
-            XYChart.Series<String, Number> monthlyRevenues = new XYChart.Series<>();
-            XYChart.Series<String, Number> monthlyExpenses = new XYChart.Series<>();
-            XYChart.Series<String, Number> monthlyBalance = new XYChart.Series<>();
-            monthlyRevenues.setName("Revenues");
-            monthlyExpenses.setName("Expenses");
-            monthlyBalance.setName("Cash Balance");
-
-            for (int month = 1; month <= 12; month++) {
-                double revenues = 0;
-                double expenses = 0;
-                double balance = 0;
-
-                for (DailySummary s : allSummaries) {
-                    if (s.getDate().getMonthValue() == month && s.getDate().getYear() == now.getYear()) {
-                        revenues += s.getRevenues();
-                        expenses += s.getExpenses();
-                        balance = s.getBalance();
-                    }
-                }
-
-                monthlyRevenues.getData().add(new XYChart.Data<>(ViewUtils.shortMonthStringValue(month), revenues));
-                monthlyExpenses.getData().add(new XYChart.Data<>(ViewUtils.shortMonthStringValue(month), expenses));
-                monthlyBalance.getData().add(new XYChart.Data<>(ViewUtils.shortMonthStringValue(month), balance));
-            }
-
-            monthlyLineChart.getData().clear();
-            monthlyLineChart.getData().add(monthlyRevenues);
-            monthlyLineChart.getData().add(monthlyExpenses);
-            monthlyLineChart.getData().add(monthlyBalance);
-
-            for (XYChart.Data<String, Number> data : monthlyRevenues.getData()) {
-                String text = String.format("%s\n%s", "Revenues", ViewUtils.toStringMoneyFormat(data.getYValue().doubleValue()));
-                Tooltip.install(data.getNode(), new Tooltip(text));
-            }
-
-            for (XYChart.Data<String, Number> data : monthlyExpenses.getData()) {
-                String text = String.format("%s\n%s", "Expenses", ViewUtils.toStringMoneyFormat(data.getYValue().doubleValue()));
-                Tooltip.install(data.getNode(), new Tooltip(text));
-            }
-
-            for (XYChart.Data<String, Number> data : monthlyBalance.getData()) {
-                String text = String.format("%s\n%s", "Balance", ViewUtils.toStringMoneyFormat(data.getYValue().doubleValue()));
-                Tooltip.install(data.getNode(), new Tooltip(text));
-            }
-
-            // DAILY PROJECTIONS
-            XYChart.Series<String, Number> dailyRevenues = new XYChart.Series<>();
-            XYChart.Series<String, Number> dailyExpenses = new XYChart.Series<>();
-            XYChart.Series<String, Number> dailyBalance = new XYChart.Series<>();
-            dailyRevenues.setName("Revenues");
-            dailyExpenses.setName("Expenses");
-            dailyBalance.setName("Cash Balance");
-
-            YearMonth ym = YearMonth.now();
-            dailyXAxis.getCategories().clear();
-            for (int d = 1; d <= ym.atEndOfMonth().getDayOfMonth(); d++) {
-                dailyXAxis.getCategories().add(d + "");
-
-                double revenues = 0;
-                double expenses = 0;
-                double balance = 0;
-
-                for (DailySummary s : allSummaries) {
-                    if (s.getDate().getDayOfMonth() == d && s.getDate().getMonthValue() == now.getMonthValue() && s.getDate().getYear() == ym.getYear()) {
-                        revenues += s.getRevenues();
-                        expenses += s.getExpenses();
-                        balance = s.getBalance();
-                    }
-                }
-
-                dailyRevenues.getData().add(new XYChart.Data<>(d + "", revenues));
-                dailyExpenses.getData().add(new XYChart.Data<>(d + "", expenses));
-                dailyBalance.getData().add(new XYChart.Data<>(d + "", balance));
-            }
-
-            dailyLineChart.getData().clear();
-            dailyLineChart.getData().add(dailyRevenues);
-            dailyLineChart.getData().add(dailyExpenses);
-            dailyLineChart.getData().add(dailyBalance);
-
-            for (XYChart.Data<String, Number> data : dailyRevenues.getData()) {
-                String text = String.format("%s\n%s", "Revenues", ViewUtils.toStringMoneyFormat(data.getYValue().doubleValue()));
-                Tooltip.install(data.getNode(), new Tooltip(text));
-            }
-
-            for (XYChart.Data<String, Number> data : dailyExpenses.getData()) {
-                String text = String.format("%s\n%s", "Expenses", ViewUtils.toStringMoneyFormat(data.getYValue().doubleValue()));
-                Tooltip.install(data.getNode(), new Tooltip(text));
-            }
-
-            for (XYChart.Data<String, Number> data : dailyBalance.getData()) {
-                String text = String.format("%s\n%s", "Balance", ViewUtils.toStringMoneyFormat(data.getYValue().doubleValue()));
-                Tooltip.install(data.getNode(), new Tooltip(text));
-            }
-
-            // PIE CHARTS
-            // Revenues
-            double billing = 0;
-            double purchase = 0;
-            double service = 0;
-            double vendo = 0;
-            double others = 0;
-            for (Revenue r : allRevenues) {
-                switch (r.getType()) {
-                    case Revenue.TYPE_BILLING -> billing += r.getAmount();
-                    case Revenue.TYPE_PURCHASE -> purchase += r.getAmount();
-                    case Revenue.TYPE_SERVICE -> service += r.getAmount();
-                    case Revenue.TYPE_WIFI_VENDO -> vendo += r.getAmount();
-                    default -> others += r.getAmount();
-                }
-            }
-            PieChart.Data revBilling = new PieChart.Data(Revenue.TYPE_BILLING, billing);
-            PieChart.Data revPurchase = new PieChart.Data(Revenue.TYPE_PURCHASE, purchase);
-            PieChart.Data revService = new PieChart.Data(Revenue.TYPE_SERVICE, service);
-            PieChart.Data revVendo = new PieChart.Data(Revenue.TYPE_WIFI_VENDO, vendo);
-            PieChart.Data revOthers = new PieChart.Data(Revenue.TYPE_OTHERS, others);
-            revenuesPieChart.getData().clear();
-            revenuesPieChart.getData().addAll(revBilling, revPurchase, revService, revVendo, revOthers);
-            // show value (tooltip) on hover
-            for (PieChart.Data data : revenuesPieChart.getData()) {
-                String text = String.format("%s\n%s", data.getName(), ViewUtils.toStringMoneyFormat(data.getPieValue()));
-                Tooltip.install(data.getNode(), new Tooltip(text));
-            }
-
-            // Expenses
-            double education = 0;
-            double electricity = 0;
-            double internet = 0;
-            double food = 0;
-            double repair = 0;
-            double maintenance = 0;
-            double payment = 0;
-            double transportation = 0;
-            double peripherals = 0;
-            double water = 0;
-            double otherExpenses = 0;
-            for (Expense e : allExpenses) {
-                switch (e.getType()) {
-                    case Expense.TYPE_EDUCATION -> education += e.getAmount();
-                    case Expense.TYPE_ELECTRICITY -> electricity += e.getAmount();
-                    case Expense.TYPE_INTERNET -> internet += e.getAmount();
-                    case Expense.TYPE_FOOD_GROCERY -> food += e.getAmount();
-                    case Expense.TYPE_REPAIR -> repair += e.getAmount();
-                    case Expense.TYPE_MAINTENANCE -> maintenance += e.getAmount();
-                    case Expense.TYPE_PAYMENT -> payment += e.getAmount();
-                    case Expense.TYPE_TRANSPORTATION -> transportation += e.getAmount();
-                    case Expense.TYPE_PERIPHERALS -> peripherals += e.getAmount();
-                    case Expense.TYPE_WATER -> water += e.getAmount();
-                    default -> otherExpenses += e.getAmount();
-                }
-            }
-            PieChart.Data expEducation = new PieChart.Data(Expense.TYPE_EDUCATION, education);
-            PieChart.Data expElectricity = new PieChart.Data(Expense.TYPE_ELECTRICITY, electricity);
-            PieChart.Data expInternet = new PieChart.Data(Expense.TYPE_INTERNET, internet);
-            PieChart.Data expFood = new PieChart.Data(Expense.TYPE_FOOD_GROCERY, food);
-            PieChart.Data expRepair = new PieChart.Data(Expense.TYPE_REPAIR, repair);
-            PieChart.Data expMaintenance = new PieChart.Data(Expense.TYPE_MAINTENANCE, maintenance);
-            PieChart.Data expPayment = new PieChart.Data(Expense.TYPE_PAYMENT, payment);
-            PieChart.Data expTransportation = new PieChart.Data(Expense.TYPE_TRANSPORTATION, transportation);
-            PieChart.Data expPeripherals = new PieChart.Data(Expense.TYPE_PERIPHERALS, peripherals);
-            PieChart.Data expWater = new PieChart.Data(Expense.TYPE_WATER, water);
-            PieChart.Data expOther = new PieChart.Data(Expense.TYPE_OTHERS, otherExpenses);
-            expensesPieChart.getData().clear();
-            expensesPieChart.getData().addAll(expEducation, expElectricity, expInternet, expFood, expRepair, expMaintenance,
-                    expPayment, expTransportation, expPeripherals, expWater, expOther);
-            // show value (tooltip) on hover
-            for (PieChart.Data data : expensesPieChart.getData()) {
-                String text = String.format("%s\n%s", data.getName(), ViewUtils.toStringMoneyFormat(data.getPieValue()));
-                Tooltip.install(data.getNode(), new Tooltip(text));
-            }
-        }
-    }
-
-    private void refreshRevenues() {
-        showProgress("Retrieving Revenue entries...");
-        disposables.add(Single.fromCallable(revenueController::getAll)
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
-                    hideProgress();
-                    revenueList = new FilteredList<>(list);
-                    revenuesTable.setItems(revenueList);
-                    tallyRevenues(list);
-                    refreshSummary(null);
-                }, err -> {
-                    hideProgress();
-                    showErrorDialog("Database Error", "Error while retrieving Revenue entries.\n" + err);
-                }));
-    }
-
-    private void tallyRevenues(ObservableList<Revenue> revenues) {
-        double billing = 0;
-        double purchase = 0;
-        double service = 0;
-        double vendo = 0;
-        double others = 0;
-        for (Revenue rev : revenues) {
-            switch (rev.getType()) {
-                case Revenue.TYPE_BILLING -> billing += rev.getAmount();
-                case Revenue.TYPE_PURCHASE -> purchase += rev.getAmount();
-                case Revenue.TYPE_SERVICE -> service += rev.getAmount();
-                case Revenue.TYPE_WIFI_VENDO -> vendo += rev.getAmount();
-                default -> others += rev.getAmount();
-            }
-        }
-        lblBilling.setText(ViewUtils.toStringMoneyFormat(billing));
-        lblPurchase.setText(ViewUtils.toStringMoneyFormat(purchase));
-        lblService.setText(ViewUtils.toStringMoneyFormat(service));
-        lblVendo.setText(ViewUtils.toStringMoneyFormat(vendo));
-        lblOthers.setText(ViewUtils.toStringMoneyFormat(others));
-    }
-
-    private void refreshExpenses() {
-        showProgress("Retrieving Expense entries...");
-        disposables.add(Single.fromCallable(expenseController::getAll)
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
-                    hideProgress();
-                    expenseList = new FilteredList<>(list);
-                    expensesTable.setItems(expenseList);
-                    refreshSummary(null);
-                }, err -> {
-                    hideProgress();
-                    showErrorDialog("Database Error", "Error while retrieving Expense entries.\n" + err);
-                }));
-    }
-
-    // Revenue
-    private void addRevenue() {
-        if (addRevenueWindow == null) addRevenueWindow = new AddRevenueWindow(database, mainWindow.getStage());
-        addRevenueWindow.showAndWait();
-        refreshRevenues();
-    }
-
-    private void editRevenue() {
-        if (selectedRevenueItem.get() == null) {
-            showWarningDialog("Invalid Action", "No selected Revenue entry. Try again.");
-        } else {
-            if (editRevenueWindow == null) editRevenueWindow = new EditRevenueWindow(database, mainWindow.getStage());
-            editRevenueWindow.showAndWait(selectedRevenueItem.get());
-            refreshRevenues();
-        }
-    }
-
-    private void deleteRevenue() {
-        if (selectedRevenueItem.get() == null) {
-            showWarningDialog("Invalid Action", "No selected Revenue entry. Try again.");
-        } else {
-            Optional<ButtonType> result = showConfirmDialog("Delete Revenue",
-                    "Are you sure you want to delete this Revenue entry?",
-                    ButtonType.YES, ButtonType.NO);
-            if (result.isPresent() && result.get() == ButtonType.YES) {
-                deleteRevenue(selectedRevenueItem.get().getId());
-            }
-        }
-    }
-
-    private void deleteRevenue(int id) {
-        showProgress("Deleting Revenue entry...");
-        disposables.add(Single.fromCallable(() -> revenueController.delete(id))
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
-                    hideProgress();
-                    if (!success) showWarningDialog("Failed", "Failed to delete Revenue entry.");
-                    refreshRevenues();
-                }, err -> {
-                    hideProgress();
-                    showErrorDialog("Database Error", "Error while deleting Revenue entry.\n" + err);
-                }));
-    }
-
-    private void updateRevenueTag(String tag) {
-        if (selectedRevenueItem.get() == null) {
-            showWarningDialog("Invalid Action", "No selected Revenue entry. Try again.");
-        } else {
-            showProgress("Updating Revenue entry...");
-            disposables.add(Single.fromCallable(() -> revenueController.update(selectedRevenueItem.get().getId(),
-                    "tag", tag))
-                    .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
-                        hideProgress();
-                        if (!success) showWarningDialog("Failed", "Failed to update Revenue entry.");
-                        refreshRevenues();
-                    }, err -> {
-                        hideProgress();
-                        showErrorDialog("Database Error", "Error while updating Revenue entry.");
-                    }));
-        }
-    }
-
-    // Expense
-    private void addExpense() {
-        if (addExpenseWindow == null) addExpenseWindow = new AddExpenseWindow(database, mainWindow.getStage());
-        addExpenseWindow.showAndWait();
-        refreshExpenses();
-    }
-
-    private void editExpense() {
-        if (selectedExpenseItem.get() == null) {
-            showWarningDialog("Invalid Action", "No selected Expense entry. Try again.");
-        } else {
-            if (editExpenseWindow == null) editExpenseWindow = new EditExpenseWindow(database, mainWindow.getStage());
-            editExpenseWindow.showAndWait(selectedExpenseItem.get());
-            refreshExpenses();
-        }
-    }
-
-    private void deleteExpense() {
-        if (selectedExpenseItem.get() == null) {
-            showWarningDialog("Invalid Action", "No selected Expense entry. Try again.");
-        } else {
-            Optional<ButtonType> result = showConfirmDialog("Delete Expense",
-                    "Are you sure you want to delete this Expense entry?",
-                    ButtonType.YES, ButtonType.NO);
-            if (result.isPresent() && result.get() == ButtonType.YES) {
-                deleteExpense(selectedExpenseItem.get().getId());
-            }
-        }
-    }
-
-    private void deleteExpense(int id) {
-        showProgress("Deleting Expense entry...");
-        disposables.add(Single.fromCallable(() -> expenseController.delete(id))
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
-                    hideProgress();
-                    if (!success) showWarningDialog("Failed", "Failed to delete Expense entry.");
-                    refreshExpenses();
-                }, err -> {
-                    hideProgress();
-                    showErrorDialog("Database Error", "Error while deleting Expense entry.\n" + err);
-                }));
-    }
-
-    private void updateExpenseTag(String tag) {
-        if (selectedExpenseItem.get() == null) {
-            showWarningDialog("Invalid Action", "No selected Expense entry. Try again.");
-        } else {
-            showProgress("Updating Expense entry...");
-            disposables.add(Single.fromCallable(() -> expenseController.update(selectedExpenseItem.get().getId(),
-                    "tag", tag))
-                    .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
-                        hideProgress();
-                        if (!success) showWarningDialog("Failed", "Failed to update Expense entry.");
-                        refreshExpenses();
-                    }, err -> {
-                        hideProgress();
-                        showErrorDialog("Database Error", "Error while updating Expense entry.");
-                    }));
-        }
-    }
-
-    private void exportRevenues() {
-        if (revenueList == null) return;
-        File dirFolder = getDirectoryChooser().showDialog(mainWindow.getStage());
-        if (dirFolder != null) {
-            String filename = String.format("revenues_%s.xls", LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMM-dd-yyyy_hh-mm-ss")));
-            File outputFile = new File(dirFolder + Utils.FILE_SEPARATOR + filename);
-            showProgress("Exporting Revenue list...");
-            disposables.add(Completable.fromAction(() -> {
-                ExportUtils.exportRevenues(revenueList, outputFile);
-            }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(this::hideProgress, err -> {
-                hideProgress();
-                showErrorDialog("IOException", "Error while exporting Revenue list to file.\n" + err);
-            }));
-        }
-    }
-
-    private void exportExpenses() {
-        if (expenseList == null) return;
-        File dirFolder = getDirectoryChooser().showDialog(mainWindow.getStage());
-        if (dirFolder != null) {
-            String filename = String.format("expenses_%s.xls", LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMM-dd-yyyy_hh-mm-ss")));
-            File outputFile = new File(dirFolder + Utils.FILE_SEPARATOR + filename);
-            showProgress("Exporting Expense list...");
-            disposables.add(Completable.fromAction(() -> {
-                ExportUtils.exportExpenses(expenseList, outputFile);
-            }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(this::hideProgress, err -> {
-                hideProgress();
-                showErrorDialog("IOException", "Error while exporting Expense list to file.\n" + err);
-            }));
-        }
-    }
-
-    private void exportSummaries() {
-        if (summariesList == null) return;
-        File dirFolder = getDirectoryChooser().showDialog(mainWindow.getStage());
-        if (dirFolder != null) {
-            String filename = String.format("summaries_%s.xls", LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMM-dd-yyyy_hh-mm-ss")));
-            File outputFile = new File(dirFolder.getPath() + Utils.FILE_SEPARATOR + filename);
-            showProgress("Exporting Summaries list...");
-            disposables.add(Completable.fromAction(() -> {
-                ExportUtils.exportSummaries(summariesList, outputFile);
-            }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(this::hideProgress, err -> {
-                hideProgress();
-                showErrorDialog("IOException", "Error while exporting Summary list to file.\n" + err);
-            }));
-        }
-    }
-
     private void setupIcons() {
         tabProjections.setGraphic(new TrendingUpIcon(14));
         tabRevenues.setGraphic(new PesoIcon(14));
         tabExpenses.setGraphic(new PesoIcon(14));
+        tabTransactions.setGraphic(new PesoIcon(14));
         tabSummaries.setGraphic(new FileTextIcon(14));
+    }
 
-        btnAddRevenue.setGraphic(new PlusIcon(14));
-        btnEditRevenue.setGraphic(new Edit2Icon(14));
-        btnDeleteRevenue.setGraphic(new TrashIcon(14));
-        btnExportRevenues.setGraphic(new UploadIcon(14));
-
-        btnAddExpense.setGraphic(new PlusIcon(14));
-        btnEditExpense.setGraphic(new Edit2Icon(14));
-        btnDeleteExpense.setGraphic(new TrashIcon(14));
-        btnExportExpenses.setGraphic(new UploadIcon(14));
-
-        btnExportSummaries.setGraphic(new UploadIcon(14));
-        btnRecalculate.setGraphic(new SettingsIcon(14));
+    private void setupProjectionsTab() {
+        projectionsViewController = new ProjectionsViewController(this, mainWindow, database,
+                expensesPieChart, operationalBarChart, nonOperationalBarChart, revenuesBarChart, expensesRevenuesPieChart,
+                monthlyLineChart, dailyLineChart);
+        projectionsViewController.init();
     }
 
     private void setupRevenuesTab() {
-        btnAddRevenue.setOnAction(evt -> addRevenue());
-        btnEditRevenue.setOnAction(evt -> editRevenue());
-        btnDeleteRevenue.setOnAction(evt -> deleteRevenue());
-        btnExportRevenues.setOnAction(evt -> exportRevenues());
-
         colRevenueTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
-        colRevenueTag.setCellFactory(col -> new TagTableCell<>());
+        colRevenueDate.setCellValueFactory(new PropertyValueFactory<>("date"));
+        colRevenueAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
         colRevenueType.setCellValueFactory(new PropertyValueFactory<>("type"));
         colRevenueDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
-        colRevenueAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        colRevenueMode.setCellValueFactory(new PropertyValueFactory<>("mode"));
+        colRevenueRef.setCellValueFactory(new PropertyValueFactory<>("reference"));
+        colRevenueAttachment.setCellValueFactory(new PropertyValueFactory<>("attachment"));
+
+        colRevenueTag.setCellFactory(col -> new TagTableCell<>());
         colRevenueAmount.setCellFactory(col -> new AmountTableCell<>());
-        colRevenueDate.setCellValueFactory(new PropertyValueFactory<>("date"));
         colRevenueDate.setCellFactory(col -> new DateTableCell<>());
-
-        MenuItem mAdd = new MenuItem("Add");
-        mAdd.setGraphic(new PlusIcon(12));
-        mAdd.setOnAction(evt -> addRevenue());
-
-        MenuItem mEdit = new MenuItem("Edit");
-        mEdit.setGraphic(new Edit2Icon(12));
-        mEdit.setOnAction(evt -> editRevenue());
-
-        MenuItem mExport = new MenuItem("Export List");
-        mExport.setGraphic(new UploadIcon(12));
-        mExport.setOnAction(evt -> exportRevenues());
-
-        Menu mTag = new Menu("Change Tag");
-        mTag.setGraphic(new CircleIcon(12));
-        ViewUtils.getTags().forEach((tag, icon) -> {
-            MenuItem item = new MenuItem(ViewUtils.capitalize(tag));
-            item.setGraphic(icon);
-            item.setOnAction(evt -> updateRevenueTag(tag));
-            mTag.getItems().add(item);
+        colRevenueAttachment.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String s, boolean empty) {
+                super.updateItem(s, empty);
+                if (empty || s == null) {
+                    setText("");
+                    setGraphic(null);
+                } else {
+                    if (s.isBlank()) setText("No");
+                    else setText("Yes");
+                }
+            }
         });
 
-        MenuItem mDelete = new MenuItem("Delete");
-        mDelete.setGraphic(new TrashIcon(12));
-        mDelete.setOnAction(evt -> deleteRevenue());
-
-        ContextMenu cm = new ContextMenu(mAdd, mEdit, mExport, mTag, new SeparatorMenuItem(), mDelete);
-        revenuesTable.setContextMenu(cm);
-
-        selectedRevenueItem.bind(revenuesTable.getSelectionModel().selectedItemProperty());
+        revenuesViewController = new RevenuesViewController(this, mainWindow, database, btnAddRevenue,
+                btnEditRevenue, btnDeleteRevenue, btnExportRevenues, cbRevenueModes, revenuesTable);
+        revenuesViewController.init();
     }
 
     private void setupExpensesTab() {
-        btnAddExpense.setOnAction(evt -> addExpense());
-        btnEditExpense.setOnAction(evt -> editExpense());
-        btnDeleteExpense.setOnAction(evt -> deleteExpense());
-        btnExportExpenses.setOnAction(evt -> exportExpenses());
-
         colExpenseTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
-        colExpenseTag.setCellFactory(col -> new TagTableCell<>());
+        colExpenseDate.setCellValueFactory(new PropertyValueFactory<>("date"));
+        colExpenseAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        colExpenseCategory.setCellValueFactory(new PropertyValueFactory<>("category"));
         colExpenseType.setCellValueFactory(new PropertyValueFactory<>("type"));
         colExpenseDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
-        colExpenseAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
-        colExpenseAmount.setCellFactory(col -> new AmountTableCell<>());
-        colExpenseDate.setCellValueFactory(new PropertyValueFactory<>("date"));
+        colExpenseMode.setCellValueFactory(new PropertyValueFactory<>("mode"));
+        colExpenseReference.setCellValueFactory(new PropertyValueFactory<>("ref"));
+        colExpenseAttachment.setCellValueFactory(new PropertyValueFactory<>("attachment"));
+
+        colExpenseTag.setCellFactory(col -> new TagTableCell<>());
         colExpenseDate.setCellFactory(col -> new DateTableCell<>());
-
-        MenuItem mAdd = new MenuItem("Add");
-        mAdd.setGraphic(new PlusIcon(12));
-        mAdd.setOnAction(evt -> addExpense());
-
-        MenuItem mEdit = new MenuItem("Edit");
-        mEdit.setGraphic(new Edit2Icon(12));
-        mEdit.setOnAction(evt -> editExpense());
-
-        MenuItem mExport = new MenuItem("Export List");
-        mExport.setGraphic(new UploadIcon(12));
-        mExport.setOnAction(evt -> exportExpenses());
-
-        Menu mTag = new Menu("Change Tag");
-        mTag.setGraphic(new CircleIcon(12));
-        ViewUtils.getTags().forEach((tag, icon) -> {
-            MenuItem item = new MenuItem(ViewUtils.capitalize(tag));
-            item.setGraphic(icon);
-            item.setOnAction(evt -> updateExpenseTag(tag));
-            mTag.getItems().add(item);
+        colExpenseAmount.setCellFactory(col -> new AmountTableCell<>());
+        colExpenseAttachment.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String s, boolean empty) {
+                super.updateItem(s, empty);
+                if (empty || s == null) {
+                    setText("");
+                    setGraphic(null);
+                } else {
+                    if (s.isBlank()) setText("No");
+                    else setText("Yes");
+                }
+            }
         });
 
-        MenuItem mDelete = new MenuItem("Delete");
-        mDelete.setGraphic(new TrashIcon(12));
-        mDelete.setOnAction(evt -> deleteExpense());
+        expensesViewController = new ExpensesViewController(this, mainWindow, database,
+                btnAddExpense, btnEditExpense, btnDeleteExpense, btnExportExpenses, cbExpensesModes, expensesTable);
+        expensesViewController.init();
+    }
 
-        ContextMenu cm = new ContextMenu(mAdd, mEdit, mExport, mTag, new SeparatorMenuItem(), mDelete);
-        expensesTable.setContextMenu(cm);
+    private void setupTransactionsTab() {
+        colTransactionsTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
+        colTransactionsDate.setCellValueFactory(new PropertyValueFactory<>("date"));
+        colTransactionsType.setCellValueFactory(new PropertyValueFactory<>("type"));
+        colTransactionsAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        colTransactionsDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
+        colTransactionsMode.setCellValueFactory(new PropertyValueFactory<>("mode"));
+        colTransactionsReference.setCellValueFactory(new PropertyValueFactory<>("reference"));
+        colTransactionsAttachment.setCellValueFactory(new PropertyValueFactory<>("attachment"));
 
-        selectedExpenseItem.bind(expensesTable.getSelectionModel().selectedItemProperty());
+        colTransactionsTag.setCellFactory(col -> new TagTableCell<>());
+        colTransactionsDate.setCellFactory(col -> new DateTableCell<>());
+        colTransactionsAmount.setCellFactory(col -> new AmountTableCell<>());
+        colTransactionsAttachment.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String s, boolean empty) {
+                super.updateItem(s, empty);
+                if (empty || s == null) {
+                    setText("");
+                    setGraphic(null);
+                } else {
+                    setText(s.isBlank() ? "No" : "Yes");
+                }
+            }
+        });
+
+        cashTransactionsViewController = new CashTransactionsViewController(this, mainWindow, database,
+                btnAddTransaction, btnEditTransaction, btnDeleteTransaction, btnExportTransactions, cbTransactionsMode, transactionsTable);
+        cashTransactionsViewController.init();
     }
 
     private void setupSummariesTab() {
-        btnExportSummaries.setOnAction(evt -> exportSummaries());
-        btnRecalculate.setOnAction(evt -> recalculateSummaries());
-
         colSummaryTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
-        colSummaryTag.setCellFactory(col -> new TagTableCell<>());
         colSummaryDate.setCellValueFactory(new PropertyValueFactory<>("date"));
-        colSummaryDate.setCellFactory(col -> new DateTableCell<>());
         colSummaryForwarded.setCellValueFactory(new PropertyValueFactory<>("forwarded"));
-        colSummaryForwarded.setCellFactory(col -> new AmountTableCell<>());
         colSummaryRevenues.setCellValueFactory(new PropertyValueFactory<>("revenues"));
-        colSummaryRevenues.setCellFactory(col -> new AmountTableCell<>());
         colSummaryExpenses.setCellValueFactory(new PropertyValueFactory<>("expenses"));
-        colSummaryExpenses.setCellFactory(col -> new AmountTableCell<>());
+        colSummaryCashIn.setCellValueFactory(new PropertyValueFactory<>("cashIn"));
+        colSummaryCashOut.setCellValueFactory(new PropertyValueFactory<>("cashOut"));
         colSummaryBalance.setCellValueFactory(new PropertyValueFactory<>("balance"));
+
+        colSummaryTag.setCellFactory(col -> new TagTableCell<>());
+        colSummaryDate.setCellFactory(col -> new DateTableCell<>());
+        colSummaryForwarded.setCellFactory(col -> new AmountTableCell<>());
+        colSummaryRevenues.setCellFactory(col -> new AmountTableCell<>());
+        colSummaryExpenses.setCellFactory(col -> new AmountTableCell<>());
+        colSummaryCashIn.setCellFactory(col -> new AmountTableCell<>());
+        colSummaryCashOut.setCellFactory(col -> new AmountTableCell<>());
         colSummaryBalance.setCellFactory(col -> new AmountTableCell<>());
 
-        MenuItem mRecalculate = new MenuItem("Recalculate");
-        mRecalculate.setGraphic(new SettingsIcon(12));
-        mRecalculate.setOnAction(evt -> recalculateSummaries());
-
-        MenuItem mExport = new MenuItem("Export");
-        mExport.setGraphic(new UploadIcon(12));
-        mExport.setOnAction(evt -> exportSummaries());
-
-        ContextMenu cm = new ContextMenu(mRecalculate, mExport);
-        summariesTable.setContextMenu(cm);
-    }
-
-    private DirectoryChooser getDirectoryChooser() {
-        if (directoryChooser == null) {
-            directoryChooser = new DirectoryChooser();
-            directoryChooser.setTitle("Set Destination Folder");
-        }
-        return directoryChooser;
+        dailySummariesViewController = new DailySummariesViewController(this, mainWindow, database,
+                btnExportSummaries, btnRecalculate, summariesTable);
+        dailySummariesViewController.init();
     }
 
     private void showProgress(String text) {
@@ -935,29 +560,12 @@ public class DashboardPanel extends AbstractPanel {
         mainWindow.hideProgress();
     }
 
-    private void showPieLabel(double x, double y, double value) {
-        if (pieLabel == null) {
-            pieLabel = new Label();
-            pieLabel.getStyleClass().add("pie-label");
-
-        }
-
-        pieLabel.setTranslateX(x);
-        pieLabel.setTranslateY(y);
-        pieLabel.setText(ViewUtils.toStringMoneyFormat(value));
-
-        if (!pieLabel.isVisible()) {
-            pieLabel.setVisible(true);
-        }
-    }
-
     @Override
     public void onDispose() {
-        if (addRevenueWindow != null) addRevenueWindow.dispose();
-        if (editRevenueWindow != null) editRevenueWindow.dispose();
-        if (addExpenseWindow != null) addExpenseWindow.dispose();
-        if (editExpenseWindow != null) editExpenseWindow.dispose();
-        if (recalculateWindow != null) recalculateWindow.dispose();
+        if (revenuesViewController != null) revenuesViewController.dispose();
+        if (expensesViewController != null) expensesViewController.dispose();
+        if (cashTransactionsViewController != null) cashTransactionsViewController.dispose();
+        if (dailySummariesViewController != null) dailySummariesViewController.dispose();
         disposables.dispose();
     }
 }

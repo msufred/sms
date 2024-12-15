@@ -10,6 +10,8 @@ public class DailySummary {
     private double forwarded;
     private double revenues;
     private double expenses;
+    private double cashIn;
+    private double cashOut;
     private double balance;
 
     private String tag;
@@ -18,7 +20,7 @@ public class DailySummary {
     private LocalDateTime dateDeleted;
 
     public DailySummary() {
-        forwarded = revenues = expenses = balance = 0;
+        forwarded = revenues = expenses = cashIn = cashOut = balance = 0;
         tag = "normal";
         dateCreated = dateUpdated = LocalDateTime.now();
     }
@@ -61,6 +63,22 @@ public class DailySummary {
 
     public void setExpenses(double expenses) {
         this.expenses = expenses;
+    }
+
+    public double getCashIn() {
+        return cashIn;
+    }
+
+    public void setCashIn(double cashIn) {
+        this.cashIn = cashIn;
+    }
+
+    public double getCashOut() {
+        return cashOut;
+    }
+
+    public void setCashOut(double cashOut) {
+        this.cashOut = cashOut;
     }
 
     public double getBalance() {

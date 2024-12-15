@@ -7,6 +7,8 @@ public class User {
     private int id;
     private String username;
     private String password;
+    private String fullname;
+    private String designation;
     private String role;
 
     private String tag;
@@ -42,6 +44,22 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
+    }
+
+    public String getDesignation() {
+        return designation;
+    }
+
+    public void setDesignation(String designation) {
+        this.designation = designation;
     }
 
     public String getRole() {

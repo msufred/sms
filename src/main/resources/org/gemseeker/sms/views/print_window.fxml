@@ -17,9 +17,9 @@
    <children>
       <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="4.0">
          <children>
-            <Label fx:id="lblPrinter" text="Printer" />
+            <Label fx:id="lblPrinter" styleClass="icon-label" text="Printer" />
             <ComboBox fx:id="cbPrinters" promptText="Select Printer" />
-            <Label fx:id="lblCopies" text="Copies">
+            <Label id="icon-label" fx:id="lblCopies" text="Copies">
                <HBox.margin>
                   <Insets left="16.0" />
                </HBox.margin></Label>
@@ -47,7 +47,7 @@
          </content></ScrollPane>
       <HBox alignment="CENTER_RIGHT" spacing="8.0">
          <children>
-            <Label text="Zoom" />
+            <Label styleClass="icon-label" text="Zoom" />
             <Slider fx:id="zoomSlider" majorTickUnit="2.0" max="1.0" minorTickCount="1" value="0.244" HBox.hgrow="ALWAYS" />
             <Label fx:id="lblZoom" />
          </children>

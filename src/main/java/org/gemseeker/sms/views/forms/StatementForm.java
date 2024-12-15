@@ -5,10 +5,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import org.gemseeker.sms.data.Account;
-import org.gemseeker.sms.data.Billing;
-import org.gemseeker.sms.data.BillingStatement;
-import org.gemseeker.sms.data.Subscription;
+import org.gemseeker.sms.data.*;
 import org.gemseeker.sms.views.ViewUtils;
 import org.gemseeker.sms.views.panels.AbstractPanel;
 
@@ -38,6 +35,7 @@ public class StatementForm extends AbstractPanel {
     @FXML private Label lblReceivedBy;
     @FXML private ImageView tempBg;
 
+    private User mUser;
     private Account mAccount;
     private Subscription mSubscription;
     private Billing mBilling;
@@ -52,7 +50,8 @@ public class StatementForm extends AbstractPanel {
 
     }
 
-    public void setData(Account account, Subscription subscription, Billing billing, BillingStatement billingStatement) {
+    public void setData(User user, Account account, Subscription subscription, Billing billing, BillingStatement billingStatement) {
+        mUser = user;
         mAccount = account;
         mSubscription = subscription;
         mBilling = billing;
@@ -101,8 +100,8 @@ public class StatementForm extends AbstractPanel {
 
         // other info
         lblDueDate.setText(mBilling.getDueDate().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
-        lblPreparedBy.setText(mBillingStatement.getPreparedBy());
-        lblDesignation.setText(mBillingStatement.getDesignation());
+        lblPreparedBy.setText(mUser.getFullname());
+        lblDesignation.setText(mUser.getDesignation());
         lblReceivedBy.setText(mBillingStatement.getReceivedBy());
     }
 

@@ -26,6 +26,85 @@
 
 /*******************************************************************************
  *                                                                             *
+ *      Base Theme (Dark)                                                      *
+ *                                                                             *
+ ******************************************************************************/
+.root {
+    -fx-accent: #1e74c6;
+    -fx-focus-color: -fx-accent;
+    -fx-base: #373e43;
+    -fx-control-inner-background: derive(-fx-base, 35%);
+    -fx-control-inner-background-alt: -fx-control-inner-background;
+}
+
+.label {
+    -fx-text-fill: lightgray;
+}
+
+.text-field {
+    -fx-prompt-text-fill: gray;
+}
+
+.button {
+    -fx-focus-traversable: false;
+}
+
+.button:hover {
+    -fx-text-fill: white;
+}
+
+.button:default {
+    -fx-base: -fx-accent;
+}
+
+.button .feather-icon {
+    -fx-background-color: white;
+}
+
+.separator *.line {
+    -fx-background-color: #3c3c3c;
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+}
+
+.scroll-bar {
+    -fx-background-color: derive(-fx-base, 45%);
+}
+
+.table-view {
+    -fx-selection-bar-non-focused: derive(-fx-base, 50%);
+}
+
+.table-view .column-header .label {
+    -fx-alignment: CENTER;
+    -fx-font-weight: none;
+}
+
+.list-cell:even,
+.list-cell:odd,
+.table-row-cell:even,
+.table-row-cell:odd {
+    -fx-control-inner-background: derive(-fx-base, 15%);
+}
+
+.list-cell:empty,
+.table-row-cell:empty {
+    -fx-background-color: transparent;
+}
+
+.list-cell,
+.table-row-cell {
+    -fx-border-color: transparent;
+    -fx-table-cell-border-color: transparent;
+}
+
+.tab .feather-icon,
+.icon-label .feather-icon {
+    -fx-background-color: white;
+}
+
+/*******************************************************************************
+ *                                                                             *
  *      Tag Colors                                                             *
  *                                                                             *
  ******************************************************************************/
@@ -105,40 +184,23 @@
 
 /*******************************************************************************
  *                                                                             *
- * Preset colours for the theme                                                *
- *                                                                             *
- ******************************************************************************/
-
-.theme-presets {
-    -col-base: rgb(147, 147, 147);
-    -col-base-dark: derive(-col-base, -25%);
-    
-    -col-content-text: derive(-col-base, -50%);
-    -col-content-text-dimmed: derive(-col-base, -20%);
-    -col-content-detail: derive(-col-base, -25%);
-    -col-content-background: derive(-col-base, 98%);
-    
-    -col-title-container: derive(-col-base, 95%);
-}
-
-/*******************************************************************************
- *                                                                             *
  * General Style                                                               *
  *                                                                             *
  ******************************************************************************/
-.root {
-    -fx-background-color: #ECEFF1;
+.sidebar {
+    -fx-background-color: derive(-fx-base, 20%);
 }
 
 .btn {
     -fx-background-color: transparent;
 }
 .btn:hover {
-    -fx-background-color: #e5e7eb;
+    -fx-background-color: derive(-fx-base, 50%);
 }
 .btn:pressed {
     -fx-background-color: #d1d5db;
 }
+
 .btn .plus-icon {
     -fx-background-color: #f59e0b;
 }
@@ -170,14 +232,6 @@
 .chart-pane {
     -fx-background-color: #ffffff;
     -fx-background-radius: 4;
-}
-
-
-.sample1 {
-    -fx-background-color: -col-content-background;
-}
-.sample2 {
-    -fx-background-color: -col-base-dark;
 }
 
 .content-pane {
@@ -225,6 +279,70 @@
 
 .panel-sub-title {
     -fx-font-size: 16;
+}
+
+.menu-dark .feather-icon,
+.menu-item-dark .feather-icon {
+    -fx-background-color: white;
+}
+
+.menu-item-normal .feather-icon {
+    -fx-background-color: -col-normal;
+}
+.menu-item-turquoise .feather-icon {
+    -fx-background-color: -col-turquoise;
+}
+.menu-item-greensea .feather-icon {
+    -fx-background-color: -col-greensea;
+}
+.menu-item-sunflower .feather-icon {
+    -fx-background-color: -col-sunflower;
+}
+.menu-item-orange .feather-icon {
+    -fx-background-color: -col-orange;
+}
+.menu-item-emerald .feather-icon {
+    -fx-background-color: -col-emerald;
+}
+.menu-item-nephritis .feather-icon {
+    -fx-background-color: -col-nephritis;
+}
+.menu-item-carrot .feather-icon {
+    -fx-background-color: -col-carrot;
+}
+.menu-item-pumpkin .feather-icon {
+    -fx-background-color: -col-pumpkin;
+}
+.menu-item-peterriver .feather-icon {
+    -fx-background-color: -col-peterriver;
+}
+.menu-item-belizehole .feather-icon {
+    -fx-background-color: -col-belizehole;
+}
+.menu-item-alizarin .feather-icon {
+    -fx-background-color: -col-alizarin;
+}
+.menu-item-pomegranate .feather-icon {
+    -fx-background-color: -col-pomegranate;
+}
+.menu-item-amethyst .feather-icon {
+    -fx-background-color: -col-amethyst;
+}
+.menu-item-wisteria .feather-icon {
+    -fx-background-color: -col-wisteria;
+}
+.menu-item-midnight .feather-icon {
+    -fx-background-color: -col-midnight;
+}
+.menu-item-silver .feather-icon {
+    -fx-background-color: -col-silver;
+}
+
+.menu-item-alert .label {
+    -fx-text-fill: derive(red, 70%);
+}
+.menu-item-alert .feather-icon {
+    -fx-background-color: derive(red, 70%);
 }
 
 /*
@@ -332,7 +450,7 @@
 ============================ Dashboard Styles ================================
 */
 .summary-title {
-    -fx-text-fill: #535c68;
+    -fx-text-fill: white;
 }
 
 .summary-number {
@@ -361,6 +479,15 @@
 
 .negative-down .feather-icon {
     -fx-background-color: "#e74c3c";
+}
+
+.card {
+    -fx-background-color: derive(-fx-base, 10%);
+    -fx-background-radius: 10;
+}
+
+.blue-bar {
+    -fx-bar-fill: -col-peterriver;
 }
 
 /*
@@ -519,6 +646,18 @@
     -fx-background-radius: 20;
     -fx-text-fill: white;
     -fx-font-weight: bold;
+}
+
+.text-positive {
+    -fx-text-fill: derive(-col-greensea, 60%);
+}
+
+.text-negative {
+    -fx-text-fill: derive(-col-alizarin, 60%);
+}
+
+.text-warning {
+    -fx-text-fill: derive(-col-orange, 50%);
 }
 
 .row-odd {

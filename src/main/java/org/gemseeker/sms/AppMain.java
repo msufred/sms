@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
 import org.gemseeker.sms.data.Database;
@@ -23,6 +24,15 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 public class AppMain extends Application {
+
+    private Settings settings;
+    private Database database;
+    private MainWindow mainWindow;
+    private UserController userController;
+    private LoginUserWindow loginUserWindow;
+    private RegisterUserWindow registerUserWindow;
+
+    private Alert errorDialog;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -53,7 +63,7 @@ public class AppMain extends Application {
             System.out.println("Startup succeeded!");
             splashWindow.close();
             try {
-                Settings settings = new Settings(Utils.SETTINGS_PATH);
+                settings = new Settings(Utils.SETTINGS_PATH);
 
                 // TODO show dialog/window instead of hard coding
                 if (settings.getDatabaseSetting("url").isBlank()) {
@@ -65,24 +75,36 @@ public class AppMain extends Application {
                     settings.save();
                 }
 
-                Database database = new Database(settings);
-                MainWindow mainWindow = new MainWindow(settings, database, primaryStage);
+                database = new Database(settings);
+                mainWindow = new MainWindow(this, settings, database, primaryStage);
 
-                UserController userController = new UserController(database);
+                userController = new UserController(database);
                 if (!userController.hasUsers()) {
-                    RegisterUserWindow registerUserWindow = new RegisterUserWindow(mainWindow, database);
-                    registerUserWindow.show();
+                    showRegistrationWindow();
                 } else {
-                    LoginUserWindow loginUserWindow = new LoginUserWindow(mainWindow, database);
-                    loginUserWindow.show();
+                    showLoginWindow();
                 }
             } catch (IOException | ParserConfigurationException | SAXException | TransformerException | ClassNotFoundException | SQLException e) {
-                System.err.println(e);
+                showErrorDialog("Startup Error", "Error occurred during startup:\n" + e);
             }
         });
 
         splashWindow.show();
         startUp.start();
+    }
+
+    public void showRegistrationWindow() {
+        if (registerUserWindow == null) {
+            registerUserWindow = new RegisterUserWindow(mainWindow, database);
+        }
+        registerUserWindow.show();
+    }
+
+    public void showLoginWindow() {
+        if (loginUserWindow == null) {
+            loginUserWindow = new LoginUserWindow(mainWindow, database);
+        }
+        loginUserWindow.show();
     }
 
     private void createFolders() {
@@ -91,6 +113,10 @@ public class AppMain extends Application {
         createFolder(Utils.LOG_FOLDER);
         createFolder(Utils.TEMP_FOLDER);
         createFolder(Utils.DATA_FOLDER);
+        createFolder(Utils.IMAGE_FOLDER);
+        createFolder(Utils.EXPENSES_IMAGE_FOLDER);
+        createFolder(Utils.REVENUES_IMAGE_FOLDER);
+        createFolder(Utils.CASH_TRANSACTIONS_IMAGE_FOLDER);
         System.out.println("------ ok ------\n");
     }
 
@@ -127,6 +153,16 @@ public class AppMain extends Application {
         } else {
             System.out.println("already exists");
         }
+    }
+
+    private void showErrorDialog(String header, String content) {
+        if (errorDialog == null) {
+            errorDialog = new Alert(Alert.AlertType.ERROR);
+            errorDialog.setTitle("Error");
+        }
+        errorDialog.setHeaderText(header);
+        errorDialog.setContentText(content);
+        errorDialog.showAndWait();
     }
 
     public static void main(String[] args) {

@@ -11,7 +11,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.DirectoryChooser;
 import org.gemseeker.sms.ExportUtils;
 import org.gemseeker.sms.Settings;
@@ -27,11 +33,15 @@ import org.gemseeker.sms.views.*;
 import org.gemseeker.sms.views.cells.*;
 import org.gemseeker.sms.views.icons.PesoIcon;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.Optional;
 
 public class PaymentsPanel extends AbstractPanel {
@@ -41,7 +51,7 @@ public class PaymentsPanel extends AbstractPanel {
     @FXML private Tab tabBillings;
     @FXML private Tab tabOtherPayments;
     @FXML private Tab tabBillingStatements;
-    @FXML private Tab tabReceipts;
+    @FXML private Tab tabPayments;
 
     // billing group
     @FXML private Button btnAdd;
@@ -110,6 +120,8 @@ public class PaymentsPanel extends AbstractPanel {
     @FXML private TableColumn<Payment, LocalDate> colPaymentDate;
     @FXML private TableColumn<Payment, String> colPaymentName;
     @FXML private TableColumn<Payment, String> colPaymentFor;
+    @FXML private TableColumn<Payment, String> colMode;
+    @FXML private TableColumn<Payment, String> colRef;
     @FXML private TableColumn<Payment, String> colPaymentToPay;
     @FXML private TableColumn<Payment, String> colPaymentDiscount;
     @FXML private TableColumn<Payment, String> colPaymentVat;
@@ -118,8 +130,12 @@ public class PaymentsPanel extends AbstractPanel {
     @FXML private TableColumn<Payment, String> colPaymentPaid;
     @FXML private TableColumn<Payment, String> colPaymentBalance;
     @FXML private TableColumn<Payment, String> colPaymentPreparedBy;
-
-    // </editor-fold>
+    @FXML private SplitPane paymentsSplitPane;
+    @FXML private Button btnPaymentImageZoomOut;
+    @FXML private Button btnPaymentImageZoomIn;
+    @FXML private Button btnPaymentImageShowFile;
+    @FXML private ImageView paymentImageView;
+    private SplitController splitController;
 
     private FilteredList<BillingPayment> billingsList;
     private final SimpleObjectProperty<BillingPayment> selectedBilling = new SimpleObjectProperty<>();
@@ -177,7 +193,7 @@ public class PaymentsPanel extends AbstractPanel {
             switch (index.intValue()) {
                 case 1 -> refreshOtherBillings();
                 case 2 -> refreshBillingStatements();
-                case 3 -> refreshReceipts();
+                case 3 -> refreshPayments();
                 default -> refreshBillings();
             }
         });
@@ -186,8 +202,8 @@ public class PaymentsPanel extends AbstractPanel {
     @Override
     public void onResume() {
         // create PrintWindow and SaveImageWindow
-        if (printWindow == null) printWindow = new PrintWindow(database, mainWindow.getStage());
-        if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(database, mainWindow.getStage());
+        if (printWindow == null) printWindow = new PrintWindow(mainWindow, database);
+        if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(mainWindow, database);
 
         showProgress("Retrieving Account entries...");
         disposables.add(Single.fromCallable(accountController::getAll)
@@ -248,7 +264,7 @@ public class PaymentsPanel extends AbstractPanel {
 
     }
 
-    private void refreshReceipts() {
+    private void refreshPayments() {
         showProgress("Retrieving receipt entries...");
         disposables.add(Single.fromCallable(paymentController::getAll)
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
@@ -267,7 +283,8 @@ public class PaymentsPanel extends AbstractPanel {
     }
 
     private void addBilling() {
-        if (addBillingWindow == null) addBillingWindow = new AddBillingWindow(database, printWindow, saveImageWindow, mainWindow.getStage());
+        if (addBillingWindow == null) addBillingWindow = new AddBillingWindow(mainWindow, database, printWindow,
+                saveImageWindow, mainWindow.getStage());
         addBillingWindow.showAndWait();
         refreshBillings();
     }
@@ -291,10 +308,10 @@ public class PaymentsPanel extends AbstractPanel {
         } else {
             checkBillingStatementExists(billing.getBillingNo(), () -> {
                 if (acceptPaymentWindow == null) acceptPaymentWindow = new AcceptPaymentWindow(
-                        database, printWindow, saveImageWindow, mainWindow.getStage());
+                        mainWindow.getUser(), database, printWindow, saveImageWindow, mainWindow.getStage());
                 acceptPaymentWindow.showAndWait(selectedBilling.get().getBillingNo());
                 refreshBillings();
-                refreshReceipts();
+                refreshPayments();
             }, () -> {
                 showInfoDialog("Invalid", "No Billing Statement issued for " +
                         "this Billing entry.");
@@ -311,7 +328,7 @@ public class PaymentsPanel extends AbstractPanel {
                         "for this Billing entry.");
             }, () -> {
                 if (prepareBillingStatementWindow == null) prepareBillingStatementWindow =
-                        new PrepareBillingStatementWindow(database, mainWindow.getStage());
+                        new PrepareBillingStatementWindow(mainWindow, database);
                 prepareBillingStatementWindow.showAndWait(selectedBilling.get().getBillingNo());
                 refreshBillings();
                 refreshBillingStatements();
@@ -325,7 +342,7 @@ public class PaymentsPanel extends AbstractPanel {
         } else {
             checkBillingStatementExists(selectedBilling.get().getBillingNo(), () -> {
                 // save billing as image
-                if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(database, mainWindow.getStage());
+                if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(mainWindow, database);
                 saveImageWindow.showAndWait(SaveImageWindow.Type.STATEMENT, selectedBilling.get().getBillingNo());
             }, () -> {
                 showWarningDialog("Invalid Action", "Create Billing Statement first.");
@@ -459,7 +476,7 @@ public class PaymentsPanel extends AbstractPanel {
         if (selectedBillingStatement.get() == null) {
             showWarningDialog("Invalid", "No selected Billing Statement. Try again.");
         } else {
-            if (prepareBillingStatementWindow == null) prepareBillingStatementWindow = new PrepareBillingStatementWindow(database, mainWindow.getStage());
+            if (prepareBillingStatementWindow == null) prepareBillingStatementWindow = new PrepareBillingStatementWindow(mainWindow, database);
             prepareBillingStatementWindow.showAndWait(selectedBillingStatement.get().getBillingNo());
             refreshBillingStatements();
         }
@@ -491,13 +508,43 @@ public class PaymentsPanel extends AbstractPanel {
                 }));
     }
 
+
+    private void togglePaymentDetails() {
+        if (splitController.isTargetVisible()) {
+            splitController.hideTarget();
+        } else {
+            splitController.showTarget();
+            if (selectedPayment.get() != null) showPaymentAttachment(selectedPayment.get());
+        }
+    }
+
+    private void showPaymentAttachment(Payment payment) {
+        File imageFolder = new File(Utils.IMAGE_FOLDER);
+        File file = null;
+        for (String filename: imageFolder.list()) {
+            if (filename.contains(String.valueOf(payment.getPaymentNo()))) {
+                file = new File(Utils.IMAGE_FOLDER + Utils.FILE_SEPARATOR + filename);
+                break;
+            }
+        }
+
+        if (file != null) {
+            Image image = new Image(file.toURI().toString());
+            paymentImageView.setFitWidth(image.getWidth());
+            paymentImageView.setFitHeight(image.getHeight());
+            paymentImageView.setImage(image);
+        } else {
+            paymentImageView.setImage(null);
+        }
+    }
+
     private void editSelectedPayment() {
         if (selectedPayment.get() == null) {
             showWarningDialog("Invalid", "No selected Payment entry. Try again.");
         } else {
             if (editPaymentWindow == null) editPaymentWindow = new EditPaymentWindow(database, mainWindow.getStage());
             editPaymentWindow.showAndWait(selectedPayment.get().getId());
-            refreshReceipts();
+            refreshPayments();
         }
     }
 
@@ -520,7 +567,7 @@ public class PaymentsPanel extends AbstractPanel {
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
                     hideProgress();
                     if (!success) showWarningDialog("Failed", "Failed to delete Payment entry.");
-                    refreshReceipts();
+                    refreshPayments();
                 }, err -> {
                     hideProgress();
                     showErrorDialog("Database Error", "Error while deleting Payment entry.\n" + err);
@@ -536,7 +583,7 @@ public class PaymentsPanel extends AbstractPanel {
                     .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
                         hideProgress();
                         if (!success) showWarningDialog("Failed", "Failed to update Payment entry.");
-                        refreshReceipts();
+                        refreshPayments();
                     }, err -> {
                         hideProgress();
                         showErrorDialog("Database Error", "Error while updating Payment entry.\n" + err);
@@ -662,7 +709,7 @@ public class PaymentsPanel extends AbstractPanel {
         tabBillings.setGraphic(new PesoIcon(14));
         tabBillingStatements.setGraphic(new FileTextIcon(14));
         tabOtherPayments.setGraphic(new PesoIcon(14));
-        tabReceipts.setGraphic(new FileTextIcon(14));
+        tabPayments.setGraphic(new FileTextIcon(14));
 
         btnAdd.setGraphic(new PlusIcon(14));
         btnEdit.setGraphic(new Edit2Icon(14));
@@ -930,6 +977,8 @@ public class PaymentsPanel extends AbstractPanel {
         colPaymentTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
         colPaymentTag.setCellFactory(col -> new TagTableCell<>());
         colPaymentNo.setCellValueFactory(new PropertyValueFactory<>("paymentNo"));
+        colMode.setCellValueFactory(new PropertyValueFactory<>("mode"));
+        colRef.setCellValueFactory(new PropertyValueFactory<>("ref"));
         colPaymentStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colPaymentDate.setCellValueFactory(new PropertyValueFactory<>("paymentDate"));
         colPaymentDate.setCellFactory(col -> new DateTableCell<>());
@@ -943,6 +992,10 @@ public class PaymentsPanel extends AbstractPanel {
         colPaymentPaid.setCellValueFactory(new PropertyValueFactory<>("amountPaid"));
         colPaymentBalance.setCellValueFactory(new PropertyValueFactory<>("balance"));
         colPaymentPreparedBy.setCellValueFactory(new PropertyValueFactory<>("preparedBy"));
+
+        MenuItem mShowPaymentDetails = new MenuItem("Show/Hide Attachment");
+        mShowPaymentDetails.setGraphic(new EyeIcon(12));
+        mShowPaymentDetails.setOnAction(evt -> togglePaymentDetails());
 
         MenuItem mEdit = new MenuItem("Edit");
         mEdit.setGraphic(new Edit2Icon(12));
@@ -964,10 +1017,44 @@ public class PaymentsPanel extends AbstractPanel {
         mDelete.setGraphic(new TrashIcon(12));
         mDelete.setOnAction(evt -> deleteSelectedPayment());
 
-        ContextMenu cm = new ContextMenu(mEdit, mExport, mTag, new SeparatorMenuItem(), mDelete);
+        ContextMenu cm = new ContextMenu(mEdit, mExport, mShowPaymentDetails, mTag, new SeparatorMenuItem(), mDelete);
         paymentsTable.setContextMenu(cm);
 
         selectedPayment.bind(paymentsTable.getSelectionModel().selectedItemProperty());
+        selectedPayment.addListener((o, oldValue, newValue) -> {
+            if (newValue != null && splitController.isTargetVisible()) {
+                showPaymentAttachment(newValue);
+            }
+        });
+
+        splitController = new SplitController(paymentsSplitPane, SplitController.Target.LAST);
+        splitController.hideTarget();
+
+        btnPaymentImageZoomOut.setGraphic(new ZoomOutIcon(12));
+        btnPaymentImageZoomOut.setOnAction(evt -> {
+            if (paymentImageView.getImage() != null) {
+                paymentImageView.setFitWidth(paymentImageView.getFitWidth() - (paymentImageView.getFitWidth() * 0.2));
+                paymentImageView.setFitHeight(paymentImageView.getFitHeight() - (paymentImageView.getFitHeight() * 0.2));
+            }
+        });
+        btnPaymentImageZoomIn.setGraphic(new ZoomInIcon(12));
+        btnPaymentImageZoomIn.setOnAction(evt -> {
+            if (paymentImageView.getImage() != null) {
+                paymentImageView.setFitWidth(paymentImageView.getFitWidth() + (paymentImageView.getFitWidth() * 0.2));
+                paymentImageView.setFitHeight(paymentImageView.getFitHeight() + (paymentImageView.getFitHeight() * 0.2));
+            }
+        });
+        btnPaymentImageShowFile.setGraphic(new FolderIcon(12));
+        btnPaymentImageShowFile.setOnAction(evt -> {
+            if (paymentImageView.getImage() != null && selectedPayment.get() != null) {
+                File file = new File(Utils.IMAGE_FOLDER);
+                try {
+                    Desktop.getDesktop().open(file);
+                } catch (IOException e) {
+                    showErrorDialog("File Exception", "Failed to open file " + file.getPath());
+                }
+            }
+        });
     }
 
     private void showProgress(String text) {

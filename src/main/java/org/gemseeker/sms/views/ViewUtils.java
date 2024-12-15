@@ -125,7 +125,6 @@ public class ViewUtils {
 
     public static String getFileExtension(File file) {
         String path = file.getName();
-        System.out.println(path);
         return path.substring(path.lastIndexOf(".") + 1);
     }
 

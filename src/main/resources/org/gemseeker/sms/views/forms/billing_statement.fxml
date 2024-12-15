@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1772.0" prefWidth="2421.0" stylesheets="@statement.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1772.0" prefWidth="2421.0" style="-fx-background-color: white;" stylesheets="@statement.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ImageView fx:id="tempBg" fitHeight="1772.0" fitWidth="2421.0" pickOnBounds="true" preserveRatio="true">
          <image>
@@ -26,7 +26,7 @@
          <children>
             <HBox alignment="BOTTOM_LEFT">
                <VBox.margin>
-                  <Insets top="475.0" />
+                  <Insets top="480.0" />
                </VBox.margin>
                <children>
                   <VBox minWidth="1500.0">
@@ -47,7 +47,7 @@
                         <Insets left="200.0" />
                      </HBox.margin>
                   </VBox>
-                  <VBox prefWidth="100.0" HBox.hgrow="ALWAYS">
+                  <VBox prefWidth="100.0" spacing="4.0" HBox.hgrow="ALWAYS">
                      <children>
                         <Label fx:id="lblStatementDate" styleClass="text-8pt" text="January 01, 2022">
                            <VBox.margin>
@@ -84,7 +84,7 @@
                         <String fx:value="text-bold" />
                      </styleClass>
                      <HBox.margin>
-                        <Insets top="36.0" />
+                        <Insets top="60.0" />
                      </HBox.margin>
                   </Label>
                </children>
@@ -94,12 +94,12 @@
             </HBox>
             <Label fx:id="lblPrevBalance" alignment="CENTER_RIGHT" minWidth="300.0" styleClass="text-10pt" text="0.00">
                <VBox.margin>
-                  <Insets left="1670.0" top="30.0" />
+                  <Insets left="1670.0" top="40.0" />
                </VBox.margin>
             </Label>
             <Label fx:id="lblCurrentCharges" alignment="CENTER_RIGHT" minWidth="300.0" styleClass="text-10pt" text="0.00">
                <VBox.margin>
-                  <Insets left="1670.0" top="60.0" />
+                  <Insets left="1670.0" top="87.0" />
                </VBox.margin>
             </Label>
             <Label fx:id="lblVat" alignment="CENTER_RIGHT" minWidth="300.0" styleClass="text-10pt" text="0.00">
@@ -117,7 +117,7 @@
                   <Insets left="330.0" top="70.0" />
                </VBox.margin>
                <children>
-                  <Label fx:id="lblDueDate" minWidth="200.0" text="May 01, 2022">
+                  <Label fx:id="lblDueDate" minWidth="1340.0" text="May 01, 2022">
                      <styleClass>
                         <String fx:value="text-10pt" />
                         <String fx:value="text-red" />
@@ -145,14 +145,14 @@
                         </Label>
                      </children>
                      <HBox.margin>
-                        <Insets left="1070.0" />
+                        <Insets />
                      </HBox.margin>
                   </VBox>
                </children>
             </HBox>
             <Label fx:id="lblTotal" alignment="CENTER_RIGHT" minWidth="300.0" text="0.00">
                <VBox.margin>
-                  <Insets left="1670.0" top="24.0" />
+                  <Insets left="1670.0" top="60.0" />
                </VBox.margin>
                <styleClass>
                   <String fx:value="text-12pt" />
@@ -161,17 +161,17 @@
             </Label>
             <HBox>
                <children>
-                  <Label fx:id="lblPreparedBy" alignment="CENTER" minWidth="450.0" styleClass="text-10pt">
+                  <Label fx:id="lblPreparedBy" alignment="CENTER" minWidth="450.0" styleClass="text-10pt" text="Name">
                      <HBox.margin>
                         <Insets left="260.0" />
                      </HBox.margin>
                   </Label>
-                  <Label fx:id="lblDesignation" alignment="CENTER" minWidth="300.0" styleClass="text-10pt">
+                  <Label fx:id="lblDesignation" alignment="CENTER" minWidth="300.0" styleClass="text-10pt" text="Position">
                      <HBox.margin>
                         <Insets left="220.0" />
                      </HBox.margin>
                   </Label>
-                  <Label fx:id="lblReceivedBy" alignment="CENTER" minWidth="540.0" styleClass="text-10pt">
+                  <Label fx:id="lblReceivedBy" alignment="CENTER" minWidth="540.0" styleClass="text-10pt" text="Name">
                      <HBox.margin>
                         <Insets left="230.0" />
                      </HBox.margin>

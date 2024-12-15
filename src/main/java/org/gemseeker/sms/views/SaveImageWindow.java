@@ -50,6 +50,8 @@ public class SaveImageWindow extends AbstractWindow {
     @FXML private Button btnSave;
     @FXML private Button btnCancel;
 
+    private final MainWindow mainWindow;
+
     private final Scale scale = new Scale(); // use for scaling contentPane
 
     // ModelControllers for accessing database entries
@@ -78,8 +80,9 @@ public class SaveImageWindow extends AbstractWindow {
     private FileChooser fileChooser;
     private DirectoryChooser directoryChooser;
 
-    public SaveImageWindow(Database database, Stage owner) {
-        super("Save As Image", SaveImageWindow.class.getResource("save_image_window.fxml"), null, owner);
+    public SaveImageWindow(MainWindow mainWindow, Database database) {
+        super("Save As Image", SaveImageWindow.class.getResource("save_image_window.fxml"), null, mainWindow.getStage());
+        this.mainWindow = mainWindow;
         this.accountController = new AccountController(database);
         this.subscriptionController = new SubscriptionController(database);
         this.billingController = new BillingController(database);
@@ -157,7 +160,7 @@ public class SaveImageWindow extends AbstractWindow {
         mContent = statementEcopyForm.getView();
         contentPane.getChildren().clear();
         contentPane.getChildren().add(mContent);
-        statementEcopyForm.setData(account, subscription, billing, billingStatement);
+        statementEcopyForm.setData(mainWindow.getUser(), account, subscription, billing, billingStatement);
         statementEcopyForm.onResume();
     }
 
@@ -186,7 +189,7 @@ public class SaveImageWindow extends AbstractWindow {
         mContent = billingReceiptEcopyForm.getView();
         contentPane.getChildren().clear();
         contentPane.getChildren().add(mContent);
-        billingReceiptEcopyForm.setData(account, payment);
+        billingReceiptEcopyForm.setData(mainWindow.getUser(), account, payment);
         billingReceiptEcopyForm.onResume();
     }
 

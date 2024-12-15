@@ -14,6 +14,8 @@ public class AccountSubscription {
     private String address;
     private String phone;
     private String email;
+    private String bankAccountName;
+    private String bankAccountNo;
     private String status;
 
     private String tag;
@@ -75,6 +77,22 @@ public class AccountSubscription {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getBankAccountName() {
+        return bankAccountName;
+    }
+
+    public void setBankAccountName(String bankAccountName) {
+        this.bankAccountName = bankAccountName;
+    }
+
+    public String getBankAccountNo() {
+        return bankAccountNo;
+    }
+
+    public void setBankAccountNo(String bankAccountNo) {
+        this.bankAccountNo = bankAccountNo;
     }
 
     public String getStatus() {

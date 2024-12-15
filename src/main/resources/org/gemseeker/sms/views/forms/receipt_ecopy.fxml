@@ -277,14 +277,14 @@
                   <Label styleClass="text-10pt" text="Prepared By:" />
                   <VBox alignment="TOP_CENTER">
                      <children>
-                        <Label fx:id="lblAuthorized" text="&lt;Authorized Person Name&gt;">
+                        <Label fx:id="lblPreparedBy" text="Name">
                            <styleClass>
                               <String fx:value="text-12pt" />
                               <String fx:value="text-bold" />
                               <String fx:value="bottom-outline" />
                            </styleClass>
                         </Label>
-                        <Label fx:id="lblAuthorizedPosition" styleClass="text-10pt" text="Cashier/Authorized Person" />
+                        <Label fx:id="lblDesignation" styleClass="text-10pt" text="Designation" />
                      </children>
                      <HBox.margin>
                         <Insets left="16.0" />

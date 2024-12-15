@@ -21,6 +21,7 @@ module org.gemseeker.sms {
     requires org.apache.poi.ooxml;
     requires commons.math3;
     requires org.jxmapviewer.jxmapviewer2;
+    requires jdk.compiler;
 
     opens org.gemseeker.sms.views to javafx.fxml;
     opens org.gemseeker.sms.views.panels to javafx.fxml;

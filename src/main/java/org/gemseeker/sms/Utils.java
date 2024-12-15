@@ -9,6 +9,10 @@ public final class Utils {
     public static final String APP_FOLDER = USER_HOME + FILE_SEPARATOR + "sms_app";
     public static final String LOG_FOLDER = APP_FOLDER + FILE_SEPARATOR + "logs";
     public static final String DATA_FOLDER = APP_FOLDER + FILE_SEPARATOR + "data";
+    public static final String IMAGE_FOLDER = APP_FOLDER + FILE_SEPARATOR + "images";
+    public static final String EXPENSES_IMAGE_FOLDER = IMAGE_FOLDER + FILE_SEPARATOR + "expenses";
+    public static final String REVENUES_IMAGE_FOLDER = IMAGE_FOLDER + FILE_SEPARATOR + "revenues";
+    public static final String CASH_TRANSACTIONS_IMAGE_FOLDER = IMAGE_FOLDER + FILE_SEPARATOR + "cash_transactions";
     public static final String TEMP_FOLDER = APP_FOLDER + FILE_SEPARATOR + "temp";
 
     public static final String SETTINGS_PATH = APP_FOLDER + FILE_SEPARATOR + "settings.xml";

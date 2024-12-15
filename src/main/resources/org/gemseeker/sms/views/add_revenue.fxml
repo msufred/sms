@@ -20,8 +20,8 @@
          </VBox.margin></Label>
       <HBox alignment="CENTER_LEFT">
          <children>
-            <Label minWidth="80.0" styleClass="form-label" text="Date" />
-            <DatePicker fx:id="datePicker" prefWidth="200.0" promptText="Select Date" styleClass="form-datepicker" />
+            <Label minWidth="120.0" styleClass="form-label" text="Date" />
+            <DatePicker fx:id="datePicker" prefWidth="240.0" promptText="Select Date" styleClass="form-datepicker" />
             <Label fx:id="lblErrDate" styleClass="label-error">
                <HBox.margin>
                   <Insets left="8.0" />
@@ -34,8 +34,8 @@
       </HBox>
       <HBox alignment="CENTER_LEFT">
          <children>
-            <Label minWidth="80.0" styleClass="form-label" text="Type" />
-            <ComboBox fx:id="cbTypes" prefWidth="200.0" promptText="Select Revenue Type" styleClass="form-combobox" />
+            <Label minWidth="120.0" styleClass="form-label" text="Type" />
+            <ComboBox fx:id="cbTypes" prefWidth="240.0" promptText="Select Revenue Type" styleClass="form-combobox" />
             <Label fx:id="lblErrType" styleClass="label-error">
                <HBox.margin>
                   <Insets left="8.0" />
@@ -48,11 +48,11 @@
       </HBox>
       <HBox>
          <children>
-            <Label minWidth="80.0" styleClass="form-label" text="Description">
+            <Label minWidth="120.0" styleClass="form-label" text="Description">
                <HBox.margin>
                   <Insets top="8.0" />
                </HBox.margin></Label>
-            <TextArea fx:id="taDescription" prefHeight="100.0" prefWidth="200.0" promptText="Description or Remarks" styleClass="form-textarea" wrapText="true" />
+            <TextArea fx:id="taDescription" prefHeight="100.0" prefWidth="240.0" promptText="Description or Remarks" styleClass="form-textarea" wrapText="true" />
          </children>
          <VBox.margin>
             <Insets left="16.0" right="16.0" />
@@ -60,9 +60,46 @@
       </HBox>
       <HBox alignment="CENTER_LEFT">
          <children>
-            <Label minWidth="80.0" styleClass="form-label" text="Amount" />
-            <TextField fx:id="tfAmount" prefWidth="200.0" promptText="Enter Amount" styleClass="form-field" />
+            <Label minWidth="120.0" styleClass="form-label" text="Amount" />
+            <TextField fx:id="tfAmount" prefWidth="240.0" promptText="Enter Amount" styleClass="form-field" />
             <Label fx:id="lblErrAmount" styleClass="label-error">
+               <HBox.margin>
+                  <Insets left="8.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+         <VBox.margin>
+            <Insets left="16.0" right="16.0" />
+         </VBox.margin>
+      </HBox>
+      <HBox alignment="CENTER_LEFT" layoutX="26.0" layoutY="105.0">
+         <children>
+            <Label minWidth="120.0" styleClass="form-label" text="Mode" />
+            <ComboBox fx:id="cbModes" prefWidth="240.0" promptText="Select Mode" styleClass="form-combobox" />
+            <Label fx:id="lblErrMode" styleClass="label-error">
+               <HBox.margin>
+                  <Insets left="8.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+         <VBox.margin>
+            <Insets left="16.0" right="16.0" />
+         </VBox.margin>
+      </HBox>
+      <HBox fx:id="refGroup" alignment="CENTER_LEFT" prefWidth="200.0">
+         <children>
+            <Label fx:id="lblRef" minWidth="120.0" styleClass="form-label" text="Reference" />
+            <TextField fx:id="tfRef" prefWidth="240.0" promptText="Reference" styleClass="form-field" />
+         </children>
+         <VBox.margin>
+            <Insets left="16.0" right="16.0" />
+         </VBox.margin>
+      </HBox>
+      <HBox alignment="CENTER_LEFT">
+         <children>
+            <Label minWidth="120.0" styleClass="form-label" text="Attachment" />
+            <Button fx:id="btnUpload" minWidth="90.0" mnemonicParsing="false" text="Upload" />
+            <Label fx:id="lblPath" maxWidth="140.0" text="No Attached File" textOverrun="LEADING_ELLIPSIS">
                <HBox.margin>
                   <Insets left="8.0" />
                </HBox.margin>

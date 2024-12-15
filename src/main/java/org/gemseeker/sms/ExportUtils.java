@@ -5,10 +5,7 @@ import javafx.collections.ObservableList;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Font;
-import org.gemseeker.sms.data.DailySummary;
-import org.gemseeker.sms.data.Expense;
-import org.gemseeker.sms.data.Payment;
-import org.gemseeker.sms.data.Revenue;
+import org.gemseeker.sms.data.*;
 import org.gemseeker.sms.views.ViewUtils;
 
 import java.awt.*;
@@ -40,6 +37,7 @@ public class ExportUtils {
         rowStyle.setBorderRight(BorderStyle.DASHED);
         rowStyle.setBorderBottom(BorderStyle.DASHED);
         rowStyle.setWrapText(true);
+        rowStyle.setAlignment(HorizontalAlignment.CENTER);
         return rowStyle;
     }
 
@@ -54,11 +52,12 @@ public class ExportUtils {
 
             // Header
             Header header = sheet.getHeader();
-            header.setLeft("Revenues as of " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy h:mm:s a")));
+            header.setLeft("Revenues");
+            header.setRight("Date Printed: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy h:mm:s a")));
 
             // Create Row Headers
             ObservableList<String> headers = FXCollections.observableArrayList(
-                    "Type", "Description", "Amount", "Date"
+                    "Date", "Amount", "Type", "Description", "Mode", "Reference"
             );
             Row headerRow = sheet.createRow(0);
             for (int c = 0; c < headers.size(); c++) {
@@ -71,20 +70,36 @@ public class ExportUtils {
             for (int r = 1; r < revenues.size() + 1; r ++) {
                 Row row = sheet.createRow(r);
                 Revenue revenue = revenues.get(r - 1);
+
+                // Date
                 Cell c0 = row.createCell(0);
                 c0.setCellStyle(rowStyle);
-                c0.setCellValue(revenue.getType());
+                c0.setCellValue(revenue.getDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy")));
 
+                // Amount
                 Cell c1 = row.createCell(1);
                 c1.setCellStyle(rowStyle);
-                c1.setCellValue(revenue.getDescription());
+                c1.setCellValue(revenue.getAmount());
 
+                // Type
                 Cell c2 = row.createCell(2);
                 c2.setCellStyle(rowStyle);
-                c2.setCellValue(ViewUtils.toStringMoneyFormat(revenue.getAmount()));
+                c2.setCellValue(revenue.getType());
+
+                // Description
                 Cell c3 = row.createCell(3);
                 c3.setCellStyle(rowStyle);
-                c3.setCellValue(revenue.getDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy")));
+                c3.setCellValue(revenue.getDescription());
+
+                // Mode
+                Cell c4 = row.createCell(4);
+                c4.setCellStyle(rowStyle);
+                c4.setCellValue(revenue.getMode());
+
+                // Reference
+                Cell c5 = row.createCell(5);
+                c5.setCellStyle(rowStyle);
+                c5.setCellValue(revenue.getReference());
             }
 
             for (int i = 0; i < headers.size(); i++) {
@@ -110,12 +125,14 @@ public class ExportUtils {
 
             // Header
             Header header = sheet.getHeader();
-            header.setLeft("Expenses as of " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy h:mm:s a")));
+            header.setLeft("Expenses");
+            header.setRight("Date Printed: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy h:mm:s a")));
 
             // Create Row Headers
             ObservableList<String> headers = FXCollections.observableArrayList(
-                    "Type", "Description", "Amount", "Date"
+                    "Date", "Amount", "Category", "Type", "Description", "Mode", "Reference"
             );
+
             Row headerRow = sheet.createRow(0);
             for (int c = 0; c < headers.size(); c++) {
                 Cell cell = headerRow.createCell(c);
@@ -127,20 +144,115 @@ public class ExportUtils {
             for (int exp = 1; exp < expenses.size() + 1; exp ++) {
                 Row row = sheet.createRow(exp);
                 Expense expense = expenses.get(exp - 1);
+
+                // Date
                 Cell c0 = row.createCell(0);
                 c0.setCellStyle(rowStyle);
-                c0.setCellValue(expense.getType());
+                c0.setCellValue(expense.getDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy")));
 
+                // Amount
                 Cell c1 = row.createCell(1);
                 c1.setCellStyle(rowStyle);
-                c1.setCellValue(expense.getDescription());
+                c1.setCellValue(expense.getAmount());
 
+                // Category
                 Cell c2 = row.createCell(2);
                 c2.setCellStyle(rowStyle);
-                c2.setCellValue(ViewUtils.toStringMoneyFormat(expense.getAmount()));
+                c2.setCellValue(expense.getCategory());
+
+                // Type
                 Cell c3 = row.createCell(3);
                 c3.setCellStyle(rowStyle);
-                c3.setCellValue(expense.getDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy")));
+                c3.setCellValue(expense.getType());
+
+                // Description
+                Cell c4 = row.createCell(4);
+                c4.setCellStyle(rowStyle);
+                c4.setCellValue(expense.getDescription());
+
+                // Mode
+                Cell c5 = row.createCell(5);
+                c5.setCellStyle(rowStyle);
+                c5.setCellValue(expense.getMode());
+
+                // Reference
+                Cell c6 = row.createCell(6);
+                c6.setCellStyle(rowStyle);
+                c6.setCellValue(expense.getRef());
+            }
+
+            for (int i = 0; i < headers.size(); i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(fileOutputStream);
+        }
+
+        if (outputFile.exists()) {
+            Desktop.getDesktop().open(outputFile);
+        }
+    }
+
+    public static void exportCashTransactions(ObservableList<CashTransaction> cashTransactions, File outputFile) throws IOException {
+        try (FileOutputStream fileOutputStream = new FileOutputStream(outputFile)) {
+            Workbook workbook = new HSSFWorkbook();
+            Sheet sheet = workbook.createSheet("Cash Transactions");
+
+            // Create styles
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            CellStyle rowStyle = createRowStyle(workbook);
+
+            // Header
+            Header header = sheet.getHeader();
+            header.setLeft("Cash Transactions");
+            header.setRight("Date Printed: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy h:mm:s a")));
+
+            // Create Row Headers
+            ObservableList<String> headers = FXCollections.observableArrayList(
+                    "Date", "Amount", "Cash In/Out", "Description", "Mode", "Reference"
+            );
+
+            Row headerRow = sheet.createRow(0);
+            for (int c = 0; c < headers.size(); c++) {
+                Cell cell = headerRow.createCell(c);
+                cell.setCellStyle(headerStyle);
+                cell.setCellValue(headers.get(c));
+            }
+
+            // Content
+            for (int exp = 1; exp < cashTransactions.size() + 1; exp ++) {
+                Row row = sheet.createRow(exp);
+                CashTransaction ct = cashTransactions.get(exp - 1);
+
+                // Date
+                Cell c0 = row.createCell(0);
+                c0.setCellStyle(rowStyle);
+                c0.setCellValue(ct.getDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy")));
+
+                // Amount
+                Cell c1 = row.createCell(1);
+                c1.setCellStyle(rowStyle);
+                c1.setCellValue(ct.getAmount());
+
+                // Cash In/Out (Type)
+                Cell c2 = row.createCell(2);
+                c2.setCellStyle(rowStyle);
+                c2.setCellValue(ct.getType());
+
+                // Description
+                Cell c3 = row.createCell(3);
+                c3.setCellStyle(rowStyle);
+                c3.setCellValue(ct.getDescription());
+
+                // Mode
+                Cell c4 = row.createCell(4);
+                c4.setCellStyle(rowStyle);
+                c4.setCellValue(ct.getMode());
+
+                // Reference
+                Cell c5 = row.createCell(5);
+                c5.setCellStyle(rowStyle);
+                c5.setCellValue(ct.getReference());
             }
 
             for (int i = 0; i < headers.size(); i++) {
@@ -166,12 +278,14 @@ public class ExportUtils {
 
             // Header
             Header header = sheet.getHeader();
-            header.setLeft("Daily Summaries as of " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy h:mm:s a")));
+            header.setLeft("Daily Summary");
+            header.setRight("Date Printed: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy h:mm:s a")));
 
             // Create Row Headers
             ObservableList<String> headers = FXCollections.observableArrayList(
-                    "Date", "Forwarded", "Revenues", "Expenses", "Cash Balance"
+                    "Date", "Cash Forwarded", "Revenues", "Expenses", "Cash In", "Cash Out", "Running Balance"
             );
+
             Row headerRow = sheet.createRow(0);
             for (int c = 0; c < headers.size(); c++) {
                 Cell cell = headerRow.createCell(c);
@@ -184,25 +298,40 @@ public class ExportUtils {
                 Row row = sheet.createRow(i);
                 DailySummary summary = summaries.get(i - 1);
 
+                // Date
                 Cell c0 = row.createCell(0);
                 c0.setCellStyle(rowStyle);
                 c0.setCellValue(summary.getDate());
 
+                // Cash Forwarded
                 Cell c1 = row.createCell(1);
                 c1.setCellStyle(rowStyle);
-                c1.setCellValue(ViewUtils.toStringMoneyFormat(summary.getForwarded()));
+                c1.setCellValue(summary.getForwarded());
 
+                // Revenues
                 Cell c2 = row.createCell(2);
                 c2.setCellStyle(rowStyle);
-                c2.setCellValue(ViewUtils.toStringMoneyFormat(summary.getRevenues()));
+                c2.setCellValue(summary.getRevenues());
 
+                // Expenses
                 Cell c3 = row.createCell(3);
                 c3.setCellStyle(rowStyle);
-                c3.setCellValue(ViewUtils.toStringMoneyFormat(summary.getExpenses()));
+                c3.setCellValue(summary.getExpenses());
 
+                // Cash In
                 Cell c4 = row.createCell(4);
                 c4.setCellStyle(rowStyle);
-                c4.setCellValue(ViewUtils.toStringMoneyFormat(summary.getBalance()));
+                c4.setCellValue(summary.getCashIn());
+
+                // Cash Out
+                Cell c5 = row.createCell(5);
+                c5.setCellStyle(rowStyle);
+                c5.setCellValue(summary.getCashOut());
+
+                // Running Balance
+                Cell c6 = row.createCell(6);
+                c6.setCellStyle(rowStyle);
+                c6.setCellValue(summary.getBalance());
             }
 
             for (int i = 0; i < headers.size(); i++) {

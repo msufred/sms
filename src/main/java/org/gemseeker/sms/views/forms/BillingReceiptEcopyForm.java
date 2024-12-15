@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import org.gemseeker.sms.data.Account;
 import org.gemseeker.sms.data.Payment;
+import org.gemseeker.sms.data.User;
 import org.gemseeker.sms.views.panels.AbstractPanel;
 
 import java.time.LocalDate;
@@ -32,14 +33,16 @@ public class BillingReceiptEcopyForm extends AbstractPanel {
     @FXML private Label lblItem2D;
     @FXML private Label lblItem3D;
     @FXML private Label lblItem4D;
-    @FXML private Label lblAuthorized;
     @FXML private Label lblTotalSales;
     @FXML private Label lblDiscount;
     @FXML private Label lblPenalty;
     @FXML private Label lblPaymentDue;
     @FXML private Label lblAmountPaid;
     @FXML private Label lblBalance;
+    @FXML private Label lblPreparedBy;
+    @FXML private Label lblDesignation;
 
+    private User mUser;
     private Account mAccount;
     private Payment mPayment;
 
@@ -52,7 +55,8 @@ public class BillingReceiptEcopyForm extends AbstractPanel {
 
     }
 
-    public void setData(Account account, Payment payment) {
+    public void setData(User user, Account account, Payment payment) {
+        mUser = user;
         mAccount =  account;
         mPayment = payment;
     }
@@ -93,7 +97,8 @@ public class BillingReceiptEcopyForm extends AbstractPanel {
         lblPaymentDue.setText(String.format("%.2f", mPayment.getAmountTotal()));
         lblAmountPaid.setText(String.format("%.2f", mPayment.getAmountPaid()));
         lblBalance.setText(String.format("%.2f", mPayment.getBalance()));
-        lblAuthorized.setText(mPayment.getPreparedBy());
+        lblPreparedBy.setText(mUser.getFullname());
+        lblDesignation.setText(mUser.getDesignation());
     }
 
     @Override
@@ -122,13 +127,14 @@ public class BillingReceiptEcopyForm extends AbstractPanel {
         lblItem2D.setText("");
         lblItem3D.setText("");
         lblItem4D.setText("");
-        lblAuthorized.setText("");
         lblTotalSales.setText("0.00");
         lblDiscount.setText("0.00");
         lblPenalty.setText("0.00");
         lblPaymentDue.setText("0.00");
         lblAmountPaid.setText("0.00");
         lblBalance.setText("0.00");
+        lblPreparedBy.setText("");
+        lblDesignation.setText("");
     }
 
     @Override

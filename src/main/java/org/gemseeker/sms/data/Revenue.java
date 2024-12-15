@@ -1,5 +1,8 @@
 package org.gemseeker.sms.data;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -11,11 +14,28 @@ public class Revenue {
     public static final String TYPE_WIFI_VENDO = "WiFi Vendo";
     public static final String TYPE_OTHERS = "Others";
 
+    public static final ObservableList<String> types = FXCollections.observableArrayList(
+            TYPE_BILLING, TYPE_PURCHASE, TYPE_SERVICE, TYPE_WIFI_VENDO, TYPE_OTHERS
+    );
+
+    public static final String MODE_CASH = "Cash";
+    public static final String MODE_GCASH = "GCash";
+    public static final String MODE_BANK_CASH = "Bank Transfer (Cash)";
+    public static final String MODE_BANK_CHEQUE = "Bank Transfer (Cheque)";
+    public static final String MODE_PALAWAN_EXP = "Palawan Express";
+
+    public static final ObservableList<String> modes = FXCollections.observableArrayList(
+            MODE_CASH, MODE_GCASH, MODE_BANK_CASH, MODE_BANK_CHEQUE, MODE_PALAWAN_EXP
+    );
+
     private int id;
     private String type;
     private String description;
     private double amount;
+    private String mode; // cash, bank transfer etc 11/27/24
+    private String reference;
     private LocalDate date;
+    private String attachment;
 
     private String tag;
     private LocalDateTime dateCreated;
@@ -62,12 +82,36 @@ public class Revenue {
         this.amount = amount;
     }
 
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
+    public String getReference() {
+        return reference;
+    }
+
+    public void setReference(String reference) {
+        this.reference = reference;
+    }
+
     public LocalDate getDate() {
         return date;
     }
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public String getAttachment() {
+        return attachment;
+    }
+
+    public void setAttachment(String attachment) {
+        this.attachment = attachment;
     }
 
     public String getTag() {

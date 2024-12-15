@@ -2,10 +2,7 @@ package org.gemseeker.sms.views.forms;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import org.gemseeker.sms.data.Account;
-import org.gemseeker.sms.data.Billing;
-import org.gemseeker.sms.data.BillingStatement;
-import org.gemseeker.sms.data.Subscription;
+import org.gemseeker.sms.data.*;
 import org.gemseeker.sms.views.ViewUtils;
 import org.gemseeker.sms.views.panels.AbstractPanel;
 
@@ -36,6 +33,7 @@ public class StatementEcopyForm extends AbstractPanel {
     @FXML private Label lblPreparedBy;
     @FXML private Label lblDesignation;
 
+    private User mUser;
     private Account mAccount;
     private Subscription mSubscription;
     private Billing mBilling;
@@ -50,7 +48,8 @@ public class StatementEcopyForm extends AbstractPanel {
         // empty
     }
 
-    public void setData(Account account, Subscription subscription, Billing billing, BillingStatement billingStatement) {
+    public void setData(User user, Account account, Subscription subscription, Billing billing, BillingStatement billingStatement) {
+        mUser = user;
         mAccount = account;
         mSubscription = subscription;
         mBilling = billing;
@@ -99,8 +98,8 @@ public class StatementEcopyForm extends AbstractPanel {
 
         // other info
         lblDueDate.setText(mBilling.getDueDate().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
-        lblPreparedBy.setText(mBillingStatement.getPreparedBy());
-        lblDesignation.setText(mBillingStatement.getDesignation());
+        lblPreparedBy.setText(mUser.getFullname());
+        lblDesignation.setText(mUser.getDesignation());
     }
 
     @Override

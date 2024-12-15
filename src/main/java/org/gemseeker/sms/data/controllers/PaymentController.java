@@ -22,13 +22,13 @@ public class PaymentController implements ModelController<Payment> {
     public boolean insert(Payment model) throws SQLException {
         String sql = String.format("INSERT INTO payments (payment_no, name, payment_for, extra_info, prev_balance, " +
                         " amount_to_pay, discount, vat, surcharges, amount_total, amount_paid, balance, payment_date, " +
-                        "prepared_by, status, tag, date_created, date_updated) VALUES " +
-                        "('%s', '%s', '%s', '%s', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%s', '%s', '%s', " +
+                        "mode, ref, prepared_by, status, tag, date_created, date_updated) VALUES " +
+                        "('%s', '%s', '%s', '%s', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%s', '%s', '%s', '%s', '%s', " +
                         "'%s', '%s', '%s')", model.getPaymentNo(), model.getName(), model.getPaymentFor(),
                 model.getExtraInfo(), model.getPrevBalance(), model.getAmountToPay(), model.getDiscount(),
                 model.getVat(), model.getSurcharges(), model.getAmountTotal(), model.getAmountPaid(),
-                model.getBalance(), model.getPaymentDate(), model.getPreparedBy(), model.getStatus(), model.getTag(),
-                model.getDateCreated(), model.getDateUpdated());
+                model.getBalance(), model.getPaymentDate(), model.getMode(), model.getRef(), model.getPreparedBy(),
+                model.getStatus(), model.getTag(), model.getDateCreated(), model.getDateUpdated());
         return database.executeQuery(sql);
     }
 
@@ -36,9 +36,9 @@ public class PaymentController implements ModelController<Payment> {
     public boolean update(Payment model) throws SQLException {
         // NOTE: Payment should only update the following: name; prepared_by,
         // payment_date, status, tag, and date_updated.
-        String sql = String.format("UPDATE payments SET name='%s', payment_date='%s', prepared_by='%s', " +
+        String sql = String.format("UPDATE payments SET name='%s', payment_date='%s', mode='%s', prepared_by='%s', " +
                         "status='%s', tag='%s', date_updated='%s' WHERE id='%d'", model.getName(),
-                model.getPaymentDate(), model.getPreparedBy(), model.getStatus(), model.getTag(),
+                model.getPaymentDate(), model.getMode(), model.getPreparedBy(), model.getStatus(), model.getTag(),
                 LocalDateTime.now(), model.getId());
         return database.executeQuery(sql);
     }
@@ -126,6 +126,8 @@ public class PaymentController implements ModelController<Payment> {
         payment.setAmountPaid(rs.getDouble(index++));
         payment.setBalance(rs.getDouble(index++));
         payment.setPaymentDate(rs.getDate(index++).toLocalDate());
+        payment.setMode(rs.getString(index++));
+        payment.setRef(rs.getString(index++));
         payment.setPreparedBy(rs.getString(index++));
         payment.setStatus(rs.getString(index++));
         payment.setTag(rs.getString(index++));

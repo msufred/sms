@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
@@ -17,7 +20,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="1000.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="2000.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label styleClass="panel-title" text="Dashboard">
          <VBox.margin>
@@ -30,7 +33,11 @@
             <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
                <children>
                   <Label styleClass="summary-title" text="Cash Forwarded" />
-                  <Label fx:id="lblForwarded" styleClass="summary-number" text="0.00" />
+                  <Label fx:id="lblForwarded" text="0.00">
+                     <styleClass>
+                        <String fx:value="summary-number" />
+                        <String fx:value="text-positive" />
+                     </styleClass></Label>
                </children>
                <padding>
                   <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
@@ -39,7 +46,11 @@
             <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
                <children>
                   <Label styleClass="summary-title" text="Revenues" />
-                  <Label fx:id="lblRevenues" styleClass="summary-number" text="0.00" />
+                  <Label fx:id="lblRevenues" text="0.00">
+                     <styleClass>
+                        <String fx:value="summary-number" />
+                        <String fx:value="text-positive" />
+                     </styleClass></Label>
                </children>
                <padding>
                   <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
@@ -48,7 +59,39 @@
             <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
                <children>
                   <Label styleClass="summary-title" text="Expenses" />
-                  <Label fx:id="lblExpenses" styleClass="summary-number" text="0.00" />
+                  <Label fx:id="lblExpenses" text="0.00">
+                     <styleClass>
+                        <String fx:value="summary-number" />
+                        <String fx:value="text-negative" />
+                     </styleClass></Label>
+               </children>
+               <padding>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </padding>
+            </VBox>
+            <VBox alignment="TOP_CENTER" layoutX="287.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label styleClass="summary-title" text="Cash In" />
+                  <Label fx:id="lblCashIn" text="0.00">
+                     <styleClass>
+                        <String fx:value="summary-number" />
+                        <String fx:value="text-positive" />
+                     </styleClass>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </padding>
+            </VBox>
+            <VBox alignment="TOP_CENTER" layoutX="428.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label styleClass="summary-title" text="Cash Out" />
+                  <Label fx:id="lblCashOut" text="0.00">
+                     <styleClass>
+                        <String fx:value="summary-number" />
+                        <String fx:value="text-negative" />
+                     </styleClass>
+                  </Label>
                </children>
                <padding>
                   <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
@@ -57,7 +100,11 @@
             <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
                <children>
                   <Label styleClass="summary-title" text="Cash Balance" />
-                  <Label fx:id="lblBalances" styleClass="summary-number" text="0.00" />
+                  <Label fx:id="lblBalances" text="0.00">
+                     <styleClass>
+                        <String fx:value="summary-number" />
+                        <String fx:value="text-warning" />
+                     </styleClass></Label>
                </children>
                <padding>
                   <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
@@ -73,46 +120,88 @@
            <Tab fx:id="tabProjections" text="Sales Projections">
                <ScrollPane fitToWidth="true">
                   <content>
-                    <VBox spacing="8.0">
+                    <VBox spacing="16.0">
                         <padding>
                            <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
                         </padding>
                         <children>
-                           <Label text="Monthly Projection (Current Year)" />
-                           <LineChart fx:id="monthlyLineChart" legendSide="LEFT" prefHeight="200.0">
+                           <HBox prefWidth="200.0" spacing="8.0">
+                              <children>
+                                 <PieChart fx:id="expensesPieChart" labelsVisible="false" prefHeight="400.0" prefWidth="400.0" styleClass="card" title="Expenses (December 2024)">
+                                    <padding>
+                                       <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                                    </padding>
+                                 </PieChart>
+                                 <VBox prefHeight="200.0" prefWidth="100.0" spacing="8.0" HBox.hgrow="ALWAYS">
+                                    <children>
+                                       <BarChart fx:id="operationalBarChart" alternativeColumnFillVisible="true" alternativeRowFillVisible="false" horizontalZeroLineVisible="false" legendVisible="false" minHeight="400.0" prefHeight="400.0" styleClass="card" title="Operational" verticalGridLinesVisible="false" verticalZeroLineVisible="false">
+                                         <xAxis>
+                                           <CategoryAxis animated="false" side="BOTTOM" />
+                                         </xAxis>
+                                         <yAxis>
+                                           <NumberAxis side="LEFT" />
+                                         </yAxis>
+                                          <padding>
+                                             <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                                          </padding>
+                                       </BarChart>
+                                       <BarChart fx:id="nonOperationalBarChart" alternativeColumnFillVisible="true" horizontalZeroLineVisible="false" layoutX="10.0" layoutY="10.0" legendVisible="false" minHeight="400.0" prefHeight="400.0" styleClass="card" title="Non-Operational" verticalGridLinesVisible="false" verticalZeroLineVisible="false">
+                                          <xAxis>
+                                             <CategoryAxis animated="false" side="BOTTOM" />
+                                          </xAxis>
+                                          <yAxis>
+                                             <NumberAxis side="LEFT" />
+                                          </yAxis>
+                                          <padding>
+                                             <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                                          </padding>
+                                       </BarChart>
+                                    </children>
+                                 </VBox>
+                              </children>
+                           </HBox>
+                           <HBox prefHeight="100.0" prefWidth="200.0" spacing="8.0">
+                              <children>
+                                 <BarChart fx:id="revenuesBarChart" alternativeColumnFillVisible="true" alternativeRowFillVisible="false" horizontalZeroLineVisible="false" legendVisible="false" minHeight="400.0" prefHeight="400.0" styleClass="card" title="Revenues" verticalGridLinesVisible="false" verticalZeroLineVisible="false" HBox.hgrow="ALWAYS">
+                                   <xAxis>
+                                     <CategoryAxis animated="false" side="BOTTOM" />
+                                   </xAxis>
+                                   <yAxis>
+                                     <NumberAxis side="LEFT" />
+                                   </yAxis>
+                                    <padding>
+                                       <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                                    </padding>
+                                 </BarChart>
+                                 <PieChart fx:id="expensesRevenuesPieChart" labelsVisible="false" prefHeight="400.0" prefWidth="400.0" styleClass="card" title="Revenues vs Expenses">
+                                    <padding>
+                                       <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                                    </padding>
+                                 </PieChart>
+                              </children>
+                           </HBox>
+                           <LineChart fx:id="monthlyLineChart" horizontalZeroLineVisible="false" legendSide="LEFT" prefHeight="250.0" styleClass="card" title="Monthly Projection (Current Year)" verticalGridLinesVisible="false" verticalZeroLineVisible="false">
                              <xAxis>
                                <CategoryAxis fx:id="monthlyXAxis" animated="false" label="Months" side="BOTTOM" />
                              </xAxis>
                              <yAxis>
                                <NumberAxis fx:id="monthlyYAxis" animated="false" label="Amount" side="LEFT" />
                              </yAxis>
+                              <padding>
+                                 <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                              </padding>
                            </LineChart>
-                           <Label text="Daily Projection (Current Month)" />
-                           <LineChart fx:id="dailyLineChart" legendSide="LEFT" prefHeight="200.0" titleSide="LEFT">
+                           <LineChart fx:id="dailyLineChart" horizontalZeroLineVisible="false" legendSide="LEFT" prefHeight="250.0" styleClass="card" title="Daily Projection (Current Month)" verticalGridLinesVisible="false" verticalZeroLineVisible="false">
                               <xAxis>
                                  <CategoryAxis fx:id="dailyXAxis" animated="false" label="Days" side="BOTTOM" />
                               </xAxis>
                               <yAxis>
                                  <NumberAxis fx:id="dailyYAxis" animated="false" label="Amount" side="LEFT" />
                               </yAxis>
+                              <padding>
+                                 <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                              </padding>
                            </LineChart>
-                           <Label text="Revenues &amp; Expenses Breakdown" />
-                           <HBox prefHeight="100.0" prefWidth="200.0">
-                              <children>
-                                 <VBox alignment="TOP_CENTER" HBox.hgrow="ALWAYS">
-                                    <children>
-                                       <Label text="Revenues" />
-                                       <PieChart fx:id="revenuesPieChart" minHeight="400.0" minWidth="400.0" prefHeight="400.0" prefWidth="400.0" />
-                                    </children>
-                                 </VBox>
-                                 <VBox alignment="TOP_CENTER" HBox.hgrow="ALWAYS">
-                                    <children>
-                                       <Label text="Expenses" />
-                                       <PieChart fx:id="expensesPieChart" minHeight="400.0" minWidth="400.0" prefHeight="400.0" prefWidth="400.0" />
-                                    </children>
-                                 </VBox>
-                              </children>
-                           </HBox>
                         </children>
                      </VBox>
                   </content>
@@ -122,12 +211,18 @@
                <content>
                   <VBox>
                      <children>
-                        <HBox spacing="4.0">
+                        <HBox alignment="CENTER_LEFT" spacing="4.0">
                            <children>
                               <Button fx:id="btnAddRevenue" mnemonicParsing="false" styleClass="btn" />
                               <Button fx:id="btnEditRevenue" mnemonicParsing="false" styleClass="btn" />
                               <Button fx:id="btnDeleteRevenue" mnemonicParsing="false" styleClass="btn" />
-                              <Button fx:id="btnExportRevenues" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnExportRevenues" mnemonicParsing="false" styleClass="btn" text="Export" />
+                              <Label text="Mode">
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <ComboBox fx:id="cbRevenueModes" promptText="Select Mode" />
                            </children>
                            <padding>
                               <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
@@ -136,82 +231,37 @@
                         <TableView fx:id="revenuesTable" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
                            <columns>
                               <TableColumn fx:id="colRevenueTag" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" style="-fx-alignment: center;" />
+                              <TableColumn fx:id="colRevenueDate" prefWidth="120.0" style="-fx-alignment: center;" text="Date" />
+                              <TableColumn fx:id="colRevenueAmount" prefWidth="120.0" style="-fx-alignment: center;" text="Amount" />
                               <TableColumn fx:id="colRevenueType" prefWidth="120.0" style="-fx-alignment: center;" text="Type" />
                               <TableColumn fx:id="colRevenueDescription" prefWidth="120.0" style="-fx-alignment: center;" text="Description" />
-                              <TableColumn fx:id="colRevenueAmount" prefWidth="120.0" style="-fx-alignment: center;" text="Amount" />
-                              <TableColumn fx:id="colRevenueDate" prefWidth="120.0" style="-fx-alignment: center;" text="Date" />
+                              <TableColumn fx:id="colRevenueMode" prefWidth="120.0" style="-fx-alignment: center;" text="Mode" />
+                              <TableColumn fx:id="colRevenueRef" prefWidth="120.0" style="-fx-alignment: center;" text="Reference" />
+                              <TableColumn fx:id="colRevenueAttachment" prefWidth="120.0" style="-fx-alignment: center;" text="Attachment" />
                            </columns>
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
                         </TableView>
-                        <ScrollPane fitToHeight="true" prefWidth="200.0" vbarPolicy="NEVER">
-                           <content>
-                              <HBox alignment="CENTER_LEFT" spacing="8.0">
-                                 <children>
-                                    <Label styleClass="form-title" text="SUMMARY" />
-                                    <HBox alignment="CENTER" spacing="8.0" styleClass="summary-card-pane">
-                                       <children>
-                                          <Label text="BILLING:" />
-                                          <Label fx:id="lblBilling" styleClass="summary-number-small" text="0.00" />
-                                       </children>
-                                       <padding>
-                                          <Insets bottom="4.0" left="8.0" right="8.0" top="4.0" />
-                                       </padding>
-                                    </HBox>
-                                    <HBox alignment="CENTER" spacing="8.0" styleClass="summary-card-pane">
-                                       <children>
-                                          <Label text="PURCHASE:" />
-                                          <Label fx:id="lblPurchase" styleClass="summary-number-small" text="0.00" />
-                                       </children>
-                                       <padding>
-                                          <Insets bottom="4.0" left="8.0" right="8.0" top="4.0" />
-                                       </padding>
-                                    </HBox>
-                                    <HBox alignment="CENTER" spacing="8.0" styleClass="summary-card-pane">
-                                       <children>
-                                          <Label text="SERVICE:" />
-                                          <Label fx:id="lblService" styleClass="summary-number-small" text="0.00" />
-                                       </children>
-                                       <padding>
-                                          <Insets bottom="4.0" left="8.0" right="8.0" top="4.0" />
-                                       </padding>
-                                    </HBox>
-                                    <HBox alignment="CENTER" spacing="8.0" styleClass="summary-card-pane">
-                                       <children>
-                                          <Label text="WIFI VENDO:" />
-                                          <Label fx:id="lblVendo" styleClass="summary-number-small" text="0.00" />
-                                       </children>
-                                       <padding>
-                                          <Insets bottom="4.0" left="8.0" right="8.0" top="4.0" />
-                                       </padding>
-                                    </HBox>
-                                    <HBox alignment="CENTER" spacing="8.0" styleClass="summary-card-pane">
-                                       <children>
-                                          <Label text="OTHERS:" />
-                                          <Label fx:id="lblOthers" styleClass="summary-number-small" text="0.00" />
-                                       </children>
-                                       <padding>
-                                          <Insets bottom="4.0" left="8.0" right="8.0" top="4.0" />
-                                       </padding>
-                                    </HBox>
-                                 </children>
-                                 <padding>
-                                    <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
-                                 </padding>
-                              </HBox>
-                           </content>
-                        </ScrollPane>
                      </children></VBox>
                </content>
             </Tab>
             <Tab fx:id="tabExpenses" text="Expenses">
                <content>
-                  <VBox>
+                  <VBox fx:id="expensesVBox">
                      <children>
-                        <HBox spacing="4.0">
+                        <HBox alignment="CENTER_LEFT" spacing="4.0">
                            <children>
                               <Button fx:id="btnAddExpense" mnemonicParsing="false" styleClass="btn" />
                               <Button fx:id="btnEditExpense" mnemonicParsing="false" styleClass="btn" />
                               <Button fx:id="btnDeleteExpense" mnemonicParsing="false" styleClass="btn" />
-                              <Button fx:id="btnExportExpenses" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnExportExpenses" mnemonicParsing="false" styleClass="btn" text="Export" />
+                              <Label text="Mode">
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <ComboBox fx:id="cbExpensesModes" promptText="Select Mode" />
                            </children>
                            <padding>
                               <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
@@ -220,22 +270,69 @@
                         <TableView fx:id="expensesTable" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
                           <columns>
                             <TableColumn fx:id="colExpenseTag" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" style="-fx-alignment: center;" />
+                              <TableColumn fx:id="colExpenseDate" prefWidth="120.0" style="-fx-alignment: center;" text="Date" />
+                              <TableColumn fx:id="colExpenseAmount" prefWidth="120.0" style="-fx-alignment: center;" text="Amount" />
+                              <TableColumn fx:id="colExpenseCategory" prefWidth="120.0" style="-fx-alignment: center;" text="Category" />
                             <TableColumn fx:id="colExpenseType" prefWidth="120.0" style="-fx-alignment: center;" text="Type" />
                               <TableColumn fx:id="colExpenseDescription" prefWidth="120.0" style="-fx-alignment: center;" text="Description" />
-                              <TableColumn fx:id="colExpenseAmount" prefWidth="120.0" style="-fx-alignment: center;" text="Amount" />
-                              <TableColumn fx:id="colExpenseDate" prefWidth="120.0" style="-fx-alignment: center;" text="Date" />
+                              <TableColumn fx:id="colExpenseMode" prefWidth="120.0" style="-fx-alignment: center;" text="Mode" />
+                              <TableColumn fx:id="colExpenseReference" prefWidth="120.0" style="-fx-alignment: center;" text="Reference" />
+                              <TableColumn fx:id="colExpenseAttachment" prefWidth="120.0" style="-fx-alignment: center;" text="Attachment" />
                           </columns>
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
                         </TableView>
                      </children></VBox>
                </content>
             </Tab>
-            <Tab fx:id="tabSummaries" text="Summaries">
+           <Tab fx:id="tabTransactions" text="Cash In/Out Transactions">
+              <content>
+                 <VBox>
+                    <children>
+                       <HBox alignment="CENTER_LEFT" spacing="4.0">
+                          <children>
+                             <Button fx:id="btnAddTransaction" mnemonicParsing="false" styleClass="btn" />
+                             <Button fx:id="btnEditTransaction" mnemonicParsing="false" styleClass="btn" />
+                             <Button fx:id="btnDeleteTransaction" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnExportTransactions" layoutX="56.0" layoutY="14.0" mnemonicParsing="false" styleClass="btn" text="Export" />
+                              <Label text="Mode">
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <ComboBox fx:id="cbTransactionsMode" promptText="Select Mode" />
+                          </children>
+                           <padding>
+                              <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                           </padding>
+                       </HBox>
+                        <TableView fx:id="transactionsTable" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+                          <columns>
+                            <TableColumn fx:id="colTransactionsTag" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" style="-fx-alignment: center;" />
+                            <TableColumn fx:id="colTransactionsDate" prefWidth="75.0" style="-fx-alignment: center;" text="Date" />
+                              <TableColumn fx:id="colTransactionsAmount" prefWidth="75.0" style="-fx-alignment: center;" text="Amount" />
+                              <TableColumn fx:id="colTransactionsType" prefWidth="75.0" style="-fx-alignment: center;" text="Cash In/Out" />
+                              <TableColumn fx:id="colTransactionsDescription" prefWidth="75.0" style="-fx-alignment: center;" text="Description" />
+                              <TableColumn fx:id="colTransactionsMode" prefWidth="75.0" style="-fx-alignment: center;" text="Mode" />
+                              <TableColumn fx:id="colTransactionsReference" prefWidth="75.0" style="-fx-alignment: center;" text="Reference" />
+                              <TableColumn fx:id="colTransactionsAttachment" prefWidth="75.0" style="-fx-alignment: center;" text="Attachment" />
+                          </columns>
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
+                        </TableView>
+                    </children>
+                 </VBox>
+              </content>
+           </Tab>
+            <Tab fx:id="tabSummaries" text="Daily Summary">
                <content>
                   <VBox>
                      <children>
                         <HBox spacing="4.0">
                            <children>
-                              <Button fx:id="btnExportSummaries" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnExportSummaries" mnemonicParsing="false" styleClass="btn" text="Export" />
                               <Button fx:id="btnRecalculate" mnemonicParsing="false" styleClass="btn" text="Re-Calculate" />
                            </children>
                            <padding>
@@ -249,8 +346,13 @@
                               <TableColumn fx:id="colSummaryForwarded" prefWidth="120.0" style="-fx-alignment: center;" text="Cash Forwarded" />
                               <TableColumn fx:id="colSummaryRevenues" prefWidth="120.0" style="-fx-alignment: center;" text="Revenues" />
                               <TableColumn fx:id="colSummaryExpenses" prefWidth="120.0" style="-fx-alignment: center;" text="Expenses" />
-                              <TableColumn fx:id="colSummaryBalance" prefWidth="120.0" style="-fx-alignment: center;" text="Cash Balance" />
+                              <TableColumn fx:id="colSummaryCashIn" prefWidth="120.0" style="-fx-alignment: center;" text="Cash In" />
+                              <TableColumn fx:id="colSummaryCashOut" prefWidth="120.0" style="-fx-alignment: center;" text="Cash Out" />
+                              <TableColumn fx:id="colSummaryBalance" prefWidth="120.0" style="-fx-alignment: center;" text="Balance" />
                            </columns>
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
                         </TableView>
                      </children>
                   </VBox>

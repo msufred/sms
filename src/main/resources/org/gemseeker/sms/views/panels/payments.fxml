@@ -5,14 +5,18 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="600.0" prefWidth="1050.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="600.0" prefWidth="1182.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <Label styleClass="panel-title" text="Payments">
             <VBox.margin>
@@ -137,28 +141,57 @@
                         </VBox>
                     </content>
                 </Tab>
-            <Tab fx:id="tabReceipts" text="Payments">
+            <Tab fx:id="tabPayments" text="Payments">
                <content>
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
-                        <TableView fx:id="paymentsTable" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
-                          <columns>
-                            <TableColumn fx:id="colPaymentTag" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" style="-fx-alignment: center;" />
-                            <TableColumn fx:id="colPaymentNo" prefWidth="75.0" style="-fx-alignment: center;" text="OR #" />
-                              <TableColumn fx:id="colPaymentFor" prefWidth="100.0" style="-fx-alignment: center;" text="Payment For" />
-                              <TableColumn fx:id="colPaymentStatus" prefWidth="75.0" style="-fx-alignment: center;" text="Status" />
-                              <TableColumn fx:id="colPaymentDate" prefWidth="100.0" style="-fx-alignment: center;" text="Date" />
-                              <TableColumn fx:id="colPaymentName" prefWidth="150.0" style="-fx-alignment: center;" text="Name" />
-                              <TableColumn fx:id="colPaymentToPay" prefWidth="100.0" style="-fx-alignment: center;" text="To Pay" />
-                              <TableColumn fx:id="colPaymentDiscount" prefWidth="100.0" style="-fx-alignment: center;" text="Discount" />
-                              <TableColumn fx:id="colPaymentVat" prefWidth="100.0" style="-fx-alignment: center;" text="VAT" />
-                              <TableColumn fx:id="colPaymentSurcharges" prefWidth="100.0" style="-fx-alignment: center;" text="Surcharges" />
-                              <TableColumn fx:id="colPaymentTotal" prefWidth="100.0" style="-fx-alignment: center;" text="TOTAL" />
-                              <TableColumn fx:id="colPaymentPaid" prefWidth="100.0" style="-fx-alignment: center;" text="Paid" />
-                              <TableColumn fx:id="colPaymentBalance" prefWidth="100.0" style="-fx-alignment: center;" text="Balance" />
-                              <TableColumn fx:id="colPaymentPreparedBy" prefWidth="100.0" style="-fx-alignment: center;" text="Prepared By" />
-                          </columns>
-                        </TableView>
+                        <SplitPane fx:id="paymentsSplitPane" dividerPositions="0.75" VBox.vgrow="ALWAYS">
+                           <items>
+                              <TableView fx:id="paymentsTable" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true">
+                                <columns>
+                                  <TableColumn fx:id="colPaymentTag" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" style="-fx-alignment: center;" />
+                                  <TableColumn fx:id="colPaymentNo" prefWidth="75.0" style="-fx-alignment: center;" text="OR #" />
+                                    <TableColumn fx:id="colPaymentFor" prefWidth="100.0" style="-fx-alignment: center;" text="Payment For" />
+                                    <TableColumn fx:id="colMode" prefWidth="100.0" style="-fx-alignment: center;" text="Mode" />
+                                    <TableColumn fx:id="colRef" prefWidth="100.0" style="-fx-alignment: center;" text="Reference" />
+                                    <TableColumn fx:id="colPaymentStatus" prefWidth="75.0" style="-fx-alignment: center;" text="Status" />
+                                    <TableColumn fx:id="colPaymentDate" prefWidth="100.0" style="-fx-alignment: center;" text="Date" />
+                                    <TableColumn fx:id="colPaymentName" prefWidth="150.0" style="-fx-alignment: center;" text="Name" />
+                                    <TableColumn fx:id="colPaymentToPay" prefWidth="100.0" style="-fx-alignment: center;" text="To Pay" />
+                                    <TableColumn fx:id="colPaymentDiscount" prefWidth="100.0" style="-fx-alignment: center;" text="Discount" />
+                                    <TableColumn fx:id="colPaymentVat" prefWidth="100.0" style="-fx-alignment: center;" text="VAT" />
+                                    <TableColumn fx:id="colPaymentSurcharges" prefWidth="100.0" style="-fx-alignment: center;" text="Surcharges" />
+                                    <TableColumn fx:id="colPaymentTotal" prefWidth="100.0" style="-fx-alignment: center;" text="TOTAL" />
+                                    <TableColumn fx:id="colPaymentPaid" prefWidth="100.0" style="-fx-alignment: center;" text="Paid" />
+                                    <TableColumn fx:id="colPaymentBalance" prefWidth="100.0" style="-fx-alignment: center;" text="Balance" />
+                                    <TableColumn fx:id="colPaymentPreparedBy" prefWidth="100.0" style="-fx-alignment: center;" text="Prepared By" />
+                                </columns>
+                              </TableView>
+                              <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <HBox prefWidth="200.0" spacing="4.0">
+                                       <children>
+                                          <Button fx:id="btnPaymentImageZoomOut" mnemonicParsing="false" />
+                                          <Button fx:id="btnPaymentImageZoomIn" mnemonicParsing="false" />
+                                          <Button fx:id="btnPaymentImageShowFile" mnemonicParsing="false" text="Show in File Explorer" />
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                       </padding>
+                                    </HBox>
+                                    <ScrollPane fitToHeight="true" fitToWidth="true" pannable="true" VBox.vgrow="ALWAYS">
+                                       <content>
+                                          <StackPane prefHeight="150.0" prefWidth="200.0">
+                                             <children>
+                                                <ImageView fx:id="paymentImageView" fitHeight="300.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true" />
+                                             </children>
+                                          </StackPane>
+                                       </content>
+                                    </ScrollPane>
+                                 </children>
+                              </VBox>
+                           </items>
+                        </SplitPane>
                      </children></VBox>
                </content>
             </Tab>

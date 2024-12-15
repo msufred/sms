@@ -30,6 +30,8 @@ public class Payment {
     private double amountPaid;
     private double balance;
     private LocalDate paymentDate;
+    private String mode;            // payment mode 11/25/2024
+    private String ref;             // reference 11/25/2024
     private String preparedBy;
     private String status;          // valid, void
 
@@ -156,6 +158,26 @@ public class Payment {
 
     public void setPaymentDate(LocalDate paymentDate) {
         this.paymentDate = paymentDate;
+    }
+
+    // Return payment mode 11/25/2024
+    public String getMode() {
+        return mode;
+    }
+
+    // Set payment mode 11/25/2024
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
+    // Return reference 11/25/2024
+    public String getRef() {
+        return ref;
+    }
+
+    // Set reference 11/25/2024
+    public void setRef(String ref) {
+        this.ref = ref;
     }
 
     public String getPreparedBy() {

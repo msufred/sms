@@ -20,6 +20,7 @@ public final class DBTables {
                 createBalancesTable(),
                 createExpensesTable(),
                 createRevenuesTable(),
+                createCashTransactionsTable(),
                 createDailySummariesTable(),
                 createSchedulesTable(),
         };
@@ -28,7 +29,14 @@ public final class DBTables {
     public static String[] updatesSql() {
         return new String[] {
                 updateTowersTable(),
-                updateTowersTable_050224()
+                updateTowersTable_050224(),
+                updatePaymentsTable_112524(),
+                updateRevenuesTable_112724(),
+                updateUsersTable_112724(),
+                updateAccountsTable_112724(),
+                updateExpensesTable_112824(),
+                updateCashTransactionsTable_120124(),
+                updateDailySummariesTable_120224()
         };
     }
 
@@ -309,6 +317,23 @@ public final class DBTables {
                 ")";
     }
 
+    private static String createCashTransactionsTable() {
+        return "CREATE TABLE IF NOT EXISTS cash_transactions (" +
+                "id INT NOT NULL AUTO_INCREMENT, " +
+                "type VARCHAR(10) DEFAULT 'Cash In', " +
+                "description VARCHAR(255) DEFAULT '', " +
+                "amount DOUBLE DEFAULT '0.0', " +
+                "mode VARCHAR(255) DEFAULT 'Cash', " +
+                "ref VARCHAR(255) DEFAULT '', " +
+                "date DATE NOT NULL, " +
+                "tag VARCHAR(16) DEFAULT 'normal', " +
+                "date_created TIMESTAMP, " +
+                "date_updated TIMESTAMP, " +
+                "date_deleted TIMESTAMP, " +
+                "PRIMARY KEY (id)" +
+                ")";
+    }
+
     private static String createDailySummariesTable() {
         return "CREATE TABLE IF NOT EXISTS daily_summaries (" +
                 "id INT NOT NULL AUTO_INCREMENT, " +
@@ -348,5 +373,42 @@ public final class DBTables {
 
     private static String updateTowersTable_050224() {
         return "ALTER TABLE towers ADD COLUMN IF NOT EXISTS parent_name VARCHAR(255) DEFAULT '' AFTER parent_tower_id";
+    }
+
+    private static String updatePaymentsTable_112524() {
+        return "ALTER TABLE payments ADD COLUMN IF NOT EXISTS mode VARCHAR(255) DEFAULT 'Cash' AFTER payment_date; " +
+                "ALTER TABLE payments ADD COLUMN IF NOT EXISTS ref VARCHAR(255) DEFAULT '' AFTER mode;";
+    }
+
+    private static String updateRevenuesTable_112724() {
+        return "ALTER TABLE revenues ADD COLUMN IF NOT EXISTS mode VARCHAR(255) DEFAULT 'Cash' AFTER amount; " +
+                "ALTER TABLE revenues ADD COLUMN IF NOT EXISTS ref VARCHAR(255) DEFAULT '' AFTER mode; " +
+                "ALTER TABLE revenues ADD COLUMN IF NOT EXISTS attachment VARCHAR(255) DEFAULT '' AFTER date;";
+    }
+
+    private static String updateUsersTable_112724() {
+        return "ALTER TABLE users ADD COLUMN IF NOT EXISTS fullname VARCHAR(255) DEFAULT '' AFTER password; " +
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS designation VARCHAR(255) DEFAULT 'Employee' AFTER fullname;";
+    }
+
+    private static String updateAccountsTable_112724() {
+        return "ALTER TABLE accounts ADD COLUMN IF NOT EXISTS bank_account_name VARCHAR(255) DEFAULT '' AFTER email; " +
+                "ALTER TABLE accounts ADD COLUMN IF NOT EXISTS bank_account_no VARCHAR(255) DEFAULT '' AFTER bank_account_name;";
+    }
+
+    private static String updateExpensesTable_112824() {
+        return "ALTER TABLE expenses ADD COLUMN IF NOT EXISTS mode VARCHAR(255) DEFAULT 'Cash' AFTER amount; " +
+                "ALTER TABLE expenses ADD COLUMN IF NOT EXISTS ref VARCHAR(255) DEFAULT '' AFTER mode; " +
+                "ALTER TABLE expenses ADD COLUMN IF NOT EXISTS category VARCHAR(255) DEFAULT 'Operational' AFTER id; " +
+                "ALTER TABLE expenses ADD COLUMN IF NOT EXISTS attachment VARCHAR(255) DEFAULT '' AFTER date;";
+    }
+
+    private static String updateCashTransactionsTable_120124() {
+        return "ALTER TABLE cash_transactions ADD COLUMN IF NOT EXISTS attachment VARCHAR(255) DEFAULT '' AFTER date";
+    }
+
+    private static String updateDailySummariesTable_120224() {
+        return "ALTER TABLE daily_summaries ADD COLUMN IF NOT EXISTS cash_in DOUBLE DEFAULT '0.0' AFTER expenses; " +
+                "ALTER TABLE daily_summaries ADD COLUMN IF NOT EXISTS cash_out DOUBLE DEFAULT '0.0' AFTER cash_in;";
     }
 }

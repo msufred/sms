@@ -51,7 +51,7 @@
                         <Insets />
                      </VBox.margin>
                   </HBox>
-                  <VBox prefWidth="100.0" styleClass="form-content-grey">
+                  <VBox prefWidth="100.0" styleClass="card">
                      <children>
                         <HBox alignment="CENTER_LEFT" spacing="4.0">
                            <children>

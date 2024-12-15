@@ -40,7 +40,7 @@ public abstract class AbstractPanel {
                 root = loader.load();
                 onFxmlLoaded();
             } catch (IOException e) {
-                System.err.println("Failed to load FXML file: " + fxmlUrl.getPath());
+                System.err.println("Failed to load FXML file: " + fxmlUrl.getPath() + "\n\n" + e);
             }
         }
         return root;

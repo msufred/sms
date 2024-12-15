@@ -64,6 +64,7 @@ public class AddBillingWindow extends AbstractWindow {
     private final XCircleIcon xCircleIcon = new XCircleIcon(14);
     private final CheckCircleIcon checkCircleIcon = new CheckCircleIcon(14);
 
+    private final MainWindow mainWindow;
     private final Database database;
     private final AccountController accountController;
     private final SubscriptionController subscriptionController;
@@ -86,8 +87,9 @@ public class AddBillingWindow extends AbstractWindow {
     private double vat = 0;
     private double total = 0;
 
-    public AddBillingWindow(Database database, PrintWindow printWindow, SaveImageWindow saveImageWindow, Stage owner) {
+    public AddBillingWindow(MainWindow mainWindow, Database database, PrintWindow printWindow, SaveImageWindow saveImageWindow, Stage owner) {
         super("Add Billing Payment", AddBillingWindow.class.getResource("add_billing_2.fxml"), null, owner);
+        this.mainWindow = mainWindow;
         this.database = database;
         this.printWindow = printWindow;
         this.saveImageWindow = saveImageWindow;
@@ -134,9 +136,16 @@ public class AddBillingWindow extends AbstractWindow {
     @Override
     protected void onShow() {
         clearFields();
+
+        User user = mainWindow.getUser();
+        if (user != null) {
+            tfPreparedBy.setText(user.getFullname());
+            tfDesignation.setText(user.getDesignation());
+        }
+
         disableActions(true);
         progressBar.setVisible(true);
-        disposables.add(Single.fromCallable(accountController::getAll)
+        disposables.add(Single.fromCallable(accountController::getAllActive)
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
                     cbAccounts.setItems(list);
                     disableActions(false);
