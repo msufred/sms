@@ -19,6 +19,8 @@ public class Payment {
     private int id;
     private String paymentNo;       // OR No.
     private String name;            // payee name
+    private String address;
+    private String contact;
     private String paymentFor;      // Billing, Purchase, Service
     private String extraInfo;       // billing_no, purchase_no, or service_no
     private double prevBalance;
@@ -42,6 +44,7 @@ public class Payment {
 
     public Payment() {
         paymentFor = TYPE_BILLING;
+        extraInfo = "";
         prevBalance = amountToPay = discount = vat = amountTotal = amountPaid = balance = 0;
         status = "Valid";
         tag = "normal";
@@ -70,6 +73,22 @@ public class Payment {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
     }
 
     public String getPaymentFor() {

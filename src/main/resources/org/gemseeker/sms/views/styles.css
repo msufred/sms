@@ -211,6 +211,10 @@
     -fx-background-color: #dc2626;
 }
 
+.label-icon .feather-icon {
+    -fx-background-color: white;
+}
+
 .label-error {
     -fx-text-color: #dc2626;
 }
@@ -449,6 +453,7 @@
 /*
 ============================ Dashboard Styles ================================
 */
+
 .summary-title {
     -fx-text-fill: white;
 }
@@ -463,6 +468,9 @@
     -fx-font-family: 'Montserrat';
     -fx-font-weight: bold;
     -fx-font-size: 20;
+}
+.summary-number-small .feather-icon {
+    -fx-background-color: white;
 }
 
 .positive-up .feather-icon {
@@ -573,9 +581,15 @@
     Summary/Sales
 */
 .summary-box {
-    -fx-background-color: #ffffff;
-    -fx-background-radius: 8px;
-    /*-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);*/
+    -fx-background-color: derive(-col-greensea, 60%);
+}
+
+.summary-box-2 {
+    -fx-background-color: derive(-col-alizarin, 60%);
+}
+
+.summary-box-3 {
+    -fx-background-color: derive(-col-peterriver, 60%);
 }
 
 .text-percentage-up {
@@ -585,41 +599,6 @@
 
 .text-label {
     -fx-text-fill: #999999;
-}
-
-.paper {
-    -fx-background-color: #ffffff;
-    /*-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);*/
-}
-
-
-
-
-/* Summary Pane Style */
-.summary-card-pane {
-    -fx-background-color: #ffffff;
-    -fx-background-radius: 8px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);
-}
-
-.summary-card-title {
-    -fx-text-fill: #535c68;
-    -fx-font-size: 13px;
-}
-
-.summary-card-title2 {
-    -fx-text-fill: #535c68;
-    -fx-font-size: 11px;
-}
-
-.summary-card-count {
-    -fx-text-fill: #535c68;
-    -fx-font-size: 28px;
-}
-
-.summary-card-count2 {
-    -fx-text-fill: #95afc0;
-    -fx-font-size: 24px;
 }
 
 .text-status-active {

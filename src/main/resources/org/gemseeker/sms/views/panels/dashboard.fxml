@@ -28,93 +28,157 @@
          </VBox.margin>
       </Label>
       <Separator prefWidth="200.0" />
-      <HBox spacing="8.0">
+      <VBox alignment="TOP_CENTER" styleClass="card">
          <children>
-            <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
+            <Label styleClass="panel-title" text="Today's Summary" />
+            <HBox spacing="8.0">
                <children>
-                  <Label styleClass="summary-title" text="Cash Forwarded" />
-                  <Label fx:id="lblForwarded" text="0.00">
-                     <styleClass>
-                        <String fx:value="summary-number" />
-                        <String fx:value="text-positive" />
-                     </styleClass></Label>
+                  <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="summary-title" text="Cash Forwarded" />
+                        <Label fx:id="lblForwarded" text="0.00">
+                           <styleClass>
+                              <String fx:value="summary-number" />
+                              <String fx:value="text-positive" />
+                           </styleClass>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                     </padding>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="summary-title" text="Revenues" />
+                        <Label fx:id="lblRevenues" text="0.00">
+                           <styleClass>
+                              <String fx:value="summary-number" />
+                              <String fx:value="text-positive" />
+                           </styleClass>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                     </padding>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="summary-title" text="Expenses" />
+                        <Label fx:id="lblExpenses" text="0.00">
+                           <styleClass>
+                              <String fx:value="summary-number" />
+                              <String fx:value="text-negative" />
+                           </styleClass>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                     </padding>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER" layoutX="287.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="summary-title" text="Cash Transfer" />
+                        <Label fx:id="lblCashIn" text="0.00">
+                           <styleClass>
+                              <String fx:value="summary-number" />
+                              <String fx:value="text-positive" />
+                           </styleClass>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                     </padding>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="summary-title" text="Cash Balance" />
+                        <Label fx:id="lblBalances" text="0.00">
+                           <styleClass>
+                              <String fx:value="summary-number" />
+                              <String fx:value="text-warning" />
+                           </styleClass>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                     </padding>
+                  </VBox>
                </children>
                <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                  <Insets left="8.0" right="8.0" />
                </padding>
-            </VBox>
-            <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
-               <children>
-                  <Label styleClass="summary-title" text="Revenues" />
-                  <Label fx:id="lblRevenues" text="0.00">
-                     <styleClass>
-                        <String fx:value="summary-number" />
-                        <String fx:value="text-positive" />
-                     </styleClass></Label>
-               </children>
-               <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
-               </padding>
-            </VBox>
-            <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
-               <children>
-                  <Label styleClass="summary-title" text="Expenses" />
-                  <Label fx:id="lblExpenses" text="0.00">
-                     <styleClass>
-                        <String fx:value="summary-number" />
-                        <String fx:value="text-negative" />
-                     </styleClass></Label>
-               </children>
-               <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
-               </padding>
-            </VBox>
-            <VBox alignment="TOP_CENTER" layoutX="287.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
-               <children>
-                  <Label styleClass="summary-title" text="Cash In" />
-                  <Label fx:id="lblCashIn" text="0.00">
-                     <styleClass>
-                        <String fx:value="summary-number" />
-                        <String fx:value="text-positive" />
-                     </styleClass>
-                  </Label>
-               </children>
-               <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
-               </padding>
-            </VBox>
-            <VBox alignment="TOP_CENTER" layoutX="428.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
-               <children>
-                  <Label styleClass="summary-title" text="Cash Out" />
-                  <Label fx:id="lblCashOut" text="0.00">
-                     <styleClass>
-                        <String fx:value="summary-number" />
-                        <String fx:value="text-negative" />
-                     </styleClass>
-                  </Label>
-               </children>
-               <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
-               </padding>
-            </VBox>
-            <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
-               <children>
-                  <Label styleClass="summary-title" text="Cash Balance" />
-                  <Label fx:id="lblBalances" text="0.00">
-                     <styleClass>
-                        <String fx:value="summary-number" />
-                        <String fx:value="text-warning" />
-                     </styleClass></Label>
-               </children>
-               <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
-               </padding>
-            </VBox>
+            </HBox>
          </children>
+         <VBox.margin>
+            <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+         </VBox.margin>
          <padding>
-            <Insets left="8.0" right="8.0" />
+            <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
          </padding>
-      </HBox>
+      </VBox>
+      <VBox alignment="TOP_CENTER" styleClass="card">
+         <children>
+            <Label styleClass="panel-title" text="Total Cash Breakdown" />
+            <HBox spacing="4.0" styleClass="blue-bar">
+               <children>
+                  <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="summary-title" text="Cash on Hand" />
+                        <Label fx:id="lblCash" styleClass="summary-number-small" text="0.00" />
+                     </children>
+                     <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                     </padding>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER" layoutX="10.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="summary-title" text="GCash" />
+                        <Label fx:id="lblGCash" styleClass="summary-number-small" text="0.00" />
+                     </children>
+                     <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                     </padding>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER" layoutX="75.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="summary-title" text="Bank" />
+                        <Label fx:id="lblBank" styleClass="summary-number-small" text="0.00" />
+                     </children>
+                     <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                     </padding>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER" layoutX="161.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="summary-title" text="Cheque" />
+                        <Label fx:id="lblCheque" styleClass="summary-number-small" text="0.00" />
+                     </children>
+                     <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                     </padding>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER" layoutX="245.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="summary-title" text="Palawan Express" />
+                        <Label fx:id="lblPalawan" styleClass="summary-number-small" text="0.00" />
+                     </children>
+                     <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                     </padding>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </padding>
+            </HBox>
+         </children>
+         <VBox.margin>
+            <Insets bottom="4.0" left="4.0" right="4.0" />
+         </VBox.margin>
+         <padding>
+            <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+         </padding>
+      </VBox>
       <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <tabs>
            <Tab fx:id="tabProjections" text="Sales Projections">
@@ -125,6 +189,26 @@
                            <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
                         </padding>
                         <children>
+                           <HBox prefHeight="100.0" prefWidth="200.0" spacing="8.0">
+                              <children>
+                                 <BarChart fx:id="revenuesBarChart" alternativeColumnFillVisible="true" alternativeRowFillVisible="false" horizontalZeroLineVisible="false" legendVisible="false" minHeight="400.0" prefHeight="400.0" styleClass="card" title="Revenues" verticalGridLinesVisible="false" verticalZeroLineVisible="false" HBox.hgrow="ALWAYS">
+                                   <xAxis>
+                                     <CategoryAxis animated="false" side="BOTTOM" />
+                                   </xAxis>
+                                   <yAxis>
+                                     <NumberAxis side="LEFT" />
+                                   </yAxis>
+                                    <padding>
+                                       <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                                    </padding>
+                                 </BarChart>
+                                 <PieChart fx:id="expensesRevenuesPieChart" labelsVisible="false" prefHeight="400.0" prefWidth="400.0" styleClass="card" title="Revenues vs Expenses">
+                                    <padding>
+                                       <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                                    </padding>
+                                 </PieChart>
+                              </children>
+                           </HBox>
                            <HBox prefWidth="200.0" spacing="8.0">
                               <children>
                                  <PieChart fx:id="expensesPieChart" labelsVisible="false" prefHeight="400.0" prefWidth="400.0" styleClass="card" title="Expenses (December 2024)">
@@ -158,26 +242,6 @@
                                        </BarChart>
                                     </children>
                                  </VBox>
-                              </children>
-                           </HBox>
-                           <HBox prefHeight="100.0" prefWidth="200.0" spacing="8.0">
-                              <children>
-                                 <BarChart fx:id="revenuesBarChart" alternativeColumnFillVisible="true" alternativeRowFillVisible="false" horizontalZeroLineVisible="false" legendVisible="false" minHeight="400.0" prefHeight="400.0" styleClass="card" title="Revenues" verticalGridLinesVisible="false" verticalZeroLineVisible="false" HBox.hgrow="ALWAYS">
-                                   <xAxis>
-                                     <CategoryAxis animated="false" side="BOTTOM" />
-                                   </xAxis>
-                                   <yAxis>
-                                     <NumberAxis side="LEFT" />
-                                   </yAxis>
-                                    <padding>
-                                       <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
-                                    </padding>
-                                 </BarChart>
-                                 <PieChart fx:id="expensesRevenuesPieChart" labelsVisible="false" prefHeight="400.0" prefWidth="400.0" styleClass="card" title="Revenues vs Expenses">
-                                    <padding>
-                                       <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
-                                    </padding>
-                                 </PieChart>
                               </children>
                            </HBox>
                            <LineChart fx:id="monthlyLineChart" horizontalZeroLineVisible="false" legendSide="LEFT" prefHeight="250.0" styleClass="card" title="Monthly Projection (Current Year)" verticalGridLinesVisible="false" verticalZeroLineVisible="false">
@@ -243,6 +307,55 @@
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
                         </TableView>
+                        <HBox styleClass="summary-box">
+                           <children>
+                              <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label style="-fx-text-fill: black;" styleClass="summary-title" text="Cash" />
+                                    <Label fx:id="lblRevCash" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: black;" text="0.00" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox alignment="TOP_CENTER" layoutX="10.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label style="-fx-text-fill: black;" styleClass="summary-title" text="GCash" />
+                                    <Label fx:id="lblRevGCash" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: black;" text="0.00" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox alignment="TOP_CENTER" layoutX="75.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label style="-fx-text-fill: black;" styleClass="summary-title" text="Bank" />
+                                    <Label fx:id="lblRevBank" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: black;" text="0.00" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox alignment="TOP_CENTER" layoutX="161.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label style="-fx-text-fill: black;" styleClass="summary-title" text="Cheque" />
+                                    <Label fx:id="lblRevCheque" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: black;" text="0.00" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox alignment="TOP_CENTER" layoutX="245.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label style="-fx-text-fill: black;" styleClass="summary-title" text="Palawan Express" />
+                                    <Label fx:id="lblRevPalawan" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: black;" text="0.00" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
+                              </VBox>
+                           </children>
+                        </HBox>
                      </children></VBox>
                </content>
             </Tab>
@@ -283,6 +396,55 @@
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
                         </TableView>
+                        <HBox styleClass="summary-box-2">
+                           <children>
+                              <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label style="-fx-text-fill: black;" styleClass="summary-title" text="Cash" />
+                                    <Label fx:id="lblExpCash" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: black;" text="0.00" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox alignment="TOP_CENTER" layoutX="10.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label style="-fx-text-fill: black;" styleClass="summary-title" text="GCash" />
+                                    <Label fx:id="lblExpGCash" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: black;" text="0.00" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox alignment="TOP_CENTER" layoutX="75.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label style="-fx-text-fill: black;" styleClass="summary-title" text="Bank" />
+                                    <Label fx:id="lblExpBank" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: black;" text="0.00" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox alignment="TOP_CENTER" layoutX="161.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label style="-fx-text-fill: black;" styleClass="summary-title" text="Cheque" />
+                                    <Label fx:id="lblExpCheque" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: black;" text="0.00" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox alignment="TOP_CENTER" layoutX="245.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label style="-fx-text-fill: black;" styleClass="summary-title" text="Palawan Express" />
+                                    <Label fx:id="lblExpPalawan" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: black;" text="0.00" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
+                              </VBox>
+                           </children>
+                        </HBox>
                      </children></VBox>
                </content>
             </Tab>
@@ -295,6 +457,7 @@
                              <Button fx:id="btnAddTransaction" mnemonicParsing="false" styleClass="btn" />
                              <Button fx:id="btnEditTransaction" mnemonicParsing="false" styleClass="btn" />
                              <Button fx:id="btnDeleteTransaction" mnemonicParsing="false" styleClass="btn" />
+                              <Button fx:id="btnTransfer" mnemonicParsing="false" styleClass="btn" />
                               <Button fx:id="btnExportTransactions" layoutX="56.0" layoutY="14.0" mnemonicParsing="false" styleClass="btn" text="Export" />
                               <Label text="Mode">
                                  <HBox.margin>
@@ -322,6 +485,55 @@
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
                         </TableView>
+                        <HBox styleClass="summary-box-3">
+                           <children>
+                              <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label style="-fx-text-fill: black;" styleClass="summary-title" text="Cash" />
+                                    <Label fx:id="lblCtCash" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: black;" text="0.00" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox alignment="TOP_CENTER" layoutX="10.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label style="-fx-text-fill: black;" styleClass="summary-title" text="GCash" />
+                                    <Label fx:id="lblCtGCash" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: black;" text="0.00" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox alignment="TOP_CENTER" layoutX="75.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label style="-fx-text-fill: black;" styleClass="summary-title" text="Bank" />
+                                    <Label fx:id="lblCtBank" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: black;" text="0.00" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox alignment="TOP_CENTER" layoutX="161.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label style="-fx-text-fill: black;" styleClass="summary-title" text="Cheque" />
+                                    <Label fx:id="lblCtCheque" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: black;" text="0.00" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox alignment="TOP_CENTER" layoutX="245.0" layoutY="10.0" spacing="4.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label style="-fx-text-fill: black;" styleClass="summary-title" text="Palawan Express" />
+                                    <Label fx:id="lblCtPalawan" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: black;" text="0.00" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
+                              </VBox>
+                           </children>
+                        </HBox>
                     </children>
                  </VBox>
               </content>

@@ -19,6 +19,7 @@ import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.Revenue;
 import org.gemseeker.sms.data.controllers.RevenueController;
 import org.gemseeker.sms.views.*;
+import org.gemseeker.sms.views.icons.PesoIcon;
 import org.gemseeker.sms.views.panels.DashboardPanel;
 
 import java.io.File;
@@ -30,6 +31,7 @@ public class RevenuesViewController {
 
     private final Button btnAdd, btnEdit, btnDelete, btnExport;
     private final ComboBox<String> cbModes;
+    private final Label lblCash, lblGCash, lblBank, lblCheque, lblPalawan;
     private final TableView<Revenue> tableView;
 
     private final DashboardPanel dashboardPanel;
@@ -50,12 +52,18 @@ public class RevenuesViewController {
 
     public RevenuesViewController(DashboardPanel dashboardPanel, MainWindow mainWindow, Database database,
                                   Button btnAdd, Button btnEdit, Button btnDelete, Button btnExport,
-                                  ComboBox<String> cbModes, TableView<Revenue> tableView) {
+                                  ComboBox<String> cbModes, Label lblCash, Label lblGCash, Label lblBank, Label lblCheque,
+                                  Label lblPalawan, TableView<Revenue> tableView) {
         this.btnAdd = btnAdd;
         this.btnEdit = btnEdit;
         this.btnDelete = btnDelete;
         this.btnExport = btnExport;
         this.cbModes = cbModes;
+        this.lblCash = lblCash;
+        this.lblGCash = lblGCash;
+        this.lblBank = lblBank;
+        this.lblCheque = lblCheque;
+        this.lblPalawan = lblPalawan;
         this.tableView = tableView;
 
         this.dashboardPanel = dashboardPanel;
@@ -91,6 +99,12 @@ public class RevenuesViewController {
             }
         });
         cbModes.setValue("All");
+
+        lblCash.setGraphic(new PesoIcon(14));
+        lblGCash.setGraphic(new PesoIcon(14));
+        lblBank.setGraphic(new PesoIcon(14));
+        lblCheque.setGraphic(new PesoIcon(14));
+        lblPalawan.setGraphic(new PesoIcon(14));
 
         // setup context menu
         MenuItem mAdd = new MenuItem("Add");
@@ -143,11 +157,35 @@ public class RevenuesViewController {
                     hideProgress();
                     filteredList = new FilteredList<>(list);
                     tableView.setItems(filteredList);
-                    dashboardPanel.refreshSummary(null);
+                    tally(list);
+                    dashboardPanel.refresh(null);
                 }, err -> {
                     hideProgress();
                     mainWindow.showErrorDialog("Database Error", "Error while retrieving revenue entries.\n" + err);
                 }));
+    }
+
+    private void tally(ObservableList<Revenue> list) {
+        if (list == null) return;
+        double cash = 0;
+        double gcash = 0;
+        double bank = 0;
+        double cheque = 0;
+        double palawan = 0;
+        for (Revenue rev : list) {
+            switch (rev.getMode()) {
+                case Revenue.MODE_CASH -> cash += rev.getAmount();
+                case Revenue.MODE_GCASH -> gcash += rev.getAmount();
+                case Revenue.MODE_BANK_CASH -> bank += rev.getAmount();
+                case Revenue.MODE_BANK_CHEQUE -> cheque += rev.getAmount();
+                default -> palawan += rev.getAmount();
+            }
+        }
+        lblCash.setText(ViewUtils.toStringMoneyFormat(cash));
+        lblGCash.setText(ViewUtils.toStringMoneyFormat(gcash));
+        lblBank.setText(ViewUtils.toStringMoneyFormat(bank));
+        lblCheque.setText(ViewUtils.toStringMoneyFormat(cheque));
+        lblPalawan.setText(ViewUtils.toStringMoneyFormat(palawan));
     }
 
     private void addItem() {

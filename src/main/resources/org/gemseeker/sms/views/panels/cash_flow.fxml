@@ -104,21 +104,21 @@
                         <Label style="-fx-text-fill: black; -fx-font-weight: bold; -fx-font-size: 16;" text="CREDIT" GridPane.columnIndex="3" />
                         <Label style="-fx-text-fill: black; -fx-font-weight: bold; -fx-font-size: 16;" text="RUNNING BALANCE" GridPane.columnIndex="4" />
                         <Label style="-fx-text-fill: black; -fx-font-weight: bold;" text="BALANCE FORWARDED" GridPane.rowIndex="1" />
-                        <Label style="-fx-text-fill: black;" text="Bank Transfer (Cash-In)" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <Label style="-fx-text-fill: black;" text="Bank Transfer" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                         <Label fx:id="d2" alignment="CENTER_RIGHT" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                         <Label fx:id="r2" alignment="CENTER_RIGHT" minHeight="24.0" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="4" GridPane.rowIndex="3" />
-                        <Label style="-fx-text-fill: black;" text="Subscription Payment" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                        <Label fx:id="d3" alignment="CENTER_RIGHT" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                        <Label fx:id="r3" alignment="CENTER_RIGHT" minHeight="24.0" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="4" GridPane.rowIndex="5" />
-                        <Label style="-fx-text-fill: black;" text="WiFi Vendo" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                        <Label fx:id="d4" alignment="CENTER_RIGHT" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="2" GridPane.rowIndex="6" />
-                        <Label fx:id="r4" alignment="CENTER_RIGHT" minHeight="24.0" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="4" GridPane.rowIndex="6" />
-                        <Label style="-fx-text-fill: black;" text="Merchandise" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                        <Label fx:id="d5" alignment="CENTER_RIGHT" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="2" GridPane.rowIndex="7" />
-                        <Label fx:id="r5" alignment="CENTER_RIGHT" minHeight="24.0" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="4" GridPane.rowIndex="7" />
-                        <Label style="-fx-text-fill: black;" text="Services" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                        <Label fx:id="d6" alignment="CENTER_RIGHT" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="2" GridPane.rowIndex="8" />
-                        <Label fx:id="r6" alignment="CENTER_RIGHT" minHeight="24.0" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="4" GridPane.rowIndex="8" />
+                        <Label style="-fx-text-fill: black;" text="Subscription Payment" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <Label fx:id="d3" alignment="CENTER_RIGHT" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                        <Label fx:id="r3" alignment="CENTER_RIGHT" minHeight="24.0" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="4" GridPane.rowIndex="6" />
+                        <Label style="-fx-text-fill: black;" text="WiFi Vendo" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                        <Label fx:id="d4" alignment="CENTER_RIGHT" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                        <Label fx:id="r4" alignment="CENTER_RIGHT" minHeight="24.0" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="4" GridPane.rowIndex="7" />
+                        <Label style="-fx-text-fill: black;" text="Merchandise" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                        <Label fx:id="d5" alignment="CENTER_RIGHT" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="2" GridPane.rowIndex="8" />
+                        <Label fx:id="r5" alignment="CENTER_RIGHT" minHeight="24.0" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="4" GridPane.rowIndex="8" />
+                        <Label style="-fx-text-fill: black;" text="Services" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                        <Label fx:id="d6" alignment="CENTER_RIGHT" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="2" GridPane.rowIndex="9" />
+                        <Label fx:id="r6" alignment="CENTER_RIGHT" minHeight="24.0" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="4" GridPane.rowIndex="9" />
                         <Label style="-fx-text-fill: black; -fx-font-weight: bold;" text="OPERATIONAL EXPENSES" GridPane.rowIndex="12" />
                         <Label style="-fx-text-fill: black;" text="Electricity" GridPane.columnIndex="1" GridPane.rowIndex="12" />
                         <Label fx:id="c8" alignment="CENTER_RIGHT" minWidth="100.0" style="-fx-text-fill: red;" text="0.0" GridPane.columnIndex="3" GridPane.rowIndex="12" />
@@ -158,9 +158,6 @@
                         <Label style="-fx-text-fill: black;" text="Rental" GridPane.columnIndex="1" GridPane.rowIndex="32" />
                         <Label style="-fx-text-fill: black;" text="Maintenance" GridPane.columnIndex="1" GridPane.rowIndex="33" />
                         <Label style="-fx-text-fill: black;" text="Repair" GridPane.columnIndex="1" GridPane.rowIndex="34" />
-                        <Label style="-fx-text-fill: black;" text="Bank Transfer (Cash-Out)" GridPane.columnIndex="1" GridPane.rowIndex="10" />
-                        <Label fx:id="c7" alignment="CENTER_RIGHT" minWidth="100.0" style="-fx-text-fill: red;" text="0.0" GridPane.columnIndex="3" GridPane.rowIndex="10" />
-                        <Label fx:id="r7" alignment="CENTER_RIGHT" minHeight="24.0" minWidth="100.0" style="-fx-text-fill: red;" text="0.0" GridPane.columnIndex="4" GridPane.rowIndex="10" />
                         <Label fx:id="c23" alignment="CENTER_RIGHT" minWidth="100.0" style="-fx-text-fill: red;" text="0.0" GridPane.columnIndex="3" GridPane.rowIndex="28" />
                         <Label fx:id="c24" alignment="CENTER_RIGHT" minWidth="100.0" style="-fx-text-fill: red;" text="0.0" GridPane.columnIndex="3" GridPane.rowIndex="29" />
                         <Label fx:id="c25" alignment="CENTER_RIGHT" minWidth="100.0" style="-fx-text-fill: red;" text="0.0" GridPane.columnIndex="3" GridPane.rowIndex="30" />
@@ -223,7 +220,10 @@
                         <Label fx:id="r37" alignment="CENTER_RIGHT" minHeight="24.0" minWidth="100.0" style="-fx-text-fill: red;" text="0.0" GridPane.columnIndex="4" GridPane.rowIndex="42" />
                         <Label fx:id="r38" alignment="CENTER_RIGHT" minHeight="24.0" minWidth="100.0" style="-fx-text-fill: red;" text="0.0" GridPane.columnIndex="4" GridPane.rowIndex="43" />
                         <Label fx:id="r39" alignment="CENTER_RIGHT" minHeight="24.0" minWidth="100.0" style="-fx-text-fill: red;" text="0.0" GridPane.columnIndex="4" GridPane.rowIndex="44" />
-                        <Label style="-fx-text-fill: black; -fx-font-weight: bold;" text="REVENUES" GridPane.rowIndex="5" />
+                        <Label style="-fx-text-fill: black; -fx-font-weight: bold;" text="REVENUES" GridPane.rowIndex="6" />
+                        <Label style="-fx-text-fill: black;" text="Cash Transfer" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <Label fx:id="d7" alignment="CENTER_RIGHT" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                        <Label fx:id="r7" alignment="CENTER_RIGHT" minWidth="100.0" style="-fx-text-fill: green;" text="0.0" GridPane.columnIndex="4" GridPane.rowIndex="4" />
                      </children>
                   </GridPane>
                </children>

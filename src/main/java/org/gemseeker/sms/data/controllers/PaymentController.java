@@ -20,13 +20,13 @@ public class PaymentController implements ModelController<Payment> {
 
     @Override
     public boolean insert(Payment model) throws SQLException {
-        String sql = String.format("INSERT INTO payments (payment_no, name, payment_for, extra_info, prev_balance, " +
-                        " amount_to_pay, discount, vat, surcharges, amount_total, amount_paid, balance, payment_date, " +
-                        "mode, ref, prepared_by, status, tag, date_created, date_updated) VALUES " +
-                        "('%s', '%s', '%s', '%s', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%s', '%s', '%s', '%s', '%s', " +
-                        "'%s', '%s', '%s')", model.getPaymentNo(), model.getName(), model.getPaymentFor(),
-                model.getExtraInfo(), model.getPrevBalance(), model.getAmountToPay(), model.getDiscount(),
-                model.getVat(), model.getSurcharges(), model.getAmountTotal(), model.getAmountPaid(),
+        String sql = String.format("INSERT INTO payments (payment_no, name, address, contact, payment_for, extra_info, " +
+                        "prev_balance, amount_to_pay, discount, vat, surcharges, amount_total, amount_paid, balance, " +
+                        "payment_date, mode, ref, prepared_by, status, tag, date_created, date_updated) VALUES " +
+                        "('%s', '%s', '%s', '%s', '%s', '%s', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%s', '%s', " +
+                        "'%s', '%s', '%s', '%s', '%s', '%s')", model.getPaymentNo(), model.getName(), model.getAddress(),
+                model.getContact(), model.getPaymentFor(), model.getExtraInfo(), model.getPrevBalance(), model.getAmountToPay(),
+                model.getDiscount(), model.getVat(), model.getSurcharges(), model.getAmountTotal(), model.getAmountPaid(),
                 model.getBalance(), model.getPaymentDate(), model.getMode(), model.getRef(), model.getPreparedBy(),
                 model.getStatus(), model.getTag(), model.getDateCreated(), model.getDateUpdated());
         return database.executeQuery(sql);
@@ -36,10 +36,10 @@ public class PaymentController implements ModelController<Payment> {
     public boolean update(Payment model) throws SQLException {
         // NOTE: Payment should only update the following: name; prepared_by,
         // payment_date, status, tag, and date_updated.
-        String sql = String.format("UPDATE payments SET name='%s', payment_date='%s', mode='%s', prepared_by='%s', " +
-                        "status='%s', tag='%s', date_updated='%s' WHERE id='%d'", model.getName(),
-                model.getPaymentDate(), model.getMode(), model.getPreparedBy(), model.getStatus(), model.getTag(),
-                LocalDateTime.now(), model.getId());
+        String sql = String.format("UPDATE payments SET name='%s', address='%s', contact='%s', payment_date='%s', mode='%s', " +
+                        "prepared_by='%s', status='%s', tag='%s', date_updated='%s' WHERE id='%d'", model.getName(),
+                model.getAddress(), model.getContact(), model.getPaymentDate(), model.getMode(), model.getPreparedBy(),
+                model.getStatus(), model.getTag(), LocalDateTime.now(), model.getId());
         return database.executeQuery(sql);
     }
 
@@ -109,12 +109,23 @@ public class PaymentController implements ModelController<Payment> {
         return list;
     }
 
+    public ObservableList<Payment> getPayments(String paymentFor) throws SQLException {
+        String sql = String.format("SELECT * FROM payments WHERE payment_for='%s' AND date_deleted IS NULL", paymentFor);
+        ObservableList<Payment> list = FXCollections.observableArrayList();
+        try (ResultSet rs = database.executeQueryWithResult(sql)) {
+            while (rs.next()) list.add(fetchInfo(rs));
+        }
+        return list;
+    }
+
     private Payment fetchInfo(ResultSet rs) throws SQLException {
         int index = 1;
         Payment payment = new Payment();
         payment.setId(rs.getInt(index++));
         payment.setPaymentNo(rs.getString(index++));
         payment.setName(rs.getString(index++));
+        payment.setAddress(rs.getString(index++));
+        payment.setContact(rs.getString(index++));
         payment.setPaymentFor(rs.getString(index++));
         payment.setExtraInfo(rs.getString(index++));
         payment.setPrevBalance(rs.getDouble(index++));

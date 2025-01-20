@@ -24,8 +24,6 @@ import org.gemseeker.sms.views.forms.StatementForm;
 import org.gemseeker.sms.views.forms.TermsConditionsForm;
 import org.gemseeker.sms.views.panels.AbstractPanel;
 
-import java.util.Objects;
-
 /**
  * Window for viewing forms before printing.
  */
@@ -44,8 +42,6 @@ public class PrintWindow extends AbstractWindow {
     @FXML private TextField tfCopies;
     @FXML private Button btnPrint;
 
-    private final MainWindow mainWindow;
-
     private final Scale scale = new Scale();
 
     private final AccountController accountController;
@@ -53,6 +49,7 @@ public class PrintWindow extends AbstractWindow {
     private final BillingController billingController;
     private final BillingStatementController billingStatementController;
     private final PaymentController paymentController;
+    private final PaymentItemController paymentItemController;
     private final CompositeDisposable disposables;
 
     private final ObservableList<Printer> printers = FXCollections.observableArrayList();
@@ -64,6 +61,12 @@ public class PrintWindow extends AbstractWindow {
     private Type mType;
     private String mBillingNo;
 
+    // For Services & Purchases
+    private boolean isForServiceOrPurchase;
+    private String mPaymentNo;
+    private ObservableList<PaymentItem> paymentItems;
+
+    private final User user;
     private Account account;
     private Subscription subscription;
     private Billing billing;
@@ -73,14 +76,15 @@ public class PrintWindow extends AbstractWindow {
     private AbstractPanel mForm = null;
     private Node mContent = null;
 
-    public PrintWindow(MainWindow mainWindow, Database database) {
-        super("Print", PrintWindow.class.getResource("print_window.fxml"), null, mainWindow.getStage());
-        this.mainWindow = mainWindow;
+    public PrintWindow(User user, Database database, Stage owner) {
+        super("Print", PrintWindow.class.getResource("print_window.fxml"), null, owner);
+        this.user = user;
         this.accountController = new AccountController(database);
         this.subscriptionController = new SubscriptionController(database);
         this.billingController = new BillingController(database);
         this.billingStatementController = new BillingStatementController(database);
         this.paymentController = new PaymentController(database);
+        this.paymentItemController = new PaymentItemController(database);
         this.disposables = new CompositeDisposable();
     }
 
@@ -107,10 +111,27 @@ public class PrintWindow extends AbstractWindow {
         btnPrint.setOnAction(evt -> print());
     }
 
+    /**
+     * Use this method if printing for subscription billings, and or receipts.
+     * @param type Type RECEIPT, STATEMENT, or TERMS_AND_CONDITIONS
+     * @param billingNo
+     */
     public void showAndWait(Type type, String billingNo) {
         if (type == null || (type != Type.TERMS_AND_CONDITIONS && billingNo == null)) return;
         mType = type;
         mBillingNo = billingNo;
+        isForServiceOrPurchase = false;
+        showAndWait();
+    }
+
+    /**
+     * Use this method if printing for Service or Purchase payments only.
+     * @param paymentNo
+     */
+    public void showAndWait(String paymentNo) {
+        if (paymentNo == null || paymentNo.isBlank()) return;
+        mPaymentNo = paymentNo;
+        isForServiceOrPurchase = true;
         showAndWait();
     }
 
@@ -121,10 +142,14 @@ public class PrintWindow extends AbstractWindow {
         printers.addAll(Printer.getAllPrinters());
         cbPrinters.setValue(Printer.getDefaultPrinter());
 
-        switch (mType) {
-            case STATEMENT -> loadBillingStatementForm();
-            case RECEIPT -> loadBillingReceiptForm();
-            default -> loadTermsAndConditions();
+        if (!isForServiceOrPurchase) {
+            switch (mType) {
+                case STATEMENT -> loadBillingStatementForm();
+                case RECEIPT -> loadBillingReceiptForm();
+                default -> loadTermsAndConditions();
+            }
+        } else {
+            loadPaymentReceiptForm(mPaymentNo);
         }
     }
 
@@ -156,7 +181,7 @@ public class PrintWindow extends AbstractWindow {
         mContent = statementForm.getView();
         contentPane.getChildren().clear();
         contentPane.getChildren().add(mContent);
-        statementForm.setData(mainWindow.getUser(), account, subscription, billing, billingStatement);
+        statementForm.setData(user, account, subscription, billing, billingStatement);
         statementForm.onResume();
     }
 
@@ -185,7 +210,37 @@ public class PrintWindow extends AbstractWindow {
         mContent = billingReceiptForm.getView();
         contentPane.getChildren().clear();
         contentPane.getChildren().add(mContent);
-        billingReceiptForm.setData(mainWindow.getUser(), account, payment);
+        billingReceiptForm.setData(user, account, payment);
+        billingReceiptForm.onResume();
+    }
+
+    /**
+     * Used only for Service or Purchase payments.
+     * @param paymentNo
+     */
+    private void loadPaymentReceiptForm(String paymentNo) {
+        progress.setVisible(true);
+        disposables.add(Single.fromCallable(() -> paymentController.getByPaymentNo(paymentNo))
+                .flatMap(p -> Single.fromCallable(() -> {
+                    payment = p;
+                    return paymentItemController.getByPayment(paymentNo);
+                })).observeOn(JavaFxScheduler.platform()).subscribeOn(Schedulers.io()).subscribe(items -> {
+                    progress.setVisible(false);
+                    paymentItems = items;
+                    if (billingReceiptForm == null) billingReceiptForm = new BillingReceiptForm();
+                    mForm = billingReceiptForm;
+                    fillPaymentReceiptForm();
+                }, err -> {
+                    progress.setVisible(false);
+                    showErrorDialog("Database Error", "Error while ");
+                }));
+    }
+
+    private void fillPaymentReceiptForm() {
+        mContent = billingReceiptForm.getView();
+        contentPane.getChildren().clear();
+        contentPane.getChildren().add(mContent);
+        billingReceiptForm.setData(user, payment, paymentItems);
         billingReceiptForm.onResume();
     }
 
@@ -241,12 +296,14 @@ public class PrintWindow extends AbstractWindow {
         billingStatement = null;
         billing = null;
         payment = null;
+        paymentItems = null;
         contentPane.getChildren().clear();
         mContent = null;
     }
 
     public void dispose() {
         if (statementForm != null) statementForm.onDispose();
+        if (billingReceiptForm != null) billingReceiptForm.onDispose();
         disposables.dispose();
     }
 }

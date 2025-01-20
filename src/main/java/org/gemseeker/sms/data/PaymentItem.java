@@ -10,6 +10,8 @@ public class PaymentItem {
     private String itemName;
     private String serial;      // can be null
     private double amount;
+    private double price; // price each
+    private int quantity;
 
     private String tag;
     private LocalDateTime dateCreated;
@@ -17,7 +19,9 @@ public class PaymentItem {
     private LocalDateTime dateDeleted;
 
     public PaymentItem() {
-        amount = 0;
+        itemNo = serial = "";
+        amount = price = 0;
+        quantity = 1;
         tag = "normal";
         dateCreated = dateUpdated = LocalDateTime.now();
     }
@@ -68,6 +72,22 @@ public class PaymentItem {
 
     public void setAmount(double amount) {
         this.amount = amount;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     public String getTag() {

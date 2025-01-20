@@ -46,6 +46,7 @@ public class Revenue {
         type = TYPE_OTHERS;
         description = "";
         amount = 0.0;
+        attachment = "";
         tag = "normal";
         dateCreated = dateUpdated = LocalDateTime.now();
     }

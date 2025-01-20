@@ -11,21 +11,68 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.gemseeker.sms.data.Database;
+import org.gemseeker.sms.data.Payment;
 import org.gemseeker.sms.data.Product;
 import org.gemseeker.sms.data.Service;
 import org.gemseeker.sms.data.controllers.ProductController;
 import org.gemseeker.sms.data.controllers.ServiceController;
 import org.gemseeker.sms.views.*;
+import org.gemseeker.sms.views.cells.AmountTableCell;
+import org.gemseeker.sms.views.cells.DateTableCell;
 import org.gemseeker.sms.views.cells.TagTableCell;
+import org.gemseeker.sms.views.icons.PesoIcon;
+import org.gemseeker.sms.views.panels.products_services.ItemStocksViewController;
+import org.gemseeker.sms.views.panels.products_services.JobbingViewController;
+import org.gemseeker.sms.views.panels.products_services.PurchasesViewController;
+import org.gemseeker.sms.views.panels.products_services.ServicesViewController;
 
 import java.sql.Ref;
+import java.time.LocalDate;
 import java.util.Optional;
 
 public class InventoryPanel extends AbstractPanel {
 
     @FXML private TabPane tabPane;
+    @FXML private Tab tabPurchases;
+    @FXML private Tab tabJobbings;
     @FXML private Tab tabProducts;
     @FXML private Tab tabServices;
+
+    // Purchases Group
+    @FXML private Button btnAddPurchase;
+    @FXML private Button btnEditPurchase;
+    @FXML private Button btnDeletePurchase;
+    @FXML private Button btnRefreshPurchases;
+    @FXML private Button btnPrintPurchase;
+    @FXML private ComboBox<String> cbPurchasePaymentModes;
+    @FXML private TableView<Payment> purchasesTable;
+    @FXML private TableColumn<Payment, String> colPurchaseTag;
+    @FXML private TableColumn<Payment, String> colPurchaseNo;
+    @FXML private TableColumn<Payment, LocalDate> colPurchaseDate;
+    @FXML private TableColumn<Payment, String> colPurchasePayee;
+    @FXML private TableColumn<Payment, Double> colPurchaseTotal;
+    @FXML private TableColumn<Payment, Double> colPurchasePaid;
+    @FXML private TableColumn<Payment, Double> colPurchaseBalance;
+    @FXML private TableColumn<Payment, String> colPurchaseMode;
+    @FXML private TableColumn<Payment, String> colPurchaseRef;
+
+    // Jobbing Group
+    @FXML private Button btnAddJob;
+    @FXML private Button btnEditJob;
+    @FXML private Button btnDeleteJob;
+    @FXML private Button btnRefreshJobs;
+    @FXML private Button btnPrintJobs;
+    @FXML private ComboBox<String> cbJobPaymentModes;
+    @FXML private TableView<Payment> jobbingTable;
+    @FXML private TableColumn<Payment, String> colJobTag;
+    @FXML private TableColumn<Payment, String> colJobNo;
+    @FXML private TableColumn<Payment, LocalDate> colJobDate;
+    @FXML private TableColumn<Payment, String> colJobPayee;
+    @FXML private TableColumn<Payment, Double> colJobTotal;
+    @FXML private TableColumn<Payment, Double> colJobPaid;
+    @FXML private TableColumn<Payment, Double> colJobBalance;
+    @FXML private TableColumn<Payment, String> colJobMode;
+    @FXML private TableColumn<Payment, String> colJobRef;
 
     // Products Group
     @FXML private Button btnAddProduct;
@@ -54,73 +101,40 @@ public class InventoryPanel extends AbstractPanel {
     @FXML private TableColumn<Service, Double> colServicePrice;
     @FXML private TableColumn<Service, String> colDescription;
 
-    private FilteredList<Product> productsList;
-    private final SimpleObjectProperty<Product> selectedProduct = new SimpleObjectProperty<>();
-
-    private FilteredList<Service> servicesList;
-    private final SimpleObjectProperty<Service> selectedService = new SimpleObjectProperty<>();
 
     private final MainWindow mainWindow;
     private final Database database;
-    private final ProductController productController;
-    private final ServiceController serviceController;
     private final CompositeDisposable disposables;
 
-    // Windows
-    private AddProductWindow addProductWindow;
-    private EditProductWindow editProductWindow;
-    private AddServiceWindow addServiceWindow;
-    private EditServiceWindow editServiceWindow;
+    // Tabs
+    private PurchasesViewController purchasesViewController;
+    private JobbingViewController jobbingViewController;
+    private ItemStocksViewController itemStocksViewController;
+    private ServicesViewController servicesViewController;
 
     public InventoryPanel(MainWindow mainWindow, Database database) {
         super(InventoryPanel.class.getResource("inventory.fxml"));
         this.mainWindow = mainWindow;
         this.database = database;
-        this.productController = new ProductController(database);
-        this.serviceController = new ServiceController(database);
         this.disposables = new CompositeDisposable();
     }
 
     @Override
     protected void onFxmlLoaded() {
         setupIcons();
-        setupProductsTable();
-        setupServicesTable();
-
-        // PRODUCT ACTIONS
-
-        btnAddProduct.setOnAction(evt -> addProduct());
-        btnEditProduct.setOnAction(evt -> editSelectedProduct());
-        btnDeleteProduct.setOnAction(evt -> deleteSelectedProduct());
-        btnRefreshProducts.setOnAction(evt -> refreshProducts());
-
-        // TODO filter
-
-        tfSearch.textProperty().addListener((o, oldVal, newVal) -> {
-            if (productsList == null || newVal == null) return;
-            if (newVal.isBlank()) productsList.setPredicate(p -> true);
-            else productsList.setPredicate(p -> p.getName().toLowerCase().contains(newVal.toLowerCase()));
-        });
-
-        // SERVICES ACTIONS
-        btnAddService.setOnAction(evt -> addService());
-        btnEditService.setOnAction(evt -> editSelectedService());
-        btnDeleteService.setOnAction(evt -> deleteSelectedService());
-        btnRefreshServices.setOnAction(evt -> refreshServices());
+        setupPurchasesTab();
+        setupJobbingsTab();
+        setupProductsTab();
+        setupServicesTab();
 
         tabPane.getSelectionModel().selectedIndexProperty().addListener((o, oldVal, newVal) -> {
-            if (newVal.intValue() == 0) refreshProducts();
-            else refreshServices();
+            onTabSelected(newVal.intValue());
         });
     }
 
     @Override
     public void onResume() {
-        if (tabPane.getSelectionModel().getSelectedIndex() == 0) {
-            refreshProducts();
-        } else {
-            refreshServices();
-        }
+        onTabSelected(tabPane.getSelectionModel().getSelectedIndex());
     }
 
     @Override
@@ -128,175 +142,74 @@ public class InventoryPanel extends AbstractPanel {
         // empty for now
     }
 
-    private void refreshProducts() {
-        showProgress(-1, "Retrieving Product entries...");
-        disposables.add(Single.fromCallable(() -> productController.getAll())
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
-                    hideProgress();
-                    productsList = new FilteredList<>(list);
-                    // TODO clear filters
-                    productsTable.setItems(productsList);
-                }, err -> {
-                    hideProgress();
-                    showErrorDialog("Database Error", "Error while retrieving Product entries.\n" + err);
-                }));
-    }
-
-    private void refreshServices() {
-        showProgress(-1, "Retrieving Service entries...");
-        disposables.add(Single.fromCallable(() -> serviceController.getAll())
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
-                    hideProgress();
-                    servicesList = new FilteredList<>(list);
-                    // TODO clear filters
-                    servicesTable.setItems(servicesList);
-                }, err -> {
-                    hideProgress();
-                    showErrorDialog("Database Error", "Error while retrieving Service entries.\n" + err);
-                }));
-    }
-
-    private void addProduct() {
-        if (addProductWindow == null) addProductWindow = new AddProductWindow(database, mainWindow.getStage());
-        addProductWindow.showAndWait();
-        refreshProducts();
-    }
-
-    private void addService() {
-        if (addServiceWindow == null) addServiceWindow = new AddServiceWindow(database, mainWindow.getStage());
-        addServiceWindow.showAndWait();
-        refreshServices();
-    }
-
-    private void editSelectedProduct() {
-        if (selectedProduct.get() == null) {
-            showWarningDialog("Invalid", "No selected Product. Try again.");
-        } else {
-            if (editProductWindow == null) editProductWindow = new EditProductWindow(database, mainWindow.getStage());
-            editProductWindow.showAndWait(selectedProduct.get());
-            refreshProducts();
+    private void onTabSelected(int index) {
+        switch (index) {
+            case 1 -> {
+                if (jobbingViewController != null) jobbingViewController.refresh();
+            }
+            case 2 -> {
+                if (itemStocksViewController != null) itemStocksViewController.refresh();
+            }
+            case 3 -> {
+                if (servicesViewController != null) servicesViewController.refresh();
+            }
+            default -> {
+                if (purchasesViewController != null) purchasesViewController.refresh();
+            }
         }
-    }
-
-    private void editSelectedService() {
-        if (selectedService.get() == null) {
-            showWarningDialog("Invalid", "No selected Service. Try again.");
-        } else {
-            if (editServiceWindow == null) editServiceWindow = new EditServiceWindow(database, mainWindow.getStage());
-            editServiceWindow.showAndWait(selectedService.get());
-            refreshServices();
-        }
-    }
-
-    private void deleteSelectedProduct() {
-        if (selectedProduct.get() == null) {
-            showWarningDialog("Invalid", "No selected Product. Try again.");
-        } else {
-            Optional<ButtonType> result = showConfirmDialog("Delete Product",
-                    "Are you sure you want to delete this Product entry?",
-                    ButtonType.YES, ButtonType.NO);
-            if (result.isPresent() && result.get() == ButtonType.YES) deleteProduct(selectedProduct.get().getId());
-        }
-    }
-
-    private void deleteProduct(int id) {
-        showProgress(-1, "Deleting Product entry...");
-        disposables.add(Single.fromCallable(() -> productController.delete(id))
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
-                    hideProgress();
-                    if (!success) showWarningDialog("Failed", "Failed to delete Product entry.");
-                    refreshProducts();
-                }, err -> {
-                    hideProgress();
-                    showErrorDialog("Database Error", "Error while deleting Product entry.\n" + err);
-                }));
-    }
-
-    private void deleteSelectedService() {
-        if (selectedService.get() == null) {
-            showWarningDialog("Invalid", "No selected Service. Try again.");
-        } else {
-            Optional<ButtonType> result = showConfirmDialog("Delete Service",
-                    "Are you sure you want to delete this Service entry?",
-                    ButtonType.YES, ButtonType.NO);
-            if (result.isPresent() && result.get() == ButtonType.YES) deleteService(selectedService.get().getId());
-        }
-    }
-
-    private void deleteService(int id) {
-        showProgress(-1, "Deleting Service entry...");
-        disposables.add(Single.fromCallable(() -> serviceController.delete(id))
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
-                    hideProgress();
-                    if (!success) showWarningDialog("Failed", "Failed to delete Service entry.");
-                    refreshServices();
-                }, err -> {
-                    hideProgress();
-                    showErrorDialog("Database Error", "Error while deleting Service entry.\n" + err);
-                }));
-    }
-
-    private void updateSelectedProductTag(String tag) {
-        if (selectedProduct.get() == null) {
-            showWarningDialog("Invalid", "No selected Product. Try again.");
-        } else {
-            showProgress(-1, "Updating Product entry tag....");
-            disposables.add(Single.fromCallable(() -> productController.update(selectedProduct.get().getId(), "tag", tag))
-                    .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
-                        hideProgress();
-                        if (!success) showWarningDialog("Failed", "Failed to update Product entry.");
-                        refreshProducts();
-                    }, err -> {
-                        hideProgress();
-                        showErrorDialog("Database Error", "Error while updating Product entry.\n" + err);
-                    }));
-        }
-    }
-
-    private void updateSelectedServiceTag(String tag) {
-        if (selectedService.get() == null) {
-            showWarningDialog("Invalid", "No selected Service. Try again.");
-        } else {
-            showProgress(-1, "Updating Service entry tag....");
-            disposables.add(Single.fromCallable(() -> serviceController.update(selectedService.get().getId(), "tag", tag))
-                    .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
-                        hideProgress();
-                        if (!success) showWarningDialog("Failed", "Failed to update Service entry.");
-                        refreshServices();
-                    }, err -> {
-                        hideProgress();
-                        showErrorDialog("Database Error", "Error while updating Service entry.\n" + err);
-                    }));
-        }
-    }
-
-    private void showProgress(double progress, String text) {
-        mainWindow.showProgress(progress, text);
-    }
-
-    private void hideProgress() {
-        mainWindow.hideProgress();
     }
 
     private void setupIcons() {
-        // Products group
+        tabPurchases.setGraphic(new PesoIcon(12));
+        tabJobbings.setGraphic(new PesoIcon(12));
         tabProducts.setGraphic(new ShoppingCartIcon(12));
-        btnAddProduct.setGraphic(new PlusIcon(14));
-        btnEditProduct.setGraphic(new Edit2Icon(14));
-        btnDeleteProduct.setGraphic(new TrashIcon(14));
-        btnRefreshProducts.setGraphic(new RefreshCwIcon(14));
-        btnPrintList.setGraphic(new PrinterIcon(14));
-        lblSearch.setGraphic(new SearchIcon(14));
-
-        // Service Group
         tabServices.setGraphic(new ToolIcon(12));
-        btnAddService.setGraphic(new PlusIcon(14));
-        btnEditService.setGraphic(new Edit2Icon(14));
-        btnDeleteService.setGraphic(new TrashIcon(14));
-        btnRefreshServices.setGraphic(new RefreshCwIcon(14));
     }
 
-    private void setupProductsTable() {
+    private void setupPurchasesTab() {
+        colPurchaseTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
+        colPurchaseTag.setCellFactory(col -> new TagTableCell<>());
+        colPurchaseNo.setCellValueFactory(new PropertyValueFactory<>("paymentNo"));
+        colPurchaseDate.setCellValueFactory(new PropertyValueFactory<>("paymentDate"));
+        colPurchaseDate.setCellFactory(col -> new DateTableCell<>());
+        colPurchasePayee.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colPurchaseTotal.setCellValueFactory(new PropertyValueFactory<>("amountTotal"));
+        colPurchaseTotal.setCellFactory(col -> new AmountTableCell<>());
+        colPurchasePaid.setCellValueFactory(new PropertyValueFactory<>("amountPaid"));
+        colPurchasePaid.setCellFactory(col -> new AmountTableCell<>());
+        colPurchaseBalance.setCellValueFactory(new PropertyValueFactory<>("balance"));
+        colPurchaseBalance.setCellFactory(col -> new AmountTableCell<>());
+        colPurchaseMode.setCellValueFactory(new PropertyValueFactory<>("mode"));
+        colPurchaseRef.setCellValueFactory(new PropertyValueFactory<>("ref"));
+
+        purchasesViewController = new PurchasesViewController(mainWindow, this, database,
+                btnAddPurchase, btnEditPurchase, btnDeletePurchase, btnRefreshPurchases, btnPrintPurchase, cbPurchasePaymentModes,
+                purchasesTable);
+        purchasesViewController.init();
+    }
+
+    private void setupJobbingsTab() {
+        colJobTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
+        colJobTag.setCellFactory(col -> new TagTableCell<>());
+        colJobNo.setCellValueFactory(new PropertyValueFactory<>("paymentNo"));
+        colJobDate.setCellValueFactory(new PropertyValueFactory<>("paymentDate"));
+        colJobDate.setCellFactory(col -> new DateTableCell<>());
+        colJobPayee.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colJobTotal.setCellValueFactory(new PropertyValueFactory<>("amountTotal"));
+        colJobTotal.setCellFactory(col -> new AmountTableCell<>());
+        colJobPaid.setCellValueFactory(new PropertyValueFactory<>("amountPaid"));
+        colJobPaid.setCellFactory(col -> new AmountTableCell<>());
+        colJobBalance.setCellValueFactory(new PropertyValueFactory<>("balance"));
+        colJobBalance.setCellFactory(col -> new AmountTableCell<>());
+        colJobMode.setCellValueFactory(new PropertyValueFactory<>("mode"));
+        colJobRef.setCellValueFactory(new PropertyValueFactory<>("ref"));
+
+        jobbingViewController = new JobbingViewController(mainWindow, this, database,
+                btnAddJob, btnEditJob, btnDeleteJob, btnRefreshJobs, btnPrintJobs, cbJobPaymentModes, jobbingTable);
+        jobbingViewController.init();
+    }
+
+    private void setupProductsTab() {
         colProductTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
         colProductTag.setCellFactory(col -> new TagTableCell<>());
         colProductId.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -304,33 +217,13 @@ public class InventoryPanel extends AbstractPanel {
         colProductPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
         colStocks.setCellValueFactory(new PropertyValueFactory<>("stock"));
 
-        MenuItem mAdd = new MenuItem("New Product");
-        mAdd.setGraphic(new PlusIcon(12));
-        mAdd.setOnAction(evt -> addProduct());
-
-        MenuItem mEdit = new MenuItem("Edit");
-        mEdit.setGraphic(new Edit2Icon(14));
-        mEdit.setOnAction(evt -> editSelectedProduct());
-
-        MenuItem mDelete = new MenuItem("Delete");
-        mDelete.setGraphic(new TrashIcon(12));
-        mDelete.setOnAction(evt -> deleteSelectedProduct());
-
-        Menu mChangeTag = new Menu("Change Tag");
-        mChangeTag.setGraphic(new CircleIcon(12));
-        ViewUtils.getTags().forEach((tag, icon) -> {
-            MenuItem item = new MenuItem(ViewUtils.capitalize(tag));
-            item.setGraphic(icon);
-            item.setOnAction(evt -> updateSelectedProductTag(tag));
-            mChangeTag.getItems().add(item);
-        });
-
-        ContextMenu cm = new ContextMenu(mAdd, mEdit, mDelete, mChangeTag);
-        productsTable.setContextMenu(cm);
-        selectedProduct.bind(productsTable.getSelectionModel().selectedItemProperty());
+        itemStocksViewController = new ItemStocksViewController(mainWindow, this, database,
+                btnAddProduct, btnEditProduct, btnDeleteProduct, btnRefreshProducts, btnPrintList, lblSearch,
+                tfSearch, productsTable);
+        itemStocksViewController.init();
     }
 
-    private void setupServicesTable() {
+    private void setupServicesTab() {
         colServiceTag.setCellValueFactory(new PropertyValueFactory<>("tag"));
         colServiceTag.setCellFactory(col -> new TagTableCell<>());
         colServiceId.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -338,38 +231,16 @@ public class InventoryPanel extends AbstractPanel {
         colServicePrice.setCellValueFactory(new PropertyValueFactory<>("price"));
         colDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
 
-        MenuItem mAdd = new MenuItem("New Service");
-        mAdd.setGraphic(new PlusIcon(12));
-        mAdd.setOnAction(evt -> addService());
-
-        MenuItem mEdit = new MenuItem("Edit");
-        mEdit.setGraphic(new Edit2Icon(14));
-        mEdit.setOnAction(evt -> editSelectedService());
-
-        MenuItem mDelete = new MenuItem("Delete");
-        mDelete.setGraphic(new TrashIcon(12));
-        mDelete.setOnAction(evt -> deleteSelectedService());
-
-        Menu mChangeTag = new Menu("Change Tag");
-        mChangeTag.setGraphic(new CircleIcon(12));
-        ViewUtils.getTags().forEach((tag, icon) -> {
-            MenuItem item = new MenuItem(ViewUtils.capitalize(tag));
-            item.setGraphic(icon);
-            item.setOnAction(evt -> updateSelectedServiceTag(tag));
-            mChangeTag.getItems().add(item);
-        });
-
-        ContextMenu cm = new ContextMenu(mAdd, mEdit, mDelete, mChangeTag);
-        servicesTable.setContextMenu(cm);
-        selectedService.bind(servicesTable.getSelectionModel().selectedItemProperty());
+        servicesViewController = new ServicesViewController(mainWindow, this, database,
+                btnAddService, btnEditService, btnDeleteService, btnRefreshServices, servicesTable);
+        servicesViewController.init();
     }
 
     @Override
     public void onDispose() {
-        if (addProductWindow != null) addProductWindow.dispose();
-        if (editProductWindow != null) editProductWindow.dispose();
-        if (addServiceWindow != null) addServiceWindow.dispose();
-        if (editServiceWindow != null) editServiceWindow.dispose();
+        if (jobbingViewController != null) jobbingViewController.dispose();
+        if (itemStocksViewController != null) itemStocksViewController.dispose();
+        if (servicesViewController != null) servicesViewController.dispose();
         disposables.dispose();
     }
 }

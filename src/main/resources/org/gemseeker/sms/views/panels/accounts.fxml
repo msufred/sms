@@ -58,7 +58,7 @@
                         <TableView fx:id="accountsTable" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
                           <columns>
                               <TableColumn fx:id="colTag" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" style="-fx-alignment: center;" />
-                            <TableColumn fx:id="colNo" style="-fx-alignment: center;" text="Account No." />
+                            <TableColumn fx:id="colNo" prefWidth="150.0" style="-fx-alignment: center;" text="Account No." />
                               <TableColumn fx:id="colStatus" minWidth="100.0" prefWidth="100.0" style="-fx-alignment: center;" text="Status" />
                             <TableColumn fx:id="colName" prefWidth="150.0" style="-fx-alignment: center;" text="Name" />
                               <TableColumn fx:id="colContact" prefWidth="120.0" style="-fx-alignment: center;" text="Contact No." />

@@ -36,25 +36,25 @@
                                         <Button fx:id="btnDelete" mnemonicParsing="false" styleClass="btn" />
                                         <Button fx:id="btnRefresh" mnemonicParsing="false" styleClass="btn" />
                                         <Button fx:id="btnAutomate" mnemonicParsing="false" styleClass="btn" text="Automate" />
-                                        <Label fx:id="lblAccounts" text="Account">
+                                        <Label fx:id="lblAccounts" styleClass="label-icon" text="Account">
                                             <HBox.margin>
                                                 <Insets left="8.0" />
                                             </HBox.margin>
                                         </Label>
                                         <ComboBox fx:id="cbAccounts" />
-                                        <Label fx:id="lblStatus" text="Status">
+                                        <Label fx:id="lblStatus" styleClass="label-icon" text="Status">
                                             <HBox.margin>
                                                 <Insets left="8.0" />
                                             </HBox.margin>
                                         </Label>
                                         <ComboBox fx:id="cbStatus" promptText="By Status" />
-                                        <Label fx:id="lblMonth" text="Month">
+                                        <Label fx:id="lblMonth" styleClass="label-icon" text="Month">
                                             <HBox.margin>
                                                 <Insets left="8.0" />
                                             </HBox.margin>
                                         </Label>
                                         <ComboBox fx:id="cbMonths" promptText="By Month" />
-                                        <Label fx:id="lblYear" text="Year">
+                                        <Label fx:id="lblYear" styleClass="label-icon" text="Year">
                                             <HBox.margin>
                                                 <Insets left="8.0" />
                                             </HBox.margin>
@@ -77,37 +77,6 @@
                                         <TableColumn fx:id="colAmountDue" prefWidth="100.0" style="-fx-alignment: center;" text="Amount Due" />
                                         <TableColumn fx:id="colAmountPaid" prefWidth="100.0" style="-fx-alignment: center;" text="Amount Paid" />
                                         <TableColumn fx:id="colBalance" prefWidth="100.0" style="-fx-alignment: center;" text="Balance" />
-                                    </columns>
-                                </TableView>
-                            </children>
-                        </VBox>
-                    </content>
-                </Tab>
-                <Tab fx:id="tabOtherPayments" text="Purchase Orders">
-                    <content>
-                        <VBox prefHeight="200.0" prefWidth="100.0">
-                            <children>
-                                <HBox prefWidth="200.0" spacing="4.0">
-                                    <children>
-                                        <Button fx:id="btnAddPurchase" mnemonicParsing="false" styleClass="btn" />
-                                        <Button fx:id="btnEditPurchase" mnemonicParsing="false" styleClass="btn" />
-                                        <Button fx:id="btnDeletePurchase" mnemonicParsing="false" styleClass="btn" />
-                                    </children>
-                                    <padding>
-                                        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
-                                    </padding>
-                                </HBox>
-                                <TableView fx:id="purchaseTable" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
-                                    <columns>
-                                        <TableColumn fx:id="colPurchaseStatus" prefWidth="100.0" style="-fx-alignment: center" text="Status" />
-                                        <TableColumn fx:id="colPurchaseOrNo" prefWidth="100.0" style="-fx-alignment: center" text="OR #" />
-                                        <TableColumn fx:id="colPurchaseNo" prefWidth="100.0" style="-fx-alignment: center" text="Purchase No" />
-                                        <TableColumn fx:id="colPurchaseClient" prefWidth="250.0" style="-fx-alignment: center" text="Client Name" />
-                                        <TableColumn fx:id="colPurchaseWalkIn" prefWidth="75.0" styleClass="-fx-alignment: center" text="Walk-In" />
-                                        <TableColumn fx:id="colPurchasePaymentDate" prefWidth="100.0" style="-fx-alignment: center" text="Payment Date" />
-                                        <TableColumn fx:id="colPurchaseAmountDue" prefWidth="100.0" style="-fx-alignment: center" text="Amount Due" />
-                                        <TableColumn fx:id="colPurchaseAmountPaid" prefWidth="100.0" style="-fx-alignment: center" text="Amount Paid" />
-                                        <TableColumn fx:id="colPurchaseBalance" prefWidth="100.0" style="-fx-alignment: center" text="Balance" />
                                     </columns>
                                 </TableView>
                             </children>

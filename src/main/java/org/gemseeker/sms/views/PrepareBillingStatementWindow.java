@@ -255,7 +255,7 @@ public class PrepareBillingStatementWindow extends AbstractWindow {
         }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
             progressBar.setVisible(false);
             if (!success) showWarningDialog("Failed", "Failed to update Billing Statement.");
-            if (printWindow == null) printWindow = new PrintWindow(mainWindow, database);
+            if (printWindow == null) printWindow = new PrintWindow(mainWindow.getUser(), database, getStage());
             printWindow.showAndWait(PrintWindow.Type.STATEMENT, mBillingNo);
             close();
         }, err -> {
@@ -300,7 +300,7 @@ public class PrepareBillingStatementWindow extends AbstractWindow {
         }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
             progressBar.setVisible(false);
             if (!success) showWarningDialog("Failed", "Failed to add new Billing Statement.");
-            if (printWindow == null) printWindow = new PrintWindow(mainWindow, database);
+            if (printWindow == null) printWindow = new PrintWindow(mainWindow.getUser(), database, getStage());
             printWindow.showAndWait(PrintWindow.Type.STATEMENT, mBillingNo);
             close();
         }, err -> {

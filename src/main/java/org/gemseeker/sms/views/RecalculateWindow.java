@@ -98,7 +98,8 @@ public class RecalculateWindow extends AbstractWindow {
                     }
                 }
 
-                balance = lastBalance + totalRevenues - totalExpenses + totalCashIn - totalCashOut;
+                //balance = lastBalance + totalRevenues - totalExpenses + totalCashIn - totalCashOut;
+                balance = (lastBalance + totalRevenues + totalCashIn) - totalExpenses;
 
                 DailySummary summary = new DailySummary();
                 summary.setDate(curDate);

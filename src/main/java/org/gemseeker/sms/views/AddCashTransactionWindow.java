@@ -5,6 +5,7 @@ import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import io.reactivex.schedulers.Schedulers;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -62,7 +63,9 @@ public class AddCashTransactionWindow extends AbstractWindow {
         cbTypes.setItems(CashTransaction.types);
         cbTypes.setValue(CashTransaction.TYPE_CASH_IN);
 
-        cbModes.setItems(CashTransaction.modes);
+        cbModes.setItems(FXCollections.observableArrayList(
+                CashTransaction.MODE_CASH, CashTransaction.MODE_BANK_CASH
+        ));
         cbModes.valueProperty().addListener((o, oldVal, newVal) -> {
             refGroup.setDisable(newVal.equals(CashTransaction.MODE_CASH));
             if (newVal.equals(CashTransaction.MODE_BANK_CASH)) {

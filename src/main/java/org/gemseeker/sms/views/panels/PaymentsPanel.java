@@ -49,7 +49,6 @@ public class PaymentsPanel extends AbstractPanel {
     // <editor-fold default-state="collapsed" desc="FXML Components">
     @FXML private TabPane tabPane;
     @FXML private Tab tabBillings;
-    @FXML private Tab tabOtherPayments;
     @FXML private Tab tabBillingStatements;
     @FXML private Tab tabPayments;
 
@@ -78,21 +77,6 @@ public class PaymentsPanel extends AbstractPanel {
     @FXML private TableColumn<BillingPayment, Double> colAmountPaid;
     @FXML private TableColumn<BillingPayment, LocalDate> colDueDate;
     @FXML private TableColumn<BillingPayment, Double> colBalance;
-
-    // Purchase Billings
-    @FXML private Button btnAddPurchase;
-    @FXML private Button btnEditPurchase;
-    @FXML private Button btnDeletePurchase;
-    @FXML private TableView<PurchasePayment> purchaseTable;
-    @FXML private TableColumn<PurchasePayment, String> colPurchaseStatus;
-    @FXML private TableColumn<PurchasePayment, String> colPurchaseOrNo;
-    @FXML private TableColumn<PurchasePayment, String> colPurchaseNo;
-    @FXML private TableColumn<PurchasePayment, String> colPurchaseClient;
-    @FXML private TableColumn<PurchasePayment, Boolean> colPurchaseWalkIn;
-    @FXML private TableColumn<PurchasePayment, LocalDate> colPurchasePaymentDate;
-    @FXML private TableColumn<PurchasePayment, Double> colPurchaseAmountDue;
-    @FXML private TableColumn<PurchasePayment, Double> colPurchaseAmountPaid;
-    @FXML private TableColumn<PurchasePayment, Double> colPurchaseBalance;
 
     // Billing Statement Group
     @FXML private TableView<BillingStatement> billingStatementsTable;
@@ -140,9 +124,6 @@ public class PaymentsPanel extends AbstractPanel {
     private FilteredList<BillingPayment> billingsList;
     private final SimpleObjectProperty<BillingPayment> selectedBilling = new SimpleObjectProperty<>();
 
-    private FilteredList<PurchasePayment> purchasePaymentsList;
-    private final SimpleObjectProperty<PurchasePayment> selectedPurchase = new SimpleObjectProperty<>();
-
     private FilteredList<BillingStatement> billingStatementList;
     private final SimpleObjectProperty<BillingStatement> selectedBillingStatement = new SimpleObjectProperty<>();
 
@@ -185,7 +166,6 @@ public class PaymentsPanel extends AbstractPanel {
     protected void onFxmlLoaded() {
         setupIcons();
         setupBillingsTable();
-        setupPurchaseBillingsTable();
         setupPaymentsTable();
         setupBillingStatementsTable();
 
@@ -202,7 +182,7 @@ public class PaymentsPanel extends AbstractPanel {
     @Override
     public void onResume() {
         // create PrintWindow and SaveImageWindow
-        if (printWindow == null) printWindow = new PrintWindow(mainWindow, database);
+        if (printWindow == null) printWindow = new PrintWindow(mainWindow.getUser(), database, mainWindow.getStage());
         if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(mainWindow, database);
 
         showProgress("Retrieving Account entries...");
@@ -418,19 +398,6 @@ public class PaymentsPanel extends AbstractPanel {
                     showErrorDialog("Database Error", "Error while deleting Billing entry.\n" + err);
                 }));
     }
-
-    private void addPurchase() {
-        showWarningDialog("Invalid Action", "Feature not implemented.");
-    }
-
-    private void editPurchase() {
-        showWarningDialog("Invalid Action", "Feature not implemented.");
-    }
-
-    private void deletePurchase() {
-        showWarningDialog("Invalid Action", "Feature not implemented.");
-    }
-
 
     private void printTermsAndConditions() {
         if (printWindow != null) {
@@ -708,7 +675,6 @@ public class PaymentsPanel extends AbstractPanel {
     private void setupIcons() {
         tabBillings.setGraphic(new PesoIcon(14));
         tabBillingStatements.setGraphic(new FileTextIcon(14));
-        tabOtherPayments.setGraphic(new PesoIcon(14));
         tabPayments.setGraphic(new FileTextIcon(14));
 
         btnAdd.setGraphic(new PlusIcon(14));
@@ -720,10 +686,6 @@ public class PaymentsPanel extends AbstractPanel {
         lblStatus.setGraphic(new SmileIcon(14));
         lblMonth.setGraphic(new CalendarIcon(14));
         lblYear.setGraphic(new CalendarIcon(14));
-
-        btnAddPurchase.setGraphic(new PlusIcon(14));
-        btnEditPurchase.setGraphic(new Edit2Icon(14));
-        btnDeletePurchase.setGraphic(new TrashIcon(14));
     }
 
     private void setupBillingsTable() {
@@ -732,7 +694,7 @@ public class PaymentsPanel extends AbstractPanel {
         btnDelete.setOnAction(evt -> deleteSelectedBilling());
         btnRefresh.setOnAction(evt -> refreshBillings());
         btnAutomate.setOnAction(evt -> {
-            // TODO automate billings
+            showWarningDialog("Invalid Action", "Feature not implemented.");
         });
 
         cbAccounts.valueProperty().addListener((o, oldVal, newVal) -> updateFilters());
@@ -830,101 +792,6 @@ public class PaymentsPanel extends AbstractPanel {
         ContextMenu cm = new ContextMenu(mAdd, mEdit, mAcceptPayment, mBilling, mReceipt, mPrintTerms, new SeparatorMenuItem(), mDelete);
         billingsTable.setContextMenu(cm);
         selectedBilling.bind(billingsTable.getSelectionModel().selectedItemProperty());
-    }
-
-    private void setupPurchaseBillingsTable() {
-        btnAddPurchase.setOnAction(evt -> addPurchase());
-        btnEditPurchase.setOnAction(evt -> editPurchase());
-        btnDeletePurchase.setOnAction(evt -> deletePurchase());
-
-        colPurchaseStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
-        colPurchaseOrNo.setCellValueFactory(new PropertyValueFactory<>("paymentNo"));
-        colPurchaseOrNo.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(String s, boolean empty) {
-                if (empty || s == null || s.equalsIgnoreCase("null")) {
-                    setText("");
-                    setGraphic(null);
-                } else {
-                    setText(s);
-                }
-            }
-        });
-        colPurchaseNo.setCellValueFactory(new PropertyValueFactory<>("billingNo"));
-        colPurchaseClient.setCellValueFactory(new PropertyValueFactory<>("name"));
-        colPurchaseWalkIn.setCellValueFactory(new PropertyValueFactory<>("walkIn"));
-        colPurchaseWalkIn.setCellFactory(col -> new TableCell<PurchasePayment, Boolean>() {
-            @Override
-            protected void updateItem(Boolean walkIn, boolean empty) {
-                if (empty) {
-                    setText("");
-                    setGraphic(null);
-                } else {
-                    if (walkIn) setText("Yes");
-                    else setText("No");
-                }
-            }
-        });
-        colPurchaseAmountDue.setCellValueFactory(new PropertyValueFactory<>("amountTotal"));
-        colPurchaseAmountDue.setCellFactory(col -> new AmountTableCell<>());
-        colPurchaseAmountPaid.setCellValueFactory(new PropertyValueFactory<>("amountPaid"));
-        colPurchaseAmountPaid.setCellFactory(col -> new AmountTableCell<>());
-        colPurchaseBalance.setCellValueFactory(new PropertyValueFactory<>("balance"));
-        colPurchaseBalance.setCellFactory(col -> new AmountTableCell<>());
-        colPurchasePaymentDate.setCellValueFactory(new PropertyValueFactory<>("paymentDate"));
-        colPurchasePaymentDate.setCellFactory(col -> new DateTableCell<>());
-
-        MenuItem mAdd = new MenuItem("Add Purchase");
-        mAdd.setGraphic(new PlusIcon(12));
-        mAdd.setOnAction(evt -> addPurchase());
-
-        MenuItem mEdit = new MenuItem("Edit");
-        mEdit.setGraphic(new Edit2Icon(12));
-        mEdit.setOnAction(evt -> editPurchase());
-
-        MenuItem mAcceptPayment = new MenuItem("Accept Payment");
-        mAcceptPayment.setGraphic(new PesoIcon(12));
-        //mAcceptPayment.setOnAction(evt -> acceptPurchaseBillingPayment());
-
-        MenuItem mAddStatement = new MenuItem("Create");
-        mAddStatement.setGraphic(new PlusIcon(12));
-        //mAddStatement.setOnAction(evt -> addPurchaseBillingStatement());
-
-        MenuItem mSaveBilling = new MenuItem("Save As Image");
-        mSaveBilling.setGraphic(new ImageIcon(12));
-        //mSaveBilling.setOnAction(evt -> savePurchaseBillingAsImage());
-
-        MenuItem mPrintBilling = new MenuItem("Print Billing");
-        mPrintBilling.setGraphic(new PrinterIcon(12));
-        mPrintBilling.setOnAction(evt -> printBilling());
-
-        Menu mBilling = new Menu("Billing Statement");
-        mBilling.setGraphic(new FileIcon(12));
-        mBilling.getItems().addAll(mAddStatement, mSaveBilling, mPrintBilling);
-
-        MenuItem mSaveReceipt = new MenuItem("Save As Image");
-        mSaveReceipt.setGraphic(new ImageIcon(12));
-        //mSaveReceipt.setOnAction(evt -> savePurchaseReceiptAsImage());
-
-        MenuItem mPrintReceipt = new MenuItem("Print Receipt");
-        mPrintReceipt.setGraphic(new PrinterIcon(12));
-        //mPrintReceipt.setOnAction(evt -> printPurchaseReceipt());
-
-        Menu mReceipt = new Menu("Receipt");
-        mReceipt.setGraphic(new FileIcon(12));
-        mReceipt.getItems().addAll(mSaveReceipt, mPrintReceipt);
-
-        MenuItem mPrintTerms = new MenuItem("Print Terms & Conditions");
-        mPrintTerms.setGraphic(new PrinterIcon(12));
-        mPrintTerms.setOnAction(evt -> printTermsAndConditions());
-
-        MenuItem mDelete = new MenuItem("Delete");
-        mDelete.setGraphic(new TrashIcon(12));
-        mDelete.setOnAction(evt -> deletePurchase());
-
-        ContextMenu cm = new ContextMenu(mAdd, mEdit, mAcceptPayment, mBilling, mReceipt, mPrintTerms, new SeparatorMenuItem(), mDelete);
-        purchaseTable.setContextMenu(cm);
-        selectedPurchase.bind(purchaseTable.getSelectionModel().selectedItemProperty());
     }
 
     private void setupBillingStatementsTable() {

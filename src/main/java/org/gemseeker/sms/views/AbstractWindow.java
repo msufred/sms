@@ -3,6 +3,8 @@ package org.gemseeker.sms.views;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
+
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -81,17 +83,17 @@ public abstract class AbstractWindow {
     protected abstract void onFxmlLoaded();
 
     public void show() {
-        getStage().show();
+        Platform.runLater(() -> getStage().show());
     }
 
     protected abstract void onShow();
 
     public void showAndWait() {
-        getStage().showAndWait();
+        Platform.runLater(() -> getStage().showAndWait());
     }
 
     public void close() {
-        getStage().close();
+        Platform.runLater(() -> getStage().close());
     }
 
     protected abstract void onClose();

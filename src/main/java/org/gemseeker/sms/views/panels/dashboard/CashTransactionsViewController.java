@@ -18,6 +18,7 @@ import org.gemseeker.sms.data.CashTransaction;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.controllers.CashTransactionController;
 import org.gemseeker.sms.views.*;
+import org.gemseeker.sms.views.icons.PesoIcon;
 import org.gemseeker.sms.views.panels.DashboardPanel;
 
 import java.io.File;
@@ -27,8 +28,9 @@ import java.time.format.DateTimeFormatter;
 public class CashTransactionsViewController {
 
     // Components
-    private final Button btnAdd, btnEdit, btnDelete, btnExport;
+    private final Button btnAdd, btnEdit, btnDelete, btnTransfer, btnExport;
     private ComboBox<String> cbModes;
+    private final Label lblCash, lblGCash, lblBank, lblCheque, lblPalawan;
     private final TableView<CashTransaction> tableView;
 
     private final DashboardPanel dashboardPanel;
@@ -48,14 +50,21 @@ public class CashTransactionsViewController {
     private DirectoryChooser directoryChooser;
 
     public CashTransactionsViewController(DashboardPanel dashboardPanel, MainWindow mainWindow, Database database,
-                                          Button btnAdd, Button btnEdit, Button btnDelete, Button btnExport,
-                                          ComboBox<String> cbModes, TableView<CashTransaction> tableView) {
+                                          Button btnAdd, Button btnEdit, Button btnDelete, Button btnTransfer, Button btnExport,
+                                          ComboBox<String> cbModes, Label lblCash, Label lblGCash, Label lblBank, Label lblCheque,
+                                          Label lblPalawan, TableView<CashTransaction> tableView) {
         this.btnAdd = btnAdd;
         this.btnEdit = btnEdit;
         this.btnDelete = btnDelete;
+        this.btnTransfer = btnTransfer;
         this.btnExport = btnExport;
         this.cbModes = cbModes;
         this.tableView = tableView;
+        this.lblCash = lblCash;
+        this.lblGCash = lblGCash;
+        this.lblBank = lblBank;
+        this.lblCheque = lblCheque;
+        this.lblPalawan = lblPalawan;
 
         this.dashboardPanel = dashboardPanel;
         this.mainWindow = mainWindow;
@@ -74,6 +83,11 @@ public class CashTransactionsViewController {
         btnDelete.setGraphic(new TrashIcon(14));
         btnDelete.setOnAction(evt -> deleteItem());
 
+        btnTransfer.setGraphic(new RepeatIcon(14));
+        btnTransfer.setOnAction(evt -> {
+            mainWindow.showWarningDialog("Invalid Action", "Feature not yet implemented.");
+        });
+
         btnExport.setGraphic(new UploadIcon(14));
         btnExport.setOnAction(evt -> exportList());
 
@@ -90,6 +104,12 @@ public class CashTransactionsViewController {
             }
         });
         cbModes.setValue("All");
+
+        lblCash.setGraphic(new PesoIcon(14));
+        lblGCash.setGraphic(new PesoIcon(14));
+        lblBank.setGraphic(new PesoIcon(14));
+        lblCheque.setGraphic(new PesoIcon(14));
+        lblPalawan.setGraphic(new PesoIcon(14));
 
         // setup context menu
         MenuItem mAdd = new MenuItem("Add");
@@ -141,13 +161,55 @@ public class CashTransactionsViewController {
                 .observeOn(JavaFxScheduler.platform()).subscribeOn(Schedulers.io()).subscribe(list -> {
                     hideProgress();
                     filteredList = new FilteredList<>(list);
-                    tableView.setItems(filteredList);
-                    dashboardPanel.refreshSummary(null);
+                    tableView.setItems(list);
+                    tally(list);
+                    dashboardPanel.refresh(null);
                 }, err -> {
                     hideProgress();
                     mainWindow.showErrorDialog("Database Error",
                             "Error while retrieving cash transaction entries.\n" + err);
                 }));
+    }
+
+    private void tally(ObservableList<CashTransaction> list) {
+        double cash = 0;
+        double gcash = 0;
+        double bank = 0;
+        double cheque = 0;
+        double palawan = 0;
+
+        for (CashTransaction ct : list) {
+            double amount = ct.getAmount();
+            boolean cashIn = ct.getType().equals(CashTransaction.TYPE_CASH_IN);
+            switch (ct.getMode()) {
+                case CashTransaction.MODE_CASH -> {
+                    if (cashIn) cash += amount;
+                    else cash -= amount;
+                }
+                case CashTransaction.MODE_GCASH -> {
+                    if (cashIn) gcash += amount;
+                    else gcash -= amount;
+                }
+                case CashTransaction.MODE_BANK_CASH -> {
+                    if (cashIn) bank += amount;
+                    else bank -= amount;
+                }
+                case CashTransaction.MODE_BANK_CHEQUE -> {
+                    if (cashIn) cheque += amount;
+                    else cheque -= amount;
+                }
+                default -> {
+                    if (cashIn) palawan += amount;
+                    else palawan -= amount;
+                }
+            }
+        }
+
+        lblCash.setText(ViewUtils.toStringMoneyFormat(cash));
+        lblGCash.setText(ViewUtils.toStringMoneyFormat(gcash));
+        lblBank.setText(ViewUtils.toStringMoneyFormat(bank));
+        lblCheque.setText(ViewUtils.toStringMoneyFormat(cheque));
+        lblPalawan.setText(ViewUtils.toStringMoneyFormat(palawan));
     }
 
     private void addItem() {

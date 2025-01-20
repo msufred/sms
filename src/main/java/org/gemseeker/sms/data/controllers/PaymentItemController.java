@@ -20,18 +20,19 @@ public class PaymentItemController implements ModelController<PaymentItem> {
 
     @Override
     public boolean insert(PaymentItem model) throws SQLException {
-        String sql = String.format("INSERT INTO payment_items (payment_no, item_no, item_name, serial, amount, tag, " +
-                "date_created, date_updated) VALUES ('%s', '%s', '%s', '%s', '%f', '%s', '%s', '%s')", model.getPaymentNo(),
-                model.getItemNo(), model.getItemName(), model.getSerial(), model.getAmount(), model.getTag(), model.getDateCreated(),
-                model.getDateUpdated());
+        String sql = String.format("INSERT INTO payment_items (payment_no, item_no, item_name, serial, amount, price, quantity, tag, " +
+                "date_created, date_updated) VALUES ('%s', '%s', '%s', '%s', '%f', '%f', '%d', '%s', '%s', '%s')", model.getPaymentNo(),
+                model.getItemNo(), model.getItemName(), model.getSerial(), model.getAmount(), model.getPrice(), model.getQuantity(),
+                model.getTag(), model.getDateCreated(), model.getDateUpdated());
         return database.executeQuery(sql);
     }
 
     @Override
     public boolean update(PaymentItem model) throws SQLException {
         String sql = String.format("UPDATE payment_items SET item_no='%s', item_name='%s', serial='%s', amount='%f', " +
-                "tag='%s', date_updated='%s' WHERE id='%d'", model.getItemNo(), model.getItemName(), model.getSerial(),
-                model.getAmount(), model.getTag(), LocalDateTime.now(), model.getId());
+                "price='%f', quantity='%d', tag='%s', date_updated='%s' WHERE id='%d'", model.getItemNo(), model.getItemName(),
+                model.getSerial(), model.getAmount(), model.getPrice(), model.getQuantity(), model.getTag(), LocalDateTime.now(),
+                model.getId());
         return database.executeQuery(sql);
     }
 
@@ -66,18 +67,30 @@ public class PaymentItemController implements ModelController<PaymentItem> {
         return list;
     }
 
+    public ObservableList<PaymentItem> getByPayment(String paymentNo) throws SQLException {
+        String sql = "SELECT * FROM payment_items WHERE payment_no='" + paymentNo + "'";
+        ObservableList<PaymentItem> list = FXCollections.observableArrayList();
+        try (ResultSet rs = database.executeQueryWithResult(sql)) {
+            while (rs.next()) list.add(fetchInfo(rs));
+        }
+        return list;
+    }
+
     private PaymentItem fetchInfo(ResultSet rs) throws SQLException {
+        int index = 1;
         PaymentItem item = new PaymentItem();
-        item.setId(rs.getInt(1));
-        item.setPaymentNo(rs.getString(2));
-        item.setItemNo(rs.getString(3));
-        item.setItemName(rs.getString(4));
-        item.setSerial(rs.getString(5));
-        item.setAmount(rs.getDouble(6));
-        item.setTag(rs.getString(7));
-        item.setDateCreated(rs.getTimestamp(8).toLocalDateTime());
-        item.setDateUpdated(rs.getTimestamp(9).toLocalDateTime());
-        Timestamp dateDeleted = rs.getTimestamp(10);
+        item.setId(rs.getInt(index++));
+        item.setPaymentNo(rs.getString(index++));
+        item.setItemNo(rs.getString(index++));
+        item.setItemName(rs.getString(index++));
+        item.setSerial(rs.getString(index++));
+        item.setAmount(rs.getDouble(index++));
+        item.setPrice(rs.getDouble(index++));
+        item.setQuantity(rs.getInt(index++));
+        item.setTag(rs.getString(index++));
+        item.setDateCreated(rs.getTimestamp(index++).toLocalDateTime());
+        item.setDateUpdated(rs.getTimestamp(index++).toLocalDateTime());
+        Timestamp dateDeleted = rs.getTimestamp(index);
         if (dateDeleted != null) item.setDateDeleted(dateDeleted.toLocalDateTime());
         return item;
     }

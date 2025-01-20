@@ -35,14 +35,14 @@ public class CashFlowPanel extends AbstractPanel {
     @FXML private VBox contentView;
 
     // Debit Labels
-    @FXML private Label d2; // Cash In
+    @FXML private Label d2; // Bank Transfer
     @FXML private Label d3; // Billing
     @FXML private Label d4; // WiFi Vendo
     @FXML private Label d5; // Products
     @FXML private Label d6; // Services
+    @FXML private Label d7; // Cash Transfer
 
     // Credit Labels
-    @FXML private Label c7; // Cash out
     @FXML private Label c8; // Electricity
     @FXML private Label c9; // Water
     @FXML private Label c10; // Meals
@@ -79,12 +79,12 @@ public class CashFlowPanel extends AbstractPanel {
 
     // Running Balance Labels
     @FXML private Label r1; // FORWARDED
-    @FXML private Label r2; // Cash In
+    @FXML private Label r2; // Bank Transfer
     @FXML private Label r3; // Billing
     @FXML private Label r4; // WiFi Vendo
     @FXML private Label r5; // Products
     @FXML private Label r6; // Services
-    @FXML private Label r7;
+    @FXML private Label r7; // Cash Transfer
     @FXML private Label r8;
     @FXML private Label r9;
     @FXML private Label r10;
@@ -132,6 +132,7 @@ public class CashFlowPanel extends AbstractPanel {
     private ObservableList<Expense> currExpenses;
     private ObservableList<CashTransaction> currTransactions;
     private ObservableList<DailySummary> dailySummaries;
+    private DailySummary currentSummary;
 
     public CashFlowPanel(MainWindow mainWindow, Database database) {
         super(CashFlowPanel.class.getResource("cash_flow.fxml"));
@@ -176,8 +177,11 @@ public class CashFlowPanel extends AbstractPanel {
                 }).flatMap(cashTransactions -> {
                     currTransactions = cashTransactions;
                     return Single.fromCallable(dailySummaryController::getAll);
-                }).observeOn(JavaFxScheduler.platform()).subscribeOn(Schedulers.io()).subscribe(summaries -> {
+                }).flatMap(summaries -> {
                     dailySummaries = summaries;
+                    return Single.fromCallable(() -> dailySummaryController.getByDate(datePicker.getValue()));
+                }).observeOn(JavaFxScheduler.platform()).subscribeOn(Schedulers.io()).subscribe(summary -> {
+                    currentSummary = summary;
                     hideProgress();
                     displayData();
                 }, err -> {
@@ -187,18 +191,24 @@ public class CashFlowPanel extends AbstractPanel {
     }
 
     private void displayData() {
+        if (currentSummary == null) return;
+
         // Forwarded
-        FXCollections.sort(dailySummaries, Comparator.comparing(DailySummary::getDate));
-        DailySummary prevSummary = dailySummaries.isEmpty() ? null : dailySummaries.getLast();
-        double forwarded = prevSummary == null ? 0 : prevSummary.getBalance();
-        r1.setText(ViewUtils.toStringMoneyFormat(forwarded));
+        r1.setText(ViewUtils.toStringMoneyFormat(currentSummary.getForwarded()));
 
         // Cash Transaction
-        double cashIn = 0;
-        double cashOut = 0;
+        double bankTransfer = 0;
+        double cashTransfer = 0;
         for (CashTransaction ct : currTransactions) {
-            if (ct.getType().equals(CashTransaction.TYPE_CASH_IN)) cashIn += ct.getAmount();
-            else cashOut += ct.getAmount();
+            if (ct.getType().equals(CashTransaction.TYPE_CASH_IN)) {
+                if (ct.getMode().equals(CashTransaction.MODE_BANK_CASH)) {
+                    bankTransfer += ct.getAmount();
+                }
+
+                if (ct.getMode().equals(CashTransaction.MODE_CASH)) {
+                    cashTransfer += ct.getAmount();
+                }
+            }
         }
 
         // Revenues
@@ -297,11 +307,16 @@ public class CashFlowPanel extends AbstractPanel {
             }
         }
 
-        double runningBalance = forwarded + cashIn;
+        double runningBalance = currentSummary.getForwarded() + bankTransfer;
         // --- DEBIT ---
-        // Cash In
-        d2.setText(ViewUtils.toStringMoneyFormat(cashIn));
+        // Bank Transfer
+        d2.setText(ViewUtils.toStringMoneyFormat(bankTransfer));
         r2.setText(ViewUtils.toStringMoneyFormat(runningBalance));
+
+        // Cash Transfer
+        runningBalance += cashTransfer;
+        d7.setText(ViewUtils.toStringMoneyFormat(cashTransfer));
+        r7.setText(ViewUtils.toStringMoneyFormat(runningBalance));
 
         // Subscription
         runningBalance += billings;
@@ -322,12 +337,6 @@ public class CashFlowPanel extends AbstractPanel {
         runningBalance += services;
         d6.setText(ViewUtils.toStringMoneyFormat(services));
         r6.setText(ViewUtils.toStringMoneyFormat(runningBalance));
-
-        // --- CREDIT ---
-        // Cash Out
-        runningBalance -= cashOut;
-        c7.setText(ViewUtils.toStringMoneyFormat(cashOut));
-        r7.setText(ViewUtils.toStringMoneyFormat(runningBalance));
 
         // --- OPERATIONAL  EXPENSES ---
         // Electricity

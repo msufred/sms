@@ -36,7 +36,10 @@ public final class DBTables {
                 updateAccountsTable_112724(),
                 updateExpensesTable_112824(),
                 updateCashTransactionsTable_120124(),
-                updateDailySummariesTable_120224()
+                updateDailySummariesTable_120224(),
+                updatePaymentsTable_010125(),
+                updatePaymentItemsTable_010125(),
+                updatePaymentItemsTable_010225()
         };
     }
 
@@ -410,5 +413,18 @@ public final class DBTables {
     private static String updateDailySummariesTable_120224() {
         return "ALTER TABLE daily_summaries ADD COLUMN IF NOT EXISTS cash_in DOUBLE DEFAULT '0.0' AFTER expenses; " +
                 "ALTER TABLE daily_summaries ADD COLUMN IF NOT EXISTS cash_out DOUBLE DEFAULT '0.0' AFTER cash_in;";
+    }
+
+    private static String updatePaymentsTable_010125() {
+        return "ALTER TABLE payments ADD COLUMN IF NOT EXISTS address VARCHAR(255) DEFAULT '' AFTER name; " +
+                "ALTER TABLE payments ADD COLUMN IF NOT EXISTS contact VARCHAR(12) DEFAULT '' AFTER address;";
+    }
+
+    private static String updatePaymentItemsTable_010125() {
+        return "ALTER TABLE payment_items ADD COLUMN IF NOT EXISTS quantity INTEGER DEFAULT '1' AFTER amount;";
+    }
+
+    private static String updatePaymentItemsTable_010225() {
+        return "ALTER TABLE payment_items ADD COLUMN IF NOT EXISTS price DOUBLE DEFAULT '0.0' AFTER amount;";
     }
 }

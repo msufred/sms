@@ -33,8 +33,12 @@ public class DashboardPanel extends AbstractPanel {
     @FXML private Label lblRevenues;
     @FXML private Label lblExpenses;
     @FXML private Label lblCashIn;
-    @FXML private Label lblCashOut;
     @FXML private Label lblBalances;
+    @FXML private Label lblCash;
+    @FXML private Label lblGCash;
+    @FXML private Label lblBank;
+    @FXML private Label lblCheque;
+    @FXML private Label lblPalawan;
 
     // Tabs
     @FXML private TabPane tabPane;
@@ -64,6 +68,12 @@ public class DashboardPanel extends AbstractPanel {
     @FXML private Button btnExportRevenues;
     @FXML private ComboBox<String> cbRevenueModes;
 
+    @FXML private Label lblRevCash;
+    @FXML private Label lblRevGCash;
+    @FXML private Label lblRevBank;
+    @FXML private Label lblRevCheque;
+    @FXML private Label lblRevPalawan;
+
     @FXML private TableView<Revenue> revenuesTable;
     @FXML private TableColumn<Revenue, String> colRevenueTag;
     @FXML private TableColumn<Revenue, LocalDate> colRevenueDate;
@@ -81,6 +91,12 @@ public class DashboardPanel extends AbstractPanel {
     @FXML private Button btnExportExpenses;
     @FXML private ComboBox<String> cbExpensesModes;
 
+    @FXML private Label lblExpCash;
+    @FXML private Label lblExpGCash;
+    @FXML private Label lblExpBank;
+    @FXML private Label lblExpCheque;
+    @FXML private Label lblExpPalawan;
+
     @FXML private TableView<Expense> expensesTable;
     @FXML private TableColumn<Expense, String> colExpenseTag;
     @FXML private TableColumn<Expense, LocalDate> colExpenseDate;
@@ -96,8 +112,15 @@ public class DashboardPanel extends AbstractPanel {
     @FXML private Button btnAddTransaction;
     @FXML private Button btnEditTransaction;
     @FXML private Button btnDeleteTransaction;
+    @FXML private Button btnTransfer;
     @FXML private Button btnExportTransactions;
     @FXML private ComboBox<String> cbTransactionsMode;
+
+    @FXML private Label lblCtCash;
+    @FXML private Label lblCtGCash;
+    @FXML private Label lblCtBank;
+    @FXML private Label lblCtCheque;
+    @FXML private Label lblCtPalawan;
 
     @FXML private TableView<CashTransaction> transactionsTable;
     @FXML private TableColumn<CashTransaction, String> colTransactionsTag;
@@ -137,6 +160,10 @@ public class DashboardPanel extends AbstractPanel {
     private ObservableList<Revenue> revenuesToday;
     private ObservableList<Expense> expensesToday;
     private ObservableList<CashTransaction> cashTransactionsToday;
+
+    private ObservableList<Revenue> revenues;
+    private ObservableList<Expense> expenses;
+    private ObservableList<CashTransaction> transactions;
 
     // View Controllers
     private ProjectionsViewController projectionsViewController;
@@ -180,15 +207,106 @@ public class DashboardPanel extends AbstractPanel {
 
     @Override
     public void onResume() {
+        refresh(() -> onTabSelected(tabPane.getSelectionModel().getSelectedIndex()));
+    }
+
+    public void refresh(Runnable onNext) {
+        showProgress("Fetching data...");
+        disposables.add(Single.fromCallable(revenueController::getAll)
+                .flatMap(revenuesList -> {
+                    revenues = revenuesList;
+                    return Single.fromCallable(expenseController::getAll);
+                }).flatMap(expensesList -> {
+                    expenses = expensesList;
+                    return Single.fromCallable(cashTransactionController::getAll);
+                }).observeOn(JavaFxScheduler.platform()).subscribeOn(Schedulers.io()).subscribe(transactionsList -> {
+                    transactions = transactionsList;
+                    tally();
+                    fetchDailySummary(onNext);
+                }));
+    }
+
+    private void tally() {
+        double cash = 0;
+        double gcash = 0;
+        double bank = 0;
+        double cheque = 0;
+        double palawan = 0;
+
+        for (Revenue rev : revenues) {
+            switch (rev.getMode()) {
+                case Revenue.MODE_CASH -> cash += rev.getAmount();
+                case Revenue.MODE_GCASH -> gcash += rev.getAmount();
+                case Revenue.MODE_BANK_CASH -> bank += rev.getAmount();
+                case Revenue.MODE_BANK_CHEQUE -> cheque += rev.getAmount();
+                default -> palawan += rev.getAmount();
+            }
+        }
+
+        double expCash = 0;
+        double expGcash = 0;
+        double expBank = 0;
+        double expCheque = 0;
+        double expPalawan = 0;
+
+        for (Expense exp : expenses) {
+            switch (exp.getMode()) {
+                case Expense.MODE_CASH -> expCash += exp.getAmount();
+                case Expense.MODE_GCASH -> expGcash += exp.getAmount();
+                case Expense.MODE_BANK_CASH -> expBank += exp.getAmount();
+                case Expense.MODE_BANK_CHEQUE -> expCheque += exp.getAmount();
+                default ->  expPalawan += exp.getAmount();
+            }
+        }
+
+        double ctCash = 0;
+        double ctGcash = 0;
+        double ctBank = 0;
+        double ctCheque = 0;
+        double ctPalawan = 0;
+
+        for (CashTransaction ct : transactions) {
+            double amount = ct.getAmount();
+            boolean cashIn = ct.getType().equals(CashTransaction.TYPE_CASH_IN);
+            switch (ct.getMode()) {
+                case CashTransaction.MODE_CASH -> {
+                    if (cashIn) ctCash += amount;
+                    else ctCash -= amount;
+                }
+                case CashTransaction.MODE_GCASH -> {
+                    if (cashIn) ctGcash += amount;
+                    else ctGcash -= amount;
+                }
+                case CashTransaction.MODE_BANK_CASH -> {
+                    if (cashIn) ctBank += amount;
+                    else ctBank -= amount;
+                }
+                case CashTransaction.MODE_BANK_CHEQUE -> {
+                    if (cashIn) ctCheque += amount;
+                    else ctCheque -= amount;
+                }
+                default -> {
+                    if (cashIn) ctPalawan += amount;
+                    else ctPalawan -= amount;
+                }
+            }
+        }
+
+        lblCash.setText(ViewUtils.toStringMoneyFormat(cash + ctCash - expCash));
+        lblGCash.setText(ViewUtils.toStringMoneyFormat(gcash + ctGcash - expGcash));
+        lblBank.setText(ViewUtils.toStringMoneyFormat(bank + ctBank - expBank));
+        lblCheque.setText(ViewUtils.toStringMoneyFormat(cheque + ctCheque - expCheque));
+        lblPalawan.setText(ViewUtils.toStringMoneyFormat(palawan + ctPalawan - expPalawan));
+    }
+
+    private void fetchDailySummary(Runnable onNext) {
         // Check if there exist a DailySummary for today. If there is none, create and refresh summary.
         showProgress("Checking summary for today...");
         disposables.add(Single.fromCallable(() -> dailySummaryController.getByDate(LocalDate.now()))
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(summary -> {
                     hideProgress();
                     mSummary = summary;
-                    refreshSummary(() -> {
-                        onTabSelected(tabPane.getSelectionModel().getSelectedIndex());
-                    });
+                    refreshSummary(onNext);
                 }, err -> {
                     hideProgress();
                     if (err.toString().contains("NullPointer")) {
@@ -233,7 +351,7 @@ public class DashboardPanel extends AbstractPanel {
      * Recalculate today's summary and save it to database.
      * @param onNext Task to execute after updating daily summary. Can be null.
      */
-    public void refreshSummary(Runnable onNext) {
+    private void refreshSummary(Runnable onNext) {
         showProgress("Fetching summary details...");
         disposables.add(Single.fromCallable(expenseController::getExpensesToday)
                 .flatMap(expenses -> {
@@ -267,7 +385,8 @@ public class DashboardPanel extends AbstractPanel {
                         else mCashOut += ct.getAmount();
                     }
 
-                    mCashBalance = mSummary.getForwarded() + mRevenues - mExpenses + mCashIn - mCashOut;
+                    // mCashBalance = mSummary.getForwarded() + mRevenues - mExpenses + mCashIn - mCashOut;
+                    mCashBalance = mSummary.getForwarded() + mRevenues + mCashIn - mExpenses;
 
                     mSummary.setRevenues(mRevenues);
                     mSummary.setExpenses(mExpenses);
@@ -314,13 +433,13 @@ public class DashboardPanel extends AbstractPanel {
                     for (Expense e : expensesToday) mExpenses += e.getAmount();
 
                     mCashIn = 0;
-                    mCashOut = 0;
                     for (CashTransaction ct : cashTransactionsToday) {
                         if (ct.getType().equals(CashTransaction.TYPE_CASH_IN)) mCashIn += ct.getAmount();
                         else mCashOut += ct.getAmount();
                     }
 
-                    mCashBalance = mCashForwarded + mRevenues - mExpenses + mCashIn - mCashOut;
+                    mCashBalance = (mCashForwarded + mRevenues + mCashIn) - mExpenses;
+                    // mCashBalance = mCashForwarded + mRevenues - mExpenses + mCashIn - mCashOut;
 
                     DailySummary summary = new DailySummary();
                     summary.setDate(LocalDate.now());
@@ -352,14 +471,12 @@ public class DashboardPanel extends AbstractPanel {
             lblRevenues.setText(ViewUtils.toStringMoneyFormat(mSummary.getRevenues()));
             lblExpenses.setText(ViewUtils.toStringMoneyFormat(mSummary.getExpenses()));
             lblCashIn.setText(ViewUtils.toStringMoneyFormat(mSummary.getCashIn()));
-            lblCashOut.setText(ViewUtils.toStringMoneyFormat(mSummary.getCashOut()));
             lblBalances.setText(ViewUtils.toStringMoneyFormat(mSummary.getBalance()));
 
             // clear styles first
             lblRevenues.getStyleClass().removeAll("positive-up", "negative-down");
             lblExpenses.getStyleClass().removeAll("negative-up", "positive-down");
             lblCashIn.getStyleClass().removeAll("negative-up", "positive-down");
-            lblCashOut.getStyleClass().removeAll("negative-up", "positive-down");
             lblBalances.getStyleClass().removeAll("positive-up", "negative-down");
 
             if (mPrevSummary != null) {
@@ -394,16 +511,6 @@ public class DashboardPanel extends AbstractPanel {
                     lblCashIn.setGraphic(null);
                 }
 
-                if (mPrevSummary.getCashOut() > mSummary.getCashOut()) {
-                    lblCashOut.setGraphic(new ArrowDownIcon(iconSize));
-                    lblCashOut.getStyleClass().add("positive-down");
-                } else if (mPrevSummary.getCashOut() < mSummary.getCashOut()) {
-                    lblCashOut.setGraphic(new ArrowUpIcon(iconSize));
-                    lblCashOut.getStyleClass().add("negative-up");
-                } else {
-                    lblCashOut.setGraphic(null);
-                }
-
                 if (mPrevSummary.getBalance() > mSummary.getBalance()) {
                     lblBalances.setGraphic(new ArrowDownIcon(iconSize));
                     lblBalances.getStyleClass().add("negative-down");
@@ -418,6 +525,12 @@ public class DashboardPanel extends AbstractPanel {
     }
 
     private void setupIcons() {
+        lblCash.setGraphic(new PesoIcon(18));
+        lblGCash.setGraphic(new PesoIcon(18));
+        lblBank.setGraphic(new PesoIcon(18));
+        lblCheque.setGraphic(new PesoIcon(18));
+        lblPalawan.setGraphic(new PesoIcon(18));
+
         tabProjections.setGraphic(new TrendingUpIcon(14));
         tabRevenues.setGraphic(new PesoIcon(14));
         tabExpenses.setGraphic(new PesoIcon(14));
@@ -460,7 +573,8 @@ public class DashboardPanel extends AbstractPanel {
         });
 
         revenuesViewController = new RevenuesViewController(this, mainWindow, database, btnAddRevenue,
-                btnEditRevenue, btnDeleteRevenue, btnExportRevenues, cbRevenueModes, revenuesTable);
+                btnEditRevenue, btnDeleteRevenue, btnExportRevenues, cbRevenueModes, lblRevCash, lblRevGCash,
+                lblRevBank, lblRevCheque, lblRevPalawan, revenuesTable);
         revenuesViewController.init();
     }
 
@@ -493,7 +607,8 @@ public class DashboardPanel extends AbstractPanel {
         });
 
         expensesViewController = new ExpensesViewController(this, mainWindow, database,
-                btnAddExpense, btnEditExpense, btnDeleteExpense, btnExportExpenses, cbExpensesModes, expensesTable);
+                btnAddExpense, btnEditExpense, btnDeleteExpense, btnExportExpenses, cbExpensesModes, lblExpCash,
+                lblExpGCash, lblExpBank, lblExpCheque, lblExpPalawan, expensesTable);
         expensesViewController.init();
     }
 
@@ -524,7 +639,8 @@ public class DashboardPanel extends AbstractPanel {
         });
 
         cashTransactionsViewController = new CashTransactionsViewController(this, mainWindow, database,
-                btnAddTransaction, btnEditTransaction, btnDeleteTransaction, btnExportTransactions, cbTransactionsMode, transactionsTable);
+                btnAddTransaction, btnEditTransaction, btnDeleteTransaction, btnTransfer, btnExportTransactions, cbTransactionsMode,
+                lblCtCash, lblCtGCash, lblCtBank, lblCtCheque, lblCtPalawan, transactionsTable);
         cashTransactionsViewController.init();
     }
 

@@ -82,10 +82,37 @@
                         <ToggleGroup fx:id="toggleGroup" />
                      </toggleGroup>
                   </ToggleButton>
-                  <ToggleButton fx:id="btnPayments" alignment="CENTER_LEFT" graphicTextGap="16.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="200.0" text="Payments" toggleGroup="$toggleGroup">
+                  <ToggleButton fx:id="btnCashFlow" alignment="CENTER_LEFT" graphicTextGap="16.0" layoutX="10.0" layoutY="58.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="200.0" text="Cash Flow" toggleGroup="$toggleGroup">
                      <styleClass>
                         <String fx:value="main-toggle" />
                         <String fx:value="main-toggle-v2" />
+                     </styleClass>
+                     <padding>
+                        <Insets left="32.0" />
+                     </padding>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </ToggleButton>
+                  <ToggleButton fx:id="btnPayments" alignment="CENTER_LEFT" graphicTextGap="16.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="200.0" text="Payments" toggleGroup="$toggleGroup">
+                     <styleClass>
+                        <String fx:value="main-toggle" />
+                        <String fx:value="main-toggle-v3" />
+                     </styleClass>
+                     <padding>
+                        <Insets left="32.0" />
+                     </padding>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ToggleButton>
+                  <ToggleButton fx:id="btnInventory" alignment="CENTER_LEFT" graphicTextGap="16.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="200.0" text="Services &amp; Products" toggleGroup="$toggleGroup">
+                     <styleClass>
+                        <String fx:value="main-toggle" />
+                        <String fx:value="main-toggle-v4" />
                      </styleClass>
                      <padding>
                         <Insets left="32.0" />
@@ -109,19 +136,7 @@
                   <ToggleButton fx:id="btnHotspots" alignment="CENTER_LEFT" graphicTextGap="16.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="200.0" text="WiFi Hotspots" toggleGroup="$toggleGroup">
                      <styleClass>
                         <String fx:value="main-toggle" />
-                        <String fx:value="main-toggle-v4" />
-                     </styleClass>
-                     <padding>
-                        <Insets left="32.0" />
-                     </padding>
-                     <cursor>
-                        <Cursor fx:constant="HAND" />
-                     </cursor>
-                  </ToggleButton>
-                  <ToggleButton fx:id="btnInventory" alignment="CENTER_LEFT" graphicTextGap="16.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="200.0" text="Services &amp; Products" toggleGroup="$toggleGroup">
-                     <styleClass>
-                        <String fx:value="main-toggle" />
-                        <String fx:value="main-toggle-v3" />
+                        <String fx:value="main-toggle-v2" />
                      </styleClass>
                      <padding>
                         <Insets left="32.0" />
@@ -133,7 +148,7 @@
                   <ToggleButton fx:id="btnMaps" alignment="CENTER_LEFT" graphicTextGap="16.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="200.0" text="Maps" toggleGroup="$toggleGroup">
                      <styleClass>
                         <String fx:value="main-toggle" />
-                        <String fx:value="main-toggle-v2" />
+                        <String fx:value="main-toggle-v1" />
                      </styleClass>
                      <padding>
                         <Insets left="32.0" />
@@ -145,7 +160,7 @@
                   <ToggleButton fx:id="btnTasks" alignment="CENTER_LEFT" graphicTextGap="16.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="200.0" text="Tasks &amp; Schedules" toggleGroup="$toggleGroup">
                      <styleClass>
                         <String fx:value="main-toggle" />
-                        <String fx:value="main-toggle-v1" />
+                        <String fx:value="main-toggle-v2" />
                      </styleClass>
                      <padding>
                         <Insets left="32.0" />
@@ -213,21 +228,6 @@
                         <Insets top="1.0" />
                      </VBox.margin>
                   </StackPane>
-                  <ToggleButton fx:id="btnCashFlow" alignment="CENTER_LEFT" graphicTextGap="16.0" layoutX="10.0" layoutY="58.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="200.0" text="Cash Flow" toggleGroup="$toggleGroup">
-                     <styleClass>
-                        <String fx:value="main-toggle" />
-                        <String fx:value="main-toggle-v2" />
-                     </styleClass>
-                     <padding>
-                        <Insets left="32.0" />
-                     </padding>
-                     <cursor>
-                        <Cursor fx:constant="HAND" />
-                     </cursor>
-                     <VBox.margin>
-                        <Insets top="16.0" />
-                     </VBox.margin>
-                  </ToggleButton>
                </children>
             </VBox>
             <StackPane fx:id="contentPane" prefHeight="150.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />

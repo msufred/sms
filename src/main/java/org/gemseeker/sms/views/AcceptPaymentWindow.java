@@ -315,6 +315,8 @@ public class AcceptPaymentWindow extends AbstractWindow {
         payment.setMode(cbModes.getValue());
         payment.setRef(tfRef.getText());
         payment.setName(mAccount.getName());
+        payment.setAddress(mAccount.getAddress());
+        payment.setContact(mAccount.getPhone());
         payment.setPaymentFor(Payment.TYPE_BILLING);
         payment.setExtraInfo(mBillingNo);
         payment.setPrevBalance(prevBalance);

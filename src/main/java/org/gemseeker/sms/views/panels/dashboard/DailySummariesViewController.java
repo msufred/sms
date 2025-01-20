@@ -93,7 +93,7 @@ public class DailySummariesViewController {
                     FXCollections.sort(list, Comparator.comparing(DailySummary::getDate));
                     filteredList = new FilteredList<>(list);
                     tableView.setItems(filteredList);
-                    //dashboardPanel.refreshSummary(null);
+                    dashboardPanel.refresh(null);
                 }, err -> {
                     hideProgress();
                     mainWindow.showErrorDialog("Database Error", "Error while retrieving daily summary entries.\n" + err);
