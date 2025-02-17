@@ -15,6 +15,7 @@ import org.gemseeker.sms.data.controllers.*;
 import org.gemseeker.sms.views.icons.CheckCircleIcon;
 import org.gemseeker.sms.views.icons.XCircleIcon;
 
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -22,6 +23,8 @@ import java.time.format.DateTimeFormatter;
  * @author Gem
  */
 public class AddBillingWindow extends AbstractWindow {
+
+    private static final String DEBUG_NAME = "AddBillingWindow";
 
     private static final int BTN_SAVE_INDEX = 3;
 
@@ -135,12 +138,20 @@ public class AddBillingWindow extends AbstractWindow {
     protected void onShow() {
         clearFields();
 
+        // fill up "Prepared By" & "Designation" fields
         User user = mainWindow.getUser();
         if (user != null) {
             tfPreparedBy.setText(user.getFullname());
             tfDesignation.setText(user.getDesignation());
         }
 
+        // fill up "From Date", "To Date", and "Due Date"
+        YearMonth ym = YearMonth.now();
+        dpFrom.setValue(ym.atDay(1));
+        dpTo.setValue(ym.atEndOfMonth());
+        dpDue.setValue(ym.atEndOfMonth());
+
+        // retrieve Account entries
         disableActions(true);
         progressBar.setVisible(true);
         disposables.add(Single.fromCallable(accountController::getAllActive)
@@ -159,9 +170,12 @@ public class AddBillingWindow extends AbstractWindow {
         mAccount = account;
         disableActions(true);
         progressBar.setVisible(true);
+
+        // check account subscription
         disposables.add(Single.fromCallable(() -> subscriptionController.getByAccountNo(account.getAccountNo()))
                 .flatMap(subscription -> {
                     mSubscription = subscription;
+                    // return unpaid balance
                     return Single.fromCallable(() -> balanceController.getUnpaidBalance(account.getAccountNo()));
                 }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(balances -> {
                     disableActions(false);
@@ -180,11 +194,15 @@ public class AddBillingWindow extends AbstractWindow {
         if (mAccount == null || mSubscription == null || mBalances == null) return;
 
         lblName.setText(mAccount.getName());
+        tfReceivedBy.setText(mAccount.getName());
+
         lblDuration.setText(String.format("%s-%s",
                 mSubscription.getStartDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
                 mSubscription.getEndDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
         ));
+
         lblPlanType.setText(mSubscription.getPlanType());
+
         lblBandwidth.setText(mSubscription.getSpeed() + " MBPS");
 
         monthlyFee = mSubscription.getMonthlyFee();
@@ -293,7 +311,8 @@ public class AddBillingWindow extends AbstractWindow {
             Billing billing = new Billing();
             billing.setBillingNo(ViewUtils.normalize(tfBillingNo.getText()));
             billing.setAccountNo(mAccount.getAccountNo());
-            billing.setToPay(mSubscription != null ? mSubscription.getMonthlyFee() : 0);
+            // billing.setToPay(mSubscription != null ? mSubscription.getMonthlyFee() : 0);
+            billing.setToPay(total);
             billing.setFromDate(dpFrom.getValue());
             billing.setToDate(dpTo.getValue());
             billing.setDueDate(dpDue.getValue());
