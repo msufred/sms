@@ -132,7 +132,6 @@ public class PaymentsPanel extends AbstractPanel {
     private final MainWindow mainWindow;
     private final Settings settings;
     private final Database database;
-    private final AccountController accountController;
     private final BillingController billingController;
     private final BillingStatementController billingStatementController;
     private final PaymentController paymentController;
@@ -152,7 +151,6 @@ public class PaymentsPanel extends AbstractPanel {
         this.mainWindow = mainWindow;
         this.settings = settings;
         this.database = database;
-        this.accountController = new AccountController(database);
         this.billingController = new BillingController(database);
         this.billingStatementController = new BillingStatementController(database);
         this.paymentController = new PaymentController(database);
@@ -166,11 +164,10 @@ public class PaymentsPanel extends AbstractPanel {
         setupPaymentsTable();
         setupBillingStatementsTable();
 
-        tabPane.getSelectionModel().selectedIndexProperty().addListener((o, oldVal, index) -> {
-            switch (index.intValue()) {
-                case 1 -> refreshOtherBillings();
-                case 2 -> refreshBillingStatements();
-                case 3 -> refreshPayments();
+        tabPane.getSelectionModel().selectedItemProperty().addListener((o, oldVal, newVal) -> {
+            switch (newVal.getText()) {
+                case "Billing Statements" -> refreshBillingStatements();
+                case "Payments" -> refreshPayments();
                 default -> refreshBillings();
             }
         });
@@ -182,10 +179,10 @@ public class PaymentsPanel extends AbstractPanel {
         if (printWindow == null) printWindow = new PrintWindow(mainWindow.getUser(), database, mainWindow.getStage());
         if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(mainWindow, database);
 
-        switch (tabPane.getSelectionModel().getSelectedIndex()) {
-            case 1: refreshBillingStatements(); break;
-            case 2: refreshOtherBillings(); break;
-            default: refreshBillings();
+        switch (tabPane.getSelectionModel().getSelectedItem().getText()) {
+            case "Billing Statements" -> refreshBillingStatements();
+            case "Payments" -> refreshPayments();
+            default -> refreshBillings();
         }
     }
 
@@ -198,7 +195,7 @@ public class PaymentsPanel extends AbstractPanel {
                     billingsTable.setItems(billingsList);
 
                     // clear account & status filters
-                    cbStatus.getSelectionModel().select(0);
+                    cbStatus.getSelectionModel().select(Billing.STATUS_FOR_PAYMENT);
 
                     // set month & year filters to current month and year
                     LocalDate now = LocalDate.now();
@@ -223,10 +220,6 @@ public class PaymentsPanel extends AbstractPanel {
                     hideProgress();
                     showErrorDialog("Database Error", "Error while retrieving Billing Statement entries.\n" + err);
                 }));
-    }
-
-    private void refreshOtherBillings() {
-
     }
 
     private void refreshPayments() {
@@ -663,7 +656,8 @@ public class PaymentsPanel extends AbstractPanel {
             }
         });
 
-        cbStatus.setItems(FXCollections.observableArrayList("All", "For Payment", "Paid", "Overdue"));
+        cbStatus.setItems(FXCollections.observableArrayList("All",
+                Billing.STATUS_FOR_PAYMENT, Billing.STATUS_PAID, Billing.STATUS_OVERDUE));
         cbStatus.valueProperty().addListener((o, oldVal, newVal) -> updateFilters());
         cbStatus.getSelectionModel().select(0);
 
@@ -701,7 +695,7 @@ public class PaymentsPanel extends AbstractPanel {
         colTo.setCellFactory(col -> new DateTableCell<>());
         colDueDate.setCellValueFactory(new PropertyValueFactory<>("dueDate"));
         colDueDate.setCellFactory(col -> new DateTableCell<>());
-        colAmountDue.setCellValueFactory(new PropertyValueFactory<>("amountTotal"));
+        colAmountDue.setCellValueFactory(new PropertyValueFactory<>("toPay"));
         colAmountPaid.setCellValueFactory(new PropertyValueFactory<>("amountPaid"));
         colBalance.setCellValueFactory(new PropertyValueFactory<>("balance"));
 
