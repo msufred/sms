@@ -398,7 +398,7 @@
 }
 
 .form-button-positve {
-    -fx-background-color: #50b88e;
+    -fx-background-color: derive(#50b88e, -10%);
     -fx-font-size: 14;
     -fx-text-fill: white;
 }
@@ -412,7 +412,9 @@
     -fx-font-size: 14;
     -fx-text-fill: black;
 }
-
+.form-button-regular:hover {
+    -fx-text-fill: black;
+}
 .form-button-regular:pressed {
     -fx-background-color: #999999;
 }
