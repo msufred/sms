@@ -15,6 +15,7 @@ public class BillingPayment {
     private LocalDate fromDate;
     private LocalDate toDate;
     private LocalDate dueDate;
+    private double toPay;
     private String status; // For Payment, Paid, Overdue
     private String paymentNo; // if paid, payment_no is not null
 
@@ -73,6 +74,14 @@ public class BillingPayment {
 
     public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public double getToPay() {
+        return toPay;
+    }
+
+    public void setToPay(double toPay) {
+        this.toPay = toPay;
     }
 
     public String getStatus() {
