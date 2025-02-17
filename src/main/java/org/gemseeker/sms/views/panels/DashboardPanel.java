@@ -11,10 +11,7 @@ import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.gemseeker.sms.data.*;
-import org.gemseeker.sms.data.controllers.CashTransactionController;
-import org.gemseeker.sms.data.controllers.DailySummaryController;
-import org.gemseeker.sms.data.controllers.ExpenseController;
-import org.gemseeker.sms.data.controllers.RevenueController;
+import org.gemseeker.sms.data.controllers.*;
 import org.gemseeker.sms.views.*;
 import org.gemseeker.sms.views.cells.AmountTableCell;
 import org.gemseeker.sms.views.cells.DateTableCell;
@@ -33,6 +30,9 @@ public class DashboardPanel extends AbstractPanel {
     @FXML private Label lblExpenses;
     @FXML private Label lblCashIn;
     @FXML private Label lblBalances;
+    @FXML private Label lblReceivables;
+
+    // Cash Breakdown
     @FXML private Label lblCash;
     @FXML private Label lblGCash;
     @FXML private Label lblBank;
@@ -149,6 +149,7 @@ public class DashboardPanel extends AbstractPanel {
     private final CompositeDisposable disposables;
 
     // ModelControllers
+    private final BillingController billingController;
     private final RevenueController revenueController;
     private final ExpenseController expenseController;
     private final CashTransactionController cashTransactionController;
@@ -160,6 +161,7 @@ public class DashboardPanel extends AbstractPanel {
     private ObservableList<Expense> expensesToday;
     private ObservableList<CashTransaction> cashTransactionsToday;
 
+    private ObservableList<Billing> billings;
     private ObservableList<Revenue> revenues;
     private ObservableList<Expense> expenses;
     private ObservableList<CashTransaction> transactions;
@@ -177,6 +179,7 @@ public class DashboardPanel extends AbstractPanel {
     private double mCashIn = 0.0;
     private double mCashOut = 0.0;
     private double mCashBalance = 0.0;
+    private double mReceivables = 0.0; // current month
 
     public DashboardPanel(MainWindow mainWindow, Database database) {
         super(DashboardPanel.class.getResource("dashboard.fxml"));
@@ -184,6 +187,7 @@ public class DashboardPanel extends AbstractPanel {
         this.database = database;
         disposables = new CompositeDisposable();
 
+        billingController = new BillingController(database);
         revenueController = new RevenueController(database);
         expenseController = new ExpenseController(database);
         cashTransactionController = new CashTransactionController(database);
@@ -352,8 +356,11 @@ public class DashboardPanel extends AbstractPanel {
      */
     private void refreshSummary(Runnable onNext) {
         showProgress("Fetching summary details...");
-        disposables.add(Single.fromCallable(expenseController::getExpensesToday)
-                .flatMap(expenses -> {
+        disposables.add(Single.fromCallable(billingController::getAll)
+                .flatMap(billingsList -> {
+                    billings = billingsList;
+                    return Single.fromCallable(expenseController::getAll);
+                }).flatMap(expenses -> {
                     expensesToday = expenses;
                     return Single.fromCallable(revenueController::getRevenuesToday);
                 }).flatMap(revenues -> {
@@ -363,6 +370,19 @@ public class DashboardPanel extends AbstractPanel {
                     cashTransactionsToday = cashTransactions;
                     return Single.fromCallable(dailySummaryController::getAll);
                 }).flatMap(summaries -> {
+                    // receivable billings this month
+                    LocalDate now = LocalDate.now();
+                    mReceivables = 0.0;
+                    for (Billing billing : billings) {
+                        if (billing.getStatus().equalsIgnoreCase("for payment")) {
+                            LocalDate date = billing.getDueDate();
+                            if (date.getMonthValue() == now.getMonthValue()) {
+                                mReceivables += billing.getToPay();
+                            }
+                        }
+                    }
+
+
                     // sort summaries
                     FXCollections.sort(summaries, Comparator.comparing(DailySummary::getDate));
                     if (!summaries.isEmpty() && summaries.size() > 1) {
@@ -471,6 +491,7 @@ public class DashboardPanel extends AbstractPanel {
             lblExpenses.setText(ViewUtils.toStringMoneyFormat(mSummary.getExpenses()));
             lblCashIn.setText(ViewUtils.toStringMoneyFormat(mSummary.getCashIn()));
             lblBalances.setText(ViewUtils.toStringMoneyFormat(mSummary.getBalance()));
+            lblReceivables.setText(ViewUtils.toStringMoneyFormat(mReceivables));
 
             // clear styles first
             lblRevenues.getStyleClass().removeAll("positive-up", "negative-down");
