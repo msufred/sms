@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -42,7 +43,6 @@ import java.util.Optional;
 
 public class PaymentsPanel extends AbstractPanel {
 
-    // <editor-fold default-state="collapsed" desc="FXML Components">
     @FXML private TabPane tabPane;
     @FXML private Tab tabBillings;
     @FXML private Tab tabBillingStatements;
@@ -54,8 +54,8 @@ public class PaymentsPanel extends AbstractPanel {
     @FXML private Button btnDelete;
     @FXML private Button btnRefresh;
     @FXML private Button btnAutomate;
-    @FXML private Label lblAccounts;
-    @FXML private ComboBox<Account> cbAccounts;
+    @FXML private Label lblSearch;
+    @FXML private TextField tfSearch;
     @FXML private Label lblStatus;
     @FXML private ComboBox<String> cbStatus;
     @FXML private Label lblMonth;
@@ -115,6 +115,7 @@ public class PaymentsPanel extends AbstractPanel {
     @FXML private Button btnPaymentImageZoomIn;
     @FXML private Button btnPaymentImageShowFile;
     @FXML private ImageView paymentImageView;
+
     private SplitController splitController;
 
     private FilteredList<BillingPayment> billingsList;
@@ -181,24 +182,11 @@ public class PaymentsPanel extends AbstractPanel {
         if (printWindow == null) printWindow = new PrintWindow(mainWindow.getUser(), database, mainWindow.getStage());
         if (saveImageWindow == null) saveImageWindow = new SaveImageWindow(mainWindow, database);
 
-        showProgress("Retrieving Account entries...");
-        disposables.add(Single.fromCallable(accountController::getAll)
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(accounts -> {
-                    hideProgress();
-                    Account all = new Account();
-                    all.setName("All Accounts");
-                    accounts.add(0, all);
-                    cbAccounts.setItems(accounts);
-                    cbAccounts.getSelectionModel().select(0);
-                    switch (tabPane.getSelectionModel().getSelectedIndex()) {
-                        case 1: refreshBillingStatements(); break;
-                        case 2: refreshOtherBillings(); break;
-                        default: refreshBillings();
-                    }
-                }, err -> {
-                    hideProgress();
-                    showErrorDialog("Database Error", "Error while retrieving Account entries.\n" + err);
-                }));
+        switch (tabPane.getSelectionModel().getSelectedIndex()) {
+            case 1: refreshBillingStatements(); break;
+            case 2: refreshOtherBillings(); break;
+            default: refreshBillings();
+        }
     }
 
     private void refreshBillings() {
@@ -210,13 +198,14 @@ public class PaymentsPanel extends AbstractPanel {
                     billingsTable.setItems(billingsList);
 
                     // clear account & status filters
-                    cbAccounts.getSelectionModel().select(0);
                     cbStatus.getSelectionModel().select(0);
 
                     // set month & year filters to current month and year
                     LocalDate now = LocalDate.now();
                     cbMonths.setValue(now.getMonth().toString());
                     cbYears.setValue(now.getYear() + "");
+
+                    updateFilters();
                 }, err -> {
                     hideProgress();
                     showErrorDialog("Database Error", "Error while retrieving Billing entries.\n" + err);
@@ -577,95 +566,67 @@ public class PaymentsPanel extends AbstractPanel {
     }
 
     private void updateFilters() {
-        if (billingsList == null || cbAccounts.getValue() == null || cbStatus.getValue() == null ||
-                cbMonths.getValue() == null || cbYears.getValue() == null) {
+        if (billingsList == null || cbStatus.getValue() == null || cbMonths.getValue() == null || cbYears.getValue() == null) {
             return;
         }
 
-        Account account = cbAccounts.getValue();
+        // NOTE: always reset search field when filtering
+        tfSearch.clear();
+
         String status = cbStatus.getValue();
         String monthStr = cbMonths.getValue();
         String yearStr = cbYears.getValue();
 
-        if (account.getName().equals("All Accounts") && monthStr.equals("All") && yearStr.equals("All") && status.equals("All")) {
+        // Case Name=Empty, Status=All, Month=All, Year=All
+        if (status.equals("All") && monthStr.equals("All") && yearStr.equals("All")) {
             billingsList.setPredicate(b -> true);
+            return;
         }
-        // filter by status
-        else if (account.getName().equals("All Accounts") && monthStr.equals("All") && yearStr.equals("All")) {
+
+        // Case Month=All, Year=All
+        if (monthStr.equals("All") && yearStr.equals("All")) {
             billingsList.setPredicate(b -> b.getStatus().equals(status));
+            return;
         }
 
-        // filter by year
-        else if (account.getName().equals("All Accounts") && monthStr.equals("All") && status.equals("All")) {
-            billingsList.setPredicate(b -> b.getDueDate().getYear() == Integer.parseInt(yearStr));
-        }
-
-        // filter by month
-        else if (account.getName().equals("All Accounts") && yearStr.equals("All") && status.equals("All")) {
+        // Case Status=All, Year=All
+        if (status.equals("All") && yearStr.equals("All")) {
             billingsList.setPredicate(b -> b.getDueDate().getMonth() == Month.valueOf(monthStr));
+            return;
         }
 
-        // filter by account
-        else if (monthStr.equals("All") && yearStr.equals("All") && status.equals("All")) {
-            billingsList.setPredicate(b -> b.getAccountNo().equals(account.getAccountNo()));
+        // Case Status=All, Month=All
+        if (status.equals("All") && monthStr.equals("All")) {
+            billingsList.setPredicate(b -> b.getDueDate().getYear() == Integer.parseInt(yearStr.trim()));
+            return;
         }
 
-        // filter by year & status
-        else if (account.getName().equals("All Accounts") && monthStr.equals("All")) {
-            billingsList.setPredicate(b -> b.getDueDate().getYear() == Integer.parseInt(yearStr) && b.getStatus().equals(status));
-        }
-
-        // filter by month & year
-        else if (account.getName().equals("All Accounts") && status.equals("All")) {
-            billingsList.setPredicate(b -> b.getDueDate().getMonth() == Month.valueOf(monthStr) &&
-                    b.getDueDate().getYear() == Integer.parseInt(yearStr));
-        }
-
-        // filter by account & month
-        else if (yearStr.equals("All") && status.equals("All")) {
-            billingsList.setPredicate(b -> b.getAccountNo().equals(account.getAccountNo()) && b.getDueDate().getMonth() == Month.valueOf(monthStr));
-        }
-
-        // filter by account & status
-        else if (monthStr.equals("All") && yearStr.equals("All")) {
-            billingsList.setPredicate(b -> b.getAccountNo().equals(account.getAccountNo()) && b.getStatus().equals(status));
-        }
-
-        // filter by month, year, & status
-        else if (account.getName().equals("All Accounts")) {
-            billingsList.setPredicate(b -> b.getDueDate().getMonth() == Month.valueOf(monthStr) &&
-                    b.getDueDate().getYear() == Integer.parseInt(yearStr) &&
-                    b.getStatus().equals(status));
-        }
-
-        // filter by account, year, & status
-        else if (monthStr.equals("All")) {
-            billingsList.setPredicate(b -> b.getAccountNo().equals(account.getAccountNo()) &&
-                    b.getDueDate().getYear() == Integer.parseInt(yearStr) &&
-                    b.getStatus().equals(status));
-        }
-
-        // filter by account, month, & status
-        else if (yearStr.equals("All")) {
-            billingsList.setPredicate(b -> b.getAccountNo().equals(account.getAccountNo()) &&
-                    b.getDueDate().getMonth() == Month.valueOf(monthStr) &&
-                    b.getStatus().equals(status));
-        }
-
-        // filter by account, month, & year
-        else if (status.equals("All")) {
-            billingsList.setPredicate(b -> b.getAccountNo().equals(account.getAccountNo()) &&
-                    b.getDueDate().getMonth() == Month.valueOf(monthStr) &&
-                    b.getDueDate().getYear() == Integer.parseInt(yearStr));
-        }
-
-        // filter by account, month, year, & status
-        else {
+        // Case Status=All, Month != All, Year != All
+        if (status.equals("All")) {
             billingsList.setPredicate(b -> {
-                return b.getAccountNo().equals(account.getAccountNo()) && b.getDueDate().getMonth() == Month.valueOf(monthStr) &&
-                        b.getDueDate().getYear() == Integer.parseInt(yearStr) && b.getStatus().equals(status);
+                LocalDate date = b.getDueDate();
+                return date.getMonth() == Month.valueOf(monthStr) && date.getYear() == Integer.parseInt(yearStr.trim());
             });
+            return;
         }
+
+        // Case Status != All, Month = All, Year != All
+        if (monthStr.equals("All")) {
+            billingsList.setPredicate(b -> b.getStatus().equals(status) && b.getDueDate().getYear() == Integer.parseInt(yearStr.trim()));
+            return;
+        }
+
+        // Case Status!=All, Month!=All, Year=All
+        if (yearStr.equals("All")) {
+            billingsList.setPredicate(b -> b.getStatus().equals(status) && b.getDueDate().getMonth() == Month.valueOf(monthStr));
+            return;
+        }
+
+        // Case Status != All, Month != All, Year != All
+        billingsList.setPredicate(b -> {
+            LocalDate date = b.getDueDate();
+            return b.getStatus().equals(status) && date.getMonth() == Month.valueOf(monthStr) && date.getYear() == Integer.parseInt(yearStr.trim());
+        });
     }
 
     private void setupIcons() {
@@ -678,7 +639,7 @@ public class PaymentsPanel extends AbstractPanel {
         btnDelete.setGraphic(new TrashIcon(14));
         btnRefresh.setGraphic(new RefreshCwIcon(14));
         btnAutomate.setGraphic(new SettingsIcon(14));
-        lblAccounts.setGraphic(new UserIcon(14));
+        lblSearch.setGraphic(new SearchIcon(14));
         lblStatus.setGraphic(new SmileIcon(14));
         lblMonth.setGraphic(new CalendarIcon(14));
         lblYear.setGraphic(new CalendarIcon(14));
@@ -693,7 +654,14 @@ public class PaymentsPanel extends AbstractPanel {
             showWarningDialog("Invalid Action", "Feature not implemented.");
         });
 
-        cbAccounts.valueProperty().addListener((o, oldVal, newVal) -> updateFilters());
+        tfSearch.textProperty().addListener((o, oldVal, newVal) -> {
+            if (billingsList == null) return;
+            if (newVal == null || newVal.isBlank()) {
+                billingsList.setPredicate(p -> true);
+            } else {
+                billingsList.setPredicate(b -> b.getAccountName().toLowerCase().contains(newVal.toLowerCase()));
+            }
+        });
 
         cbStatus.setItems(FXCollections.observableArrayList("All", "For Payment", "Paid", "Overdue"));
         cbStatus.valueProperty().addListener((o, oldVal, newVal) -> updateFilters());

@@ -10,9 +10,8 @@ import org.gemseeker.sms.views.panels.AbstractPanel;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 
-public class BillingReceiptForm extends AbstractPanel {
+public class ServiceReceiptForm extends AbstractPanel {
 
     @FXML private Label lblAccountName;
     @FXML private Label lblDate;
@@ -51,8 +50,8 @@ public class BillingReceiptForm extends AbstractPanel {
     private Payment mPayment;
     private ObservableList<PaymentItem> paymentItems;
 
-    public BillingReceiptForm() {
-        super(BillingReceiptForm.class.getResource("receipt.fxml"));
+    public ServiceReceiptForm() {
+        super(ServiceReceiptForm.class.getResource("service_receipt.fxml"));
     }
 
     @Override

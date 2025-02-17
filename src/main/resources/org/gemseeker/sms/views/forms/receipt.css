@@ -23,6 +23,12 @@
     -fx-font-weight: bold;
 }
 
+.text-invoice {
+    -fx-font-size: 80;
+    -fx-font-weight: bold;
+    -fx-opacity: 0.5;
+}
+
 .bottom-outline {
     -fx-border-style: hidden hidden solid hidden;
     -fx-border-width: 2;

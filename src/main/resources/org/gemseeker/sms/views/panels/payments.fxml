@@ -11,12 +11,13 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="600.0" prefWidth="1182.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="600.0" prefWidth="1182.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <Label styleClass="panel-title" text="Payments">
             <VBox.margin>
@@ -36,12 +37,12 @@
                                         <Button fx:id="btnDelete" mnemonicParsing="false" styleClass="btn" />
                                         <Button fx:id="btnRefresh" mnemonicParsing="false" styleClass="btn" />
                                         <Button fx:id="btnAutomate" mnemonicParsing="false" styleClass="btn" text="Automate" />
-                                        <Label fx:id="lblAccounts" styleClass="label-icon" text="Account">
-                                            <HBox.margin>
-                                                <Insets left="8.0" />
-                                            </HBox.margin>
-                                        </Label>
-                                        <ComboBox fx:id="cbAccounts" />
+                              <Label fx:id="lblSearch">
+                                 <HBox.margin>
+                                    <Insets left="8.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <TextField fx:id="tfSearch" promptText="Search Account" />
                                         <Label fx:id="lblStatus" styleClass="label-icon" text="Status">
                                             <HBox.margin>
                                                 <Insets left="8.0" />

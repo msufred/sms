@@ -16,7 +16,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.gemseeker.sms.data.*;
 import org.gemseeker.sms.data.controllers.*;
-import org.gemseeker.sms.views.forms.BillingReceiptForm;
+import org.gemseeker.sms.views.forms.ServiceReceiptForm;
 import org.gemseeker.sms.views.forms.StatementForm;
 import org.gemseeker.sms.views.forms.TermsConditionsForm;
 import org.gemseeker.sms.views.icons.FilePlusIcon;
@@ -55,7 +55,7 @@ public class PrintWindow extends AbstractWindow {
     private final ObservableList<Printer> printers = FXCollections.observableArrayList();
 
     private StatementForm statementForm;
-    private BillingReceiptForm billingReceiptForm;
+    private ServiceReceiptForm billingReceiptForm;
     private TermsConditionsForm termsConditionsForm;
 
     private Type mType;
@@ -200,7 +200,7 @@ public class PrintWindow extends AbstractWindow {
                 }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(p -> {
                     progress.setVisible(false);
                     payment = p;
-                    if (billingReceiptForm == null) billingReceiptForm = new BillingReceiptForm();
+                    if (billingReceiptForm == null) billingReceiptForm = new ServiceReceiptForm();
                     mForm = billingReceiptForm;
                     fillBillingReceiptForm();
                 }));
@@ -227,7 +227,7 @@ public class PrintWindow extends AbstractWindow {
                 })).observeOn(JavaFxScheduler.platform()).subscribeOn(Schedulers.io()).subscribe(items -> {
                     progress.setVisible(false);
                     paymentItems = items;
-                    if (billingReceiptForm == null) billingReceiptForm = new BillingReceiptForm();
+                    if (billingReceiptForm == null) billingReceiptForm = new ServiceReceiptForm();
                     mForm = billingReceiptForm;
                     fillPaymentReceiptForm();
                 }, err -> {
@@ -257,7 +257,7 @@ public class PrintWindow extends AbstractWindow {
         contentPane.getTransforms().clear();
 
         if (mForm != null && mForm == statementForm) ((StatementForm) mForm).showTempBg(false);
-        if (mForm != null && mForm == billingReceiptForm) ((BillingReceiptForm) mForm).showTempBg(false);
+        if (mForm != null && mForm == billingReceiptForm) ((ServiceReceiptForm) mForm).showTempBg(false);
 
         Printer printer = cbPrinters.getValue() == null ? Printer.getDefaultPrinter() : cbPrinters.getValue();
         PrinterJob printerJob = PrinterJob.createPrinterJob(printer);

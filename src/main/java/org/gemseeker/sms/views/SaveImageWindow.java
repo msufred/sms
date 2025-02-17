@@ -22,8 +22,7 @@ import javafx.stage.Stage;
 import org.gemseeker.sms.Utils;
 import org.gemseeker.sms.data.*;
 import org.gemseeker.sms.data.controllers.*;
-import org.gemseeker.sms.views.forms.BillingReceiptEcopyForm;
-import org.gemseeker.sms.views.forms.BillingReceiptForm;
+import org.gemseeker.sms.views.forms.ServiceReceiptEcopyForm;
 import org.gemseeker.sms.views.forms.StatementEcopyForm;
 import org.gemseeker.sms.views.panels.AbstractPanel;
 
@@ -33,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 
 /**
  * Window for saving forms as image.
@@ -64,7 +62,7 @@ public class SaveImageWindow extends AbstractWindow {
 
     // billing statement & receipt e-copy forms
     private StatementEcopyForm statementEcopyForm;
-    private BillingReceiptEcopyForm billingReceiptEcopyForm;
+    private ServiceReceiptEcopyForm billingReceiptEcopyForm;
 
     private Account account;
     private Subscription subscription;
@@ -179,7 +177,7 @@ public class SaveImageWindow extends AbstractWindow {
                 }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(p -> {
                     progress.setVisible(false);
                     payment = p;
-                    if (billingReceiptEcopyForm == null) billingReceiptEcopyForm = new BillingReceiptEcopyForm();
+                    if (billingReceiptEcopyForm == null) billingReceiptEcopyForm = new ServiceReceiptEcopyForm();
                     mForm = billingReceiptEcopyForm;
                     fillBillingReceiptForm();
                 }));

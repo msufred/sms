@@ -10,7 +10,7 @@ import org.gemseeker.sms.views.panels.AbstractPanel;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class BillingReceiptEcopyForm extends AbstractPanel {
+public class ServiceReceiptEcopyForm extends AbstractPanel {
 
     @FXML private Label lblOrNo;
     @FXML private Label lblAccountName;
@@ -46,8 +46,8 @@ public class BillingReceiptEcopyForm extends AbstractPanel {
     private Account mAccount;
     private Payment mPayment;
 
-    public BillingReceiptEcopyForm() {
-        super(BillingReceiptEcopyForm.class.getResource("receipt_ecopy.fxml"));
+    public ServiceReceiptEcopyForm() {
+        super(ServiceReceiptEcopyForm.class.getResource("service_receipt_ecopy.fxml"));
     }
 
     @Override

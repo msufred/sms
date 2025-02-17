@@ -10,9 +10,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1772.0" prefWidth="2421.0" style="-fx-background-color: white;" stylesheets="@receipt.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1772.0" prefWidth="2421.0" style="-fx-background-color: white;" stylesheets="@receipt.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <StackPane VBox.vgrow="ALWAYS">
+      <StackPane alignment="TOP_LEFT" VBox.vgrow="ALWAYS">
          <children>
             <ImageView fx:id="tempBg" fitHeight="1772.0" fitWidth="2421.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -241,6 +241,11 @@
                   </HBox>
                </children>
             </VBox>
+            <Label styleClass="text-invoice" text="SERVICE INVOICE">
+               <StackPane.margin>
+                  <Insets left="250.0" top="1200.0" />
+               </StackPane.margin>
+            </Label>
          </children>
       </StackPane>
    </children>
