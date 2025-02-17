@@ -15,8 +15,6 @@ module org.gemseeker.sms {
     requires io.reactivex.rxjava2;
     requires rxjavafx;
 
-    requires feathericons;
-
     requires org.apache.poi.poi;
     requires org.apache.poi.ooxml;
     requires commons.math3;
