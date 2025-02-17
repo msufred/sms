@@ -1,8 +1,5 @@
 package org.gemseeker.sms.views.panels.dashboard;
 
-import io.github.msufred.feathericons.ArrowUpIcon;
-import io.github.msufred.feathericons.SettingsIcon;
-import io.github.msufred.feathericons.UploadIcon;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
@@ -23,6 +20,8 @@ import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.controllers.DailySummaryController;
 import org.gemseeker.sms.views.MainWindow;
 import org.gemseeker.sms.views.RecalculateWindow;
+import org.gemseeker.sms.views.icons.SettingsIcon;
+import org.gemseeker.sms.views.icons.UploadIcon;
 import org.gemseeker.sms.views.panels.DashboardPanel;
 
 import java.io.File;

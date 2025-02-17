@@ -1,12 +1,12 @@
 package org.gemseeker.sms.views;
 
-import io.github.msufred.feathericons.FolderIcon;
-import io.github.msufred.feathericons.ZoomInIcon;
-import io.github.msufred.feathericons.ZoomOutIcon;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import org.gemseeker.sms.views.icons.FolderIcon;
+import org.gemseeker.sms.views.icons.ZoomInIcon;
+import org.gemseeker.sms.views.icons.ZoomOutIcon;
 
 import java.awt.*;
 import java.io.File;

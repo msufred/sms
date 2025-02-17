@@ -1,12 +1,6 @@
 package org.gemseeker.sms.views.panels;
 
-import io.github.msufred.feathericons.*;
-import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
-import io.reactivex.schedulers.Schedulers;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -14,21 +8,19 @@ import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.Payment;
 import org.gemseeker.sms.data.Product;
 import org.gemseeker.sms.data.Service;
-import org.gemseeker.sms.data.controllers.ProductController;
-import org.gemseeker.sms.data.controllers.ServiceController;
 import org.gemseeker.sms.views.*;
 import org.gemseeker.sms.views.cells.AmountTableCell;
 import org.gemseeker.sms.views.cells.DateTableCell;
 import org.gemseeker.sms.views.cells.TagTableCell;
 import org.gemseeker.sms.views.icons.PesoIcon;
+import org.gemseeker.sms.views.icons.ShoppingCartIcon;
+import org.gemseeker.sms.views.icons.ToolIcon;
 import org.gemseeker.sms.views.panels.products_services.ItemStocksViewController;
 import org.gemseeker.sms.views.panels.products_services.JobbingViewController;
 import org.gemseeker.sms.views.panels.products_services.PurchasesViewController;
 import org.gemseeker.sms.views.panels.products_services.ServicesViewController;
 
-import java.sql.Ref;
 import java.time.LocalDate;
-import java.util.Optional;
 
 public class InventoryPanel extends AbstractPanel {
 

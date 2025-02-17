@@ -1,13 +1,9 @@
 package org.gemseeker.sms.views;
 
-import io.github.msufred.feathericons.CheckCircleIcon;
-import io.github.msufred.feathericons.PaperClipIcon;
-import io.github.msufred.feathericons.XCircleIcon;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import io.reactivex.schedulers.Schedulers;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -19,10 +15,12 @@ import org.apache.commons.io.FileUtils;
 import org.gemseeker.sms.Utils;
 import org.gemseeker.sms.data.*;
 import org.gemseeker.sms.data.controllers.*;
+import org.gemseeker.sms.views.icons.CheckCircleIcon;
+import org.gemseeker.sms.views.icons.PaperClipIcon;
+import org.gemseeker.sms.views.icons.XCircleIcon;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.util.concurrent.Callable;
 
 public class AcceptPaymentWindow extends AbstractWindow {
 

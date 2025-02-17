@@ -1,6 +1,5 @@
 package org.gemseeker.sms.views;
 
-import io.github.msufred.feathericons.*;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
@@ -13,17 +12,18 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.gemseeker.sms.AppMain;
 import org.gemseeker.sms.Settings;
+import org.gemseeker.sms.Utils;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.User;
 import org.gemseeker.sms.data.controllers.ScheduleController;
 import org.gemseeker.sms.data.controllers.UserController;
 import org.gemseeker.sms.views.icons.PesoIcon;
 import org.gemseeker.sms.views.panels.*;
+import org.gemseeker.sms.views.icons.*;
 
 import javax.xml.transform.TransformerException;
 import java.sql.SQLException;
 import java.util.Objects;
-import java.util.Optional;
 
 public class MainWindow extends AbstractWindow {
 
@@ -86,7 +86,7 @@ public class MainWindow extends AbstractWindow {
     private boolean isLogout = false;
 
     public MainWindow(AppMain appMain, Settings settings, Database database, Stage stage) {
-        super("SMS", MainWindow.class.getResource("main.fxml"), stage, null);
+        super("SMS " + Utils.VERSION, MainWindow.class.getResource("main.fxml"), stage, null);
         this.appMain = appMain;
         this.settings = settings;
         this.database = database;

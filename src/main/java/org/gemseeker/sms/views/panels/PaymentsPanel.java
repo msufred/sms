@@ -1,6 +1,5 @@
 package org.gemseeker.sms.views.panels;
 
-import io.github.msufred.feathericons.*;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
@@ -28,12 +27,10 @@ import org.gemseeker.sms.data.controllers.BillingController;
 import org.gemseeker.sms.data.controllers.BillingStatementController;
 import org.gemseeker.sms.data.controllers.PaymentController;
 import org.gemseeker.sms.data.controllers.models.BillingPayment;
-import org.gemseeker.sms.data.controllers.models.PurchasePayment;
 import org.gemseeker.sms.views.*;
 import org.gemseeker.sms.views.cells.*;
-import org.gemseeker.sms.views.icons.PesoIcon;
+import org.gemseeker.sms.views.icons.*;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +38,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 import java.util.Optional;
 
 public class PaymentsPanel extends AbstractPanel {

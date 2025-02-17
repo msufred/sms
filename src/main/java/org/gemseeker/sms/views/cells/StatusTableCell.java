@@ -1,9 +1,9 @@
 package org.gemseeker.sms.views.cells;
 
-import io.github.msufred.feathericons.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import org.gemseeker.sms.views.ViewUtils;
+import org.gemseeker.sms.views.icons.*;
 
 public class StatusTableCell<T> extends TableCell<T, String> {
 

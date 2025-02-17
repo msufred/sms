@@ -1,6 +1,5 @@
 package org.gemseeker.sms.views.panels;
 
-import io.github.msufred.feathericons.*;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
@@ -20,7 +19,7 @@ import org.gemseeker.sms.views.*;
 import org.gemseeker.sms.views.cells.AmountTableCell;
 import org.gemseeker.sms.views.cells.DateTableCell;
 import org.gemseeker.sms.views.cells.TagTableCell;
-import org.gemseeker.sms.views.icons.PesoIcon;
+import org.gemseeker.sms.views.icons.*;
 import org.gemseeker.sms.views.panels.dashboard.*;
 
 import java.time.LocalDate;

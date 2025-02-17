@@ -1,6 +1,5 @@
 package org.gemseeker.sms.views.panels.dashboard;
 
-import io.github.msufred.feathericons.*;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
@@ -18,7 +17,7 @@ import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.Expense;
 import org.gemseeker.sms.data.controllers.ExpenseController;
 import org.gemseeker.sms.views.*;
-import org.gemseeker.sms.views.icons.PesoIcon;
+import org.gemseeker.sms.views.icons.*;
 import org.gemseeker.sms.views.panels.DashboardPanel;
 
 import java.io.File;

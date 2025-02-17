@@ -1,6 +1,5 @@
 package org.gemseeker.sms.views;
 
-import io.github.msufred.feathericons.XCircleIcon;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
@@ -17,6 +16,7 @@ import org.gemseeker.sms.Utils;
 import org.gemseeker.sms.data.CashTransaction;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.controllers.CashTransactionController;
+import org.gemseeker.sms.views.icons.XCircleIcon;
 
 import java.io.File;
 

@@ -1,6 +1,5 @@
 package org.gemseeker.sms.views.panels.products_services;
 
-import io.github.msufred.feathericons.*;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
@@ -18,6 +17,7 @@ import org.gemseeker.sms.views.AddPurchasePaymentWindow;
 import org.gemseeker.sms.views.MainWindow;
 import org.gemseeker.sms.views.PrintWindow;
 import org.gemseeker.sms.views.ViewUtils;
+import org.gemseeker.sms.views.icons.*;
 import org.gemseeker.sms.views.panels.InventoryPanel;
 
 import java.util.Optional;

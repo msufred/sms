@@ -1,12 +1,9 @@
 package org.gemseeker.sms.views.panels;
 
-import io.github.msufred.feathericons.PrinterIcon;
-import io.github.msufred.feathericons.UploadIcon;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import io.reactivex.schedulers.Schedulers;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.print.*;
@@ -22,10 +19,10 @@ import org.gemseeker.sms.data.controllers.ExpenseController;
 import org.gemseeker.sms.data.controllers.RevenueController;
 import org.gemseeker.sms.views.MainWindow;
 import org.gemseeker.sms.views.ViewUtils;
+import org.gemseeker.sms.views.icons.PrinterIcon;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
 
 public class CashFlowPanel extends AbstractPanel {
 

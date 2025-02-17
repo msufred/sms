@@ -1,8 +1,5 @@
 package org.gemseeker.sms.views;
 
-import io.github.msufred.feathericons.CheckCircleIcon;
-import io.github.msufred.feathericons.PlusIcon;
-import io.github.msufred.feathericons.XCircleIcon;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
@@ -19,6 +16,9 @@ import org.gemseeker.sms.data.controllers.AccountController;
 import org.gemseeker.sms.data.controllers.DataPlanController;
 import org.gemseeker.sms.data.controllers.SubscriptionController;
 import org.gemseeker.sms.data.controllers.TowerController;
+import org.gemseeker.sms.views.icons.CheckCircleIcon;
+import org.gemseeker.sms.views.icons.PlusIcon;
+import org.gemseeker.sms.views.icons.XCircleIcon;
 
 public class AddAccountWindow extends AbstractWindow {
 

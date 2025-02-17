@@ -1,6 +1,5 @@
 package org.gemseeker.sms.views.panels;
 
-import io.github.msufred.feathericons.*;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
@@ -21,6 +20,7 @@ import org.gemseeker.sms.views.ViewUtils;
 import org.gemseeker.sms.views.cells.DateTableCell;
 import org.gemseeker.sms.views.cells.StatusTableCell;
 import org.gemseeker.sms.views.cells.TagTableCell;
+import org.gemseeker.sms.views.icons.*;
 
 import java.time.LocalDate;
 import java.time.Month;

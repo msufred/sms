@@ -1,12 +1,8 @@
 package org.gemseeker.sms.views.cells;
 
-import io.github.msufred.feathericons.SVGIcon;
 import javafx.scene.control.TableCell;
 import org.gemseeker.sms.data.Tower;
-import org.gemseeker.sms.views.icons.CircleFilledIcon;
-import org.gemseeker.sms.views.icons.PentagonIcon;
-import org.gemseeker.sms.views.icons.StarFilledIcon;
-import org.gemseeker.sms.views.icons.TriangleFilledIcon;
+import org.gemseeker.sms.views.icons.*;
 
 import java.util.Objects;
 

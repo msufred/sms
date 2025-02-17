@@ -1,9 +1,6 @@
 package org.gemseeker.sms.views;
 
 
-import io.github.msufred.feathericons.PlusIcon;
-import io.github.msufred.feathericons.UserIcon;
-import io.github.msufred.feathericons.XCircleIcon;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
@@ -20,6 +17,9 @@ import org.gemseeker.sms.data.controllers.PaymentItemController;
 import org.gemseeker.sms.data.controllers.RevenueController;
 import org.gemseeker.sms.data.controllers.ServiceController;
 import org.gemseeker.sms.views.cells.AmountTableCell;
+import org.gemseeker.sms.views.icons.PlusIcon;
+import org.gemseeker.sms.views.icons.UserIcon;
+import org.gemseeker.sms.views.icons.XCircleIcon;
 import org.gemseeker.sms.views.panels.products_services.JobbingViewController;
 
 public class AddServicePaymentWindow extends AbstractWindow {

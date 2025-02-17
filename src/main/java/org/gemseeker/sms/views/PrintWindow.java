@@ -1,8 +1,5 @@
 package org.gemseeker.sms.views;
 
-import io.github.msufred.feathericons.FilePlusIcon;
-import io.github.msufred.feathericons.PrinterIcon;
-import io.github.msufred.feathericons.ZoomInIcon;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
@@ -22,6 +19,9 @@ import org.gemseeker.sms.data.controllers.*;
 import org.gemseeker.sms.views.forms.BillingReceiptForm;
 import org.gemseeker.sms.views.forms.StatementForm;
 import org.gemseeker.sms.views.forms.TermsConditionsForm;
+import org.gemseeker.sms.views.icons.FilePlusIcon;
+import org.gemseeker.sms.views.icons.PrinterIcon;
+import org.gemseeker.sms.views.icons.ZoomInIcon;
 import org.gemseeker.sms.views.panels.AbstractPanel;
 
 /**

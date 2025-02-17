@@ -1,12 +1,9 @@
 package org.gemseeker.sms.views;
 
-import io.github.msufred.feathericons.UploadIcon;
-import io.github.msufred.feathericons.XCircleIcon;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import io.reactivex.schedulers.Schedulers;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -19,8 +16,9 @@ import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.Expense;
 import org.gemseeker.sms.data.Revenue;
 import org.gemseeker.sms.data.controllers.ExpenseController;
+import org.gemseeker.sms.views.icons.UploadIcon;
+import org.gemseeker.sms.views.icons.XCircleIcon;
 
-import javax.swing.text.View;
 import java.io.File;
 
 public class EditExpenseWindow extends AbstractWindow {

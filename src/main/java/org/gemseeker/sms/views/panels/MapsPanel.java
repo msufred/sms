@@ -1,6 +1,5 @@
 package org.gemseeker.sms.views.panels;
 
-import io.github.msufred.feathericons.*;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
@@ -27,6 +26,7 @@ import org.gemseeker.sms.views.AddTowerWindow;
 import org.gemseeker.sms.views.EditTowerWindow;
 import org.gemseeker.sms.views.MainWindow;
 import org.gemseeker.sms.views.cells.TowerTypeTableCell;
+import org.gemseeker.sms.views.icons.*;
 import org.gemseeker.sms.views.panels.maps.LinePainter;
 import org.gemseeker.sms.views.panels.maps.TowerPainter;
 import org.gemseeker.sms.views.panels.maps.TowerPoint;

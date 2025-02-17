@@ -1,6 +1,5 @@
 package org.gemseeker.sms.views.panels.products_services;
 
-import io.github.msufred.feathericons.*;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
@@ -8,7 +7,6 @@ import io.reactivex.schedulers.Schedulers;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.*;
-import org.apache.commons.math3.analysis.function.Sin;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.Service;
 import org.gemseeker.sms.data.controllers.ServiceController;
@@ -16,6 +14,7 @@ import org.gemseeker.sms.views.AddServiceWindow;
 import org.gemseeker.sms.views.EditServiceWindow;
 import org.gemseeker.sms.views.MainWindow;
 import org.gemseeker.sms.views.ViewUtils;
+import org.gemseeker.sms.views.icons.*;
 import org.gemseeker.sms.views.panels.InventoryPanel;
 
 import java.util.Optional;

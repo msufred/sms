@@ -1,9 +1,5 @@
 package org.gemseeker.sms.views;
 
-import io.github.msufred.feathericons.Edit2Icon;
-import io.github.msufred.feathericons.RefreshCcwIcon;
-import io.github.msufred.feathericons.UsersIcon;
-import io.github.msufred.feathericons.WifiIcon;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
@@ -19,12 +15,11 @@ import org.gemseeker.sms.data.Account;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.Tower;
 import org.gemseeker.sms.data.controllers.AccountController;
-import org.gemseeker.sms.data.controllers.BillingController;
 import org.gemseeker.sms.data.controllers.TowerController;
 import org.gemseeker.sms.views.cells.DateTimeTableCell;
 import org.gemseeker.sms.views.cells.StatusTableCell;
 import org.gemseeker.sms.views.cells.TagTableCell;
-import org.gemseeker.sms.views.icons.PesoIcon;
+import org.gemseeker.sms.views.icons.*;
 
 import java.time.LocalDateTime;
 
