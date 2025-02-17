@@ -5,6 +5,10 @@ import java.time.LocalDateTime;
 
 public class Billing {
 
+    public static final String STATUS_PAID = "Paid";
+    public static final String STATUS_FOR_PAYMENT = "For Payment";
+    public static final String STATUS_OVERDUE = "Overdue";
+
     private int id;
     private String billingNo; // based on actual statement issued by BIR
     private String accountNo;
@@ -22,7 +26,7 @@ public class Billing {
 
     public Billing() {
         toPay = 0.0;
-        status = "For Payment";
+        status = STATUS_FOR_PAYMENT;
         tag = "normal";
         dateCreated = dateUpdated = LocalDateTime.now();
     }
