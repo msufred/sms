@@ -113,6 +113,7 @@ public class BillingController implements ModelController<Billing> {
                 "billings.from_date, " +
                 "billings.to_date, " +
                 "billings.due_date, " +
+                "billings.to_pay, " +
                 "billings.status, " +
                 "billings.payment_no, " +
                 "payments.amount_total, " +
@@ -131,21 +132,23 @@ public class BillingController implements ModelController<Billing> {
     }
 
     private BillingPayment fetchBillingPayment(ResultSet rs) throws SQLException {
+        int index = 1;
         BillingPayment payment = new BillingPayment();
-        payment.setBillingId(rs.getInt(1));
-        payment.setBillingNo(rs.getString(2));
-        payment.setAccountNo(rs.getString(3));
-        payment.setFromDate(rs.getDate(4).toLocalDate());
-        payment.setToDate(rs.getDate(5).toLocalDate());
-        payment.setDueDate(rs.getDate(6).toLocalDate());
-        payment.setStatus(rs.getString(7));
-        payment.setPaymentNo(rs.getString(8));
-        payment.setAmountTotal(rs.getDouble(9));
-        payment.setAmountPaid(rs.getDouble(10));
-        payment.setBalance(rs.getDouble(11));
-        Date paymentDate = rs.getDate(12);
+        payment.setBillingId(rs.getInt(index++));
+        payment.setBillingNo(rs.getString(index++));
+        payment.setAccountNo(rs.getString(index++));
+        payment.setFromDate(rs.getDate(index++).toLocalDate());
+        payment.setToDate(rs.getDate(index++).toLocalDate());
+        payment.setDueDate(rs.getDate(index++).toLocalDate());
+        payment.setToPay(rs.getDouble(index++));
+        payment.setStatus(rs.getString(index++));
+        payment.setPaymentNo(rs.getString(index++));
+        payment.setAmountTotal(rs.getDouble(index++));
+        payment.setAmountPaid(rs.getDouble(index++));
+        payment.setBalance(rs.getDouble(index++));
+        Date paymentDate = rs.getDate(index++);
         if (paymentDate != null) payment.setPaymentDate(paymentDate.toLocalDate());
-        payment.setAccountName(rs.getString(13));
+        payment.setAccountName(rs.getString(index));
         return payment;
     }
 }
