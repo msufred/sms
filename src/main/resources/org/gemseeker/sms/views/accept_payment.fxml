@@ -8,258 +8,243 @@
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefWidth="600.0" spacing="8.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="700.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <stylesheets>
       <URL value="@styles.css" />
       <URL value="@icons_styles.css" />
    </stylesheets>
    <children>
-      <Label styleClass="form-title" text="Accept Payment" />
-      <HBox alignment="CENTER_LEFT" spacing="8.0">
-         <children>
-            <Label alignment="CENTER_RIGHT" prefWidth="120.0" text="Official Receipt No.">
-               <styleClass>
-                  <String fx:value="form-label" />
-                  <String fx:value="form-label-value" />
-               </styleClass>
-            </Label>
-            <TextField fx:id="tfPaymentNo" prefWidth="250.0" promptText="Required" styleClass="form-field" />
-         </children>
+      <Label styleClass="form-title" text="Accept Payment">
          <VBox.margin>
-            <Insets top="16.0" />
+            <Insets bottom="8.0" left="8.0" top="8.0" />
          </VBox.margin>
-      </HBox>
-      <HBox alignment="CENTER_LEFT" spacing="8.0">
-         <children>
-            <Label alignment="CENTER_RIGHT" prefWidth="120.0" text="Payment Mode">
-               <styleClass>
-                  <String fx:value="form-label" />
-                  <String fx:value="form-label-value" />
-               </styleClass>
-            </Label>
-            <ComboBox fx:id="cbModes" prefWidth="250.0" />
-         </children>
-      </HBox>
-      <HBox fx:id="refGroup" alignment="CENTER_LEFT" disable="true" prefWidth="200.0" spacing="8.0">
-         <children>
-            <Label fx:id="lblRef" alignment="CENTER_RIGHT" prefWidth="120.0" text="Reference No.">
-               <styleClass>
-                  <String fx:value="form-label" />
-                  <String fx:value="form-label-value" />
-               </styleClass>
-            </Label>
-            <TextField fx:id="tfRef" prefWidth="250.0" />
-         </children>
-      </HBox>
-      <HBox alignment="CENTER_LEFT" spacing="8.0">
-         <children>
-            <Label alignment="CENTER_RIGHT" prefWidth="120.0" text="Date">
-               <styleClass>
-                  <String fx:value="form-label" />
-                  <String fx:value="form-label-value" />
-               </styleClass>
-            </Label>
-            <DatePicker fx:id="dpPaymentDate" prefWidth="250.0" styleClass="form-datepicker" />
-            <Label fx:id="lblErrPaymentNo" />
-         </children>
-         <VBox.margin>
-            <Insets />
-         </VBox.margin>
-      </HBox>
-      <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="8.0">
-         <children>
-            <Label alignment="CENTER_RIGHT" prefWidth="120.0" styleClass="form-label-value" text="Attachment" />
-            <Button fx:id="btnUpload" mnemonicParsing="false" prefWidth="120.0" text="Upload" />
-            <Label fx:id="lblAttachment" maxHeight="300.0" prefWidth="300.0" text="No File Attached" />
-         </children>
-      </HBox>
-      <VBox spacing="8.0" styleClass="card">
-         <children>
-            <HBox alignment="CENTER_LEFT" spacing="8.0">
+      </Label>
+      <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
+         <content>
+            <VBox spacing="8.0">
                <children>
-                  <Label alignment="CENTER_RIGHT" prefWidth="120.0" text="Basic Charges/Fee">
-                     <styleClass>
-                        <String fx:value="form-label" />
-                        <String fx:value="form-label-value" />
-                     </styleClass></Label>
-                  <Region HBox.hgrow="ALWAYS" />
-                  <Label fx:id="lblFee" alignment="CENTER_RIGHT" minWidth="140.0" styleClass="form-label" text="0.00" visible="false">
+                  <HBox alignment="CENTER_LEFT" spacing="8.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Official Receipt No.">
+                           <styleClass>
+                              <String fx:value="form-label" />
+                              <String fx:value="form-label-value" />
+                           </styleClass>
+                        </Label>
+                        <TextField fx:id="tfPaymentNo" prefWidth="250.0" promptText="Required" styleClass="form-field" />
+                        <HBox alignment="CENTER">
+                           <children>
+                              <Label fx:id="lblErrPaymentNo" styleClass="label-error" />
+                              <Label fx:id="lblOkPaymentNo" styleClass="label-success" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" spacing="8.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Payment Mode">
+                           <styleClass>
+                              <String fx:value="form-label" />
+                              <String fx:value="form-label-value" />
+                           </styleClass>
+                        </Label>
+                        <ComboBox fx:id="cbModes" prefWidth="250.0" promptText="Select Payment Mode" styleClass="form-combobox" />
+                     </children>
+                  </HBox>
+                  <HBox fx:id="refGroup" alignment="CENTER_LEFT" disable="true" prefWidth="200.0" spacing="8.0">
+                     <children>
+                        <Label fx:id="lblRef" alignment="CENTER_RIGHT" prefWidth="150.0" text="Reference No.">
+                           <styleClass>
+                              <String fx:value="form-label" />
+                              <String fx:value="form-label-value" />
+                           </styleClass>
+                        </Label>
+                        <TextField fx:id="tfRef" prefWidth="250.0" styleClass="form-field" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" spacing="8.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Date">
+                           <styleClass>
+                              <String fx:value="form-label" />
+                              <String fx:value="form-label-value" />
+                           </styleClass>
+                        </Label>
+                        <DatePicker fx:id="dpPaymentDate" prefWidth="250.0" styleClass="form-datepicker" />
+                        <Label fx:id="lblErrPaymentDate" />
+                     </children>
+                  </HBox>
+                  <VBox spacing="8.0" styleClass="card">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                           <children>
+                              <Label alignment="CENTER_RIGHT" prefWidth="120.0" text="Basic Charges/Fee">
+                                 <styleClass>
+                                    <String fx:value="form-label" />
+                                    <String fx:value="form-label-value" />
+                                 </styleClass>
+                              </Label>
+                              <Region HBox.hgrow="ALWAYS" />
+                              <TextField fx:id="tfFee" alignment="CENTER_RIGHT" editable="false" style="-fx-font-weight: bold;" styleClass="form-field" text="0.00" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                           <children>
+                              <Label alignment="CENTER_RIGHT" prefWidth="120.0" text="Prev. Balance">
+                                 <styleClass>
+                                    <String fx:value="form-label" />
+                                    <String fx:value="form-label-value" />
+                                 </styleClass>
+                              </Label>
+                              <Region HBox.hgrow="ALWAYS" />
+                              <TextField fx:id="tfPrevBalance" alignment="CENTER_RIGHT" editable="false" style="-fx-font-weight: bold;" styleClass="form-field" text="0.00" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                           <children>
+                              <Label alignment="CENTER_RIGHT" prefWidth="120.0" text="Discount (Less)">
+                                 <styleClass>
+                                    <String fx:value="form-label" />
+                                    <String fx:value="form-label-value" />
+                                 </styleClass>
+                              </Label>
+                              <Region HBox.hgrow="ALWAYS" />
+                              <TextField fx:id="tfDiscount" alignment="CENTER_RIGHT" style="-fx-font-weight: bold;" styleClass="form-field" text="0.00" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                           <children>
+                              <Label alignment="CENTER_RIGHT" prefWidth="120.0" text="Penalty">
+                                 <styleClass>
+                                    <String fx:value="form-label" />
+                                    <String fx:value="form-label-value" />
+                                 </styleClass>
+                              </Label>
+                              <Region HBox.hgrow="ALWAYS" />
+                              <TextField fx:id="tfPenalty" alignment="CENTER_RIGHT" style="-fx-font-weight: bold;" styleClass="form-field" text="0.00" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                           <children>
+                              <Label alignment="CENTER_RIGHT" prefWidth="120.0" text="VAT">
+                                 <styleClass>
+                                    <String fx:value="form-label" />
+                                    <String fx:value="form-label-value" />
+                                 </styleClass>
+                              </Label>
+                              <Region HBox.hgrow="ALWAYS" />
+                              <TextField fx:id="tfVat" alignment="CENTER_RIGHT" style="-fx-font-weight: bold;" styleClass="form-field" text="0.00" />
+                           </children>
+                        </HBox>
+                     </children>
                      <padding>
-                        <Insets right="9.0" />
+                        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                      </padding>
-                  </Label>
-                  <TextField fx:id="tfFee" alignment="CENTER_RIGHT" editable="false" style="-fx-font-weight: bold;" styleClass="form-field" text="0.00" />
+                  </VBox>
+                  <HBox alignment="CENTER_RIGHT" spacing="8.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" text="Total Amount Due">
+                           <styleClass>
+                              <String fx:value="form-label" />
+                              <String fx:value="form-label-value" />
+                           </styleClass>
+                        </Label>
+                        <Label fx:id="lblTotalDue" alignment="CENTER_RIGHT" minWidth="200.0" styleClass="form-label-value" text="0.00">
+                           <padding>
+                              <Insets right="9.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_RIGHT" spacing="8.0">
+                     <children>
+                        <Label fx:id="lblErrAmount" styleClass="label-error" />
+                        <Label alignment="CENTER_RIGHT" text="Amount Paid">
+                           <styleClass>
+                              <String fx:value="form-label" />
+                              <String fx:value="form-label-value" />
+                           </styleClass>
+                        </Label>
+                        <TextField fx:id="tfAmount" alignment="CENTER_RIGHT" minWidth="200.0" style="-fx-font-weight: bold;" styleClass="form-field" text="0.00" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_RIGHT" spacing="8.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" text="Change">
+                           <styleClass>
+                              <String fx:value="form-label" />
+                              <String fx:value="form-label-value" />
+                           </styleClass>
+                        </Label>
+                        <Label fx:id="lblChange" alignment="CENTER_RIGHT" minWidth="200.0" styleClass="form-label" text="0.00">
+                           <padding>
+                              <Insets right="9.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_RIGHT" spacing="8.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" text="Balance">
+                           <styleClass>
+                              <String fx:value="form-label" />
+                              <String fx:value="form-label-value" />
+                           </styleClass>
+                        </Label>
+                        <Label fx:id="lblBalance" alignment="CENTER_RIGHT" minWidth="200.0" text="0.00">
+                           <padding>
+                              <Insets right="9.0" />
+                           </padding>
+                           <styleClass>
+                              <String fx:value="form-label" />
+                              <String fx:value="text-negative" />
+                           </styleClass>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" spacing="8.0">
+                     <children>
+                        <Label minWidth="90.0" styleClass="form-label" text="Received by" />
+                        <TextField fx:id="tfCashier" editable="false" promptText="Cashier/Owner Name" styleClass="form-field" HBox.hgrow="ALWAYS" />
+                     </children>
+                     <VBox.margin>
+                        <Insets top="16.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="8.0">
+                     <children>
+                        <Label minWidth="90.0" styleClass="form-label" text="Attachment" />
+                        <Button fx:id="btnUpload" mnemonicParsing="false" prefWidth="120.0" styleClass="form-label" text="Upload" />
+                        <Label fx:id="lblAttachment" maxHeight="300.0" prefWidth="300.0" styleClass="form-label" text="No File Attached" />
+                     </children>
+                  </HBox>
                </children>
-            </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="8.0">
-               <children>
-                  <Label alignment="CENTER_RIGHT" prefWidth="120.0" text="Prev. Balance">
-                     <styleClass>
-                        <String fx:value="form-label" />
-                        <String fx:value="form-label-value" />
-                     </styleClass></Label>
-                  <Region HBox.hgrow="ALWAYS" />
-                  <Label fx:id="lblPrevBalance" alignment="CENTER_RIGHT" minWidth="140.0" styleClass="form-label" text="0.00" visible="false">
-                     <padding>
-                        <Insets right="9.0" />
-                     </padding>
-                  </Label>
-                  <TextField fx:id="tfPrevBalance" alignment="CENTER_RIGHT" editable="false" style="-fx-font-weight: bold;" styleClass="form-field" text="0.00" />
-               </children>
-            </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="8.0">
-               <children>
-                  <Label alignment="CENTER_RIGHT" prefWidth="120.0" text="Discount (Less)">
-                     <styleClass>
-                        <String fx:value="form-label" />
-                        <String fx:value="form-label-value" />
-                     </styleClass></Label>
-                  <Region HBox.hgrow="ALWAYS" />
-                  <Label fx:id="lblDiscount" alignment="CENTER_RIGHT" minWidth="140.0" styleClass="form-label" text="0.00" visible="false">
-                     <padding>
-                        <Insets right="9.0" />
-                     </padding>
-                  </Label>
-                  <TextField fx:id="tfDiscount" alignment="CENTER_RIGHT" style="-fx-font-weight: bold;" styleClass="form-field" text="0.00" />
-               </children>
-            </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="8.0">
-               <children>
-                  <Label alignment="CENTER_RIGHT" prefWidth="120.0" text="Penalty">
-                     <styleClass>
-                        <String fx:value="form-label" />
-                        <String fx:value="form-label-value" />
-                     </styleClass></Label>
-                  <Region HBox.hgrow="ALWAYS" />
-                  <Label fx:id="lblPenalty" alignment="CENTER_RIGHT" minWidth="140.0" styleClass="form-label" text="0.00" visible="false">
-                     <padding>
-                        <Insets right="9.0" />
-                     </padding>
-                  </Label>
-                  <TextField fx:id="tfPenalty" alignment="CENTER_RIGHT" style="-fx-font-weight: bold;" styleClass="form-field" text="0.00" />
-               </children>
-            </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="8.0">
-               <children>
-                  <Label alignment="CENTER_RIGHT" prefWidth="120.0" text="VAT">
-                     <styleClass>
-                        <String fx:value="form-label" />
-                        <String fx:value="form-label-value" />
-                     </styleClass>
-                  </Label>
-                  <Region HBox.hgrow="ALWAYS" />
-                  <Label fx:id="lblVat" alignment="CENTER_RIGHT" minWidth="140.0" styleClass="form-label" text="0.00" visible="false">
-                     <padding>
-                        <Insets right="9.0" />
-                     </padding>
-                  </Label>
-                  <TextField fx:id="tfVat" alignment="CENTER_RIGHT" style="-fx-font-weight: bold;" styleClass="form-field" text="0.00" />
-               </children>
-            </HBox>
-         </children>
-         <VBox.margin>
-            <Insets top="16.0" />
-         </VBox.margin>
-         <padding>
-            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
-         </padding>
-      </VBox>
-      <HBox alignment="CENTER_RIGHT" spacing="8.0">
-         <children>
-            <Label alignment="CENTER_RIGHT" text="Total Amount Due">
-               <styleClass>
-                  <String fx:value="form-label" />
-                  <String fx:value="form-label-value" />
-               </styleClass></Label>
-            <Label fx:id="lblTotalDue" alignment="CENTER_RIGHT" minWidth="170.0" styleClass="form-label-value" text="0.00">
                <padding>
-                  <Insets right="9.0" />
+                  <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
                </padding>
-            </Label>
-         </children>
-         <VBox.margin>
-            <Insets right="8.0" />
-         </VBox.margin>
-      </HBox>
-      <HBox alignment="CENTER_RIGHT" spacing="8.0">
+            </VBox>
+         </content>
+      </ScrollPane>
+      <HBox alignment="CENTER_RIGHT" spacing="4.0">
          <children>
-            <Label alignment="CENTER_RIGHT" text="Amount Paid">
-               <styleClass>
-                  <String fx:value="form-label" />
-                  <String fx:value="form-label-value" />
-               </styleClass></Label>
-            <TextField fx:id="tfAmount" alignment="CENTER_RIGHT" style="-fx-font-weight: bold;" styleClass="form-field" text="0.00" />
-         </children>
-         <VBox.margin>
-            <Insets right="8.0" />
-         </VBox.margin>
-      </HBox>
-      <HBox alignment="CENTER_RIGHT" spacing="8.0">
-         <children>
-            <Label alignment="CENTER_RIGHT" text="Change">
-               <styleClass>
-                  <String fx:value="form-label" />
-                  <String fx:value="form-label-value" />
-               </styleClass></Label>
-            <Label fx:id="lblChange" alignment="CENTER_RIGHT" minWidth="170.0" styleClass="form-label" text="0.00">
-               <padding>
-                  <Insets right="9.0" />
-               </padding>
-            </Label>
-         </children>
-         <VBox.margin>
-            <Insets right="8.0" />
-         </VBox.margin>
-      </HBox>
-      <HBox alignment="CENTER_RIGHT" spacing="8.0">
-         <children>
-            <Label alignment="CENTER_RIGHT" text="Balance">
-               <styleClass>
-                  <String fx:value="form-label" />
-                  <String fx:value="form-label-value" />
-               </styleClass></Label>
-            <Label fx:id="lblBalance" alignment="CENTER_RIGHT" minWidth="170.0" text="0.00">
-               <padding>
-                  <Insets right="9.0" />
-               </padding>
-               <styleClass>
-                  <String fx:value="form-label" />
-                  <String fx:value="text-negative" />
-               </styleClass>
-            </Label>
-         </children>
-         <VBox.margin>
-            <Insets right="8.0" />
-         </VBox.margin>
-      </HBox>
-      <HBox alignment="CENTER_LEFT" spacing="8.0">
-         <children>
-            <Label styleClass="form-label" text="Received by" />
-            <TextField fx:id="tfCashier" editable="false" promptText="Cashier/Owner Name" styleClass="form-field" HBox.hgrow="ALWAYS" />
-         </children>
-         <VBox.margin>
-            <Insets top="48.0" />
-         </VBox.margin>
-      </HBox>
-      <HBox alignment="CENTER_RIGHT" spacing="8.0">
-         <children>
-            <ProgressBar fx:id="progressBar" prefWidth="200.0" visible="false" />
+            <ProgressBar fx:id="progressBar" prefWidth="150.0" visible="false" />
             <Region HBox.hgrow="ALWAYS" />
             <Button fx:id="btnConfirm" mnemonicParsing="false" styleClass="form-button-positve" text="Save &amp; Print" />
             <Button fx:id="btnExport" mnemonicParsing="false" styleClass="form-button-regular" text="Save &amp; Export" />
             <Button fx:id="btnCancel" mnemonicParsing="false" styleClass="form-button-regular" text="Cancel" />
          </children>
          <VBox.margin>
-            <Insets top="32.0" />
+            <Insets />
          </VBox.margin>
+         <padding>
+            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+         </padding>
       </HBox>
    </children>
-   <padding>
-      <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
-   </padding>
 </VBox>
