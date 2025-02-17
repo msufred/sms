@@ -21,21 +21,21 @@ jobs:
           distribution: 'temurin'
 
       - name: Test
-        uses: gradle/gradle-build-action@v4
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: test
 
       - name: Build
-        uses: gradle/gradle-build-action@v4
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: build
 
       - name: Build (jlink)
-        uses: gradle/gradle-build-action@v4
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: jlink
 
       - name: Build (jpackage)
-        uses: gradle/gradle-build-action@v4
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: jpackage
