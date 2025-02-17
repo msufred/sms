@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
@@ -14,7 +15,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="800.0" prefWidth="500.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="600.0" prefWidth="500.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label styleClass="form-title" text="Prepare Billing Statement">
          <VBox.margin>
@@ -25,11 +26,15 @@
          <content>
             <VBox spacing="8.0">
                <children>
-                  <Label styleClass="text-label" text="Account Information" />
+                  <Label text="Account Information">
+                     <styleClass>
+                        <String fx:value="text-label" />
+                        <String fx:value="form-label-error" />
+                     </styleClass></Label>
                   <HBox alignment="CENTER_LEFT" prefWidth="200.0">
                      <children>
-                        <Label prefWidth="100.0" text="Billing No" />
-                        <TextField fx:id="tfBillingNo" promptText="Required" />
+                        <Label prefWidth="150.0" styleClass="form-label" text="Billing No" />
+                        <TextField fx:id="tfBillingNo" promptText="Required" styleClass="form-field" />
                         <Label fx:id="lblErrBillingNo">
                            <HBox.margin>
                               <Insets left="8.0" />
@@ -39,8 +44,8 @@
                   </HBox>
                   <HBox alignment="CENTER_LEFT">
                      <children>
-                        <Label prefWidth="100.0" text="Account" />
-                        <ComboBox fx:id="cbAccounts" prefWidth="150.0" promptText="Select Account" />
+                        <Label prefWidth="150.0" styleClass="form-label" text="Account" />
+                        <ComboBox fx:id="cbAccounts" prefWidth="200.0" promptText="Select Account" styleClass="form-combobox" />
                         <Label fx:id="lblErrAccount" styleClass="label-error">
                            <HBox.margin>
                               <Insets left="8.0" />
@@ -48,29 +53,29 @@
                         </Label>
                      </children>
                   </HBox>
-                  <VBox styleClass="card">
+                  <VBox spacing="4.0" styleClass="card">
                      <children>
                         <HBox alignment="CENTER_LEFT">
                            <children>
-                              <Label prefWidth="100.0" text="Name" />
+                              <Label prefWidth="140.0" styleClass="form-label" text="Name" />
                               <Label fx:id="lblName" styleClass="form-label-value" text="Juan Dela Cruz" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT">
                            <children>
-                              <Label prefWidth="100.0" text="Subscription" />
+                              <Label prefWidth="140.0" styleClass="form-label" text="Subscription" />
                               <Label fx:id="lblDuration" styleClass="form-label-value" text="January 01, 2024 - December 31, 2024" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT">
                            <children>
-                              <Label prefWidth="100.0" text="Account Type" />
+                              <Label prefWidth="140.0" styleClass="form-label" text="Account Type" />
                               <Label fx:id="lblPlanType" styleClass="form-label-value" text="Standard" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT">
                            <children>
-                              <Label prefWidth="100.0" text="Bandwidth" />
+                              <Label prefWidth="140.0" styleClass="form-label" text="Bandwidth" />
                               <Label fx:id="lblBandwidth" styleClass="form-label-value" text="10 Mbps" />
                            </children>
                         </HBox>
@@ -81,8 +86,8 @@
                   </VBox>
                   <HBox alignment="CENTER_LEFT">
                      <children>
-                        <Label prefWidth="100.0" text="From Date" />
-                        <DatePicker fx:id="dpFrom" />
+                        <Label prefWidth="150.0" styleClass="form-label" text="From Date" />
+                        <DatePicker fx:id="dpFrom" prefWidth="200.0" styleClass="form-datepicker" />
                         <Label fx:id="lblErrFrom" styleClass="label-error">
                            <HBox.margin>
                               <Insets left="8.0" />
@@ -92,8 +97,8 @@
                   </HBox>
                   <HBox alignment="CENTER_LEFT">
                      <children>
-                        <Label prefWidth="100.0" text="To Date" />
-                        <DatePicker fx:id="dpTo" />
+                        <Label prefWidth="150.0" styleClass="form-label" text="To Date" />
+                        <DatePicker fx:id="dpTo" prefWidth="200.0" styleClass="form-datepicker" />
                         <Label fx:id="lblErrTo" styleClass="label-error">
                            <HBox.margin>
                               <Insets left="8.0" />
@@ -103,8 +108,8 @@
                   </HBox>
                   <HBox alignment="CENTER_LEFT">
                      <children>
-                        <Label prefWidth="100.0" text="Due Date" />
-                        <DatePicker fx:id="dpDue" />
+                        <Label prefWidth="150.0" styleClass="form-label" text="Due Date" />
+                        <DatePicker fx:id="dpDue" prefWidth="200.0" styleClass="form-datepicker" />
                         <Label fx:id="lblErrDue" styleClass="label-error">
                            <HBox.margin>
                               <Insets left="8.0" />
@@ -113,74 +118,82 @@
                      </children>
                   </HBox>
                   <Separator prefWidth="200.0" />
-                  <Label styleClass="text-label" text="Payment Information">
+                  <Label text="Payment Information">
                      <VBox.margin>
                         <Insets top="8.0" />
                      </VBox.margin>
+                     <styleClass>
+                        <String fx:value="text-label" />
+                        <String fx:value="form-label" />
+                     </styleClass>
                   </Label>
                   <HBox alignment="CENTER_LEFT">
                      <children>
-                        <CheckBox fx:id="cbIncludeBalance" mnemonicParsing="false" prefWidth="200.0" text="Include Previous Balance" />
-                        <TextField fx:id="tfBalance" alignment="CENTER_RIGHT" disable="true" text="0.0" />
+                        <CheckBox fx:id="cbIncludeBalance" mnemonicParsing="false" prefWidth="200.0" styleClass="form-label" text="Include Previous Balance" />
+                        <TextField fx:id="tfBalance" alignment="CENTER_RIGHT" disable="true" styleClass="form-field" text="0.0" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" prefWidth="200.0">
                      <children>
-                        <Label prefWidth="200.0" text="Monthly Service Fee" />
-                        <TextField fx:id="tfMonthlyFee" alignment="CENTER_RIGHT" text="0.0" />
+                        <Label prefWidth="200.0" styleClass="form-label" text="Monthly Service Fee" />
+                        <TextField fx:id="tfMonthlyFee" alignment="CENTER_RIGHT" styleClass="form-field" text="0.0" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" prefWidth="200.0">
                      <children>
-                        <Label prefWidth="200.0" text="Discount %" />
-                        <TextField fx:id="tfDiscount" alignment="CENTER_RIGHT" text="0.0" />
+                        <Label prefWidth="200.0" styleClass="form-label" text="Discount %" />
+                        <TextField fx:id="tfDiscount" alignment="CENTER_RIGHT" styleClass="form-field" text="0.0" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" prefWidth="200.0">
                      <children>
-                        <Label prefWidth="200.0" text="Penalty" />
-                        <TextField fx:id="tfPenalty" alignment="CENTER_RIGHT" text="0.0" />
+                        <Label prefWidth="200.0" styleClass="form-label" text="Penalty" />
+                        <TextField fx:id="tfPenalty" alignment="CENTER_RIGHT" styleClass="form-field" text="0.0" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" prefWidth="200.0">
                      <children>
-                        <Label prefWidth="200.0" text="VAT" />
-                        <TextField fx:id="tfVat" alignment="CENTER_RIGHT" text="0.0" />
+                        <Label prefWidth="200.0" styleClass="form-label" text="VAT" />
+                        <TextField fx:id="tfVat" alignment="CENTER_RIGHT" styleClass="form-field" text="0.0" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" prefWidth="200.0">
                      <children>
                         <Label prefWidth="200.0" styleClass="form-label-value" text="TOTAL" />
-                        <TextField fx:id="tfTotal" alignment="CENTER_RIGHT" editable="false" text="0.0" />
+                        <TextField fx:id="tfTotal" alignment="CENTER_RIGHT" editable="false" styleClass="form-field" text="0.0" />
                      </children>
                   </HBox>
                   <Separator prefWidth="200.0" />
-                  <Label styleClass="text-label" text="Other Information">
+                  <Label text="Other Information">
                      <VBox.margin>
                         <Insets top="8.0" />
                      </VBox.margin>
+                     <styleClass>
+                        <String fx:value="text-label" />
+                        <String fx:value="form-label" />
+                     </styleClass>
                   </Label>
                   <HBox alignment="CENTER_LEFT" prefWidth="200.0">
                      <children>
-                        <Label prefWidth="100.0" text="Prepared By" />
-                        <TextField fx:id="tfPreparedBy" prefWidth="300.0" />
+                        <Label prefWidth="100.0" styleClass="form-label" text="Prepared By" />
+                        <TextField fx:id="tfPreparedBy" prefWidth="300.0" promptText="Prepared By" styleClass="form-field" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" prefWidth="200.0">
                      <children>
-                        <Label prefWidth="100.0" text="Designation" />
-                        <TextField fx:id="tfDesignation" prefWidth="300.0" />
+                        <Label prefWidth="100.0" styleClass="form-label" text="Designation" />
+                        <TextField fx:id="tfDesignation" prefWidth="300.0" promptText="Designation/Position" styleClass="form-field" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" prefWidth="200.0">
                      <children>
-                        <Label prefWidth="100.0" text="Received By" />
-                        <TextField fx:id="tfReceivedBy" prefWidth="300.0" />
+                        <Label prefWidth="100.0" styleClass="form-label" text="Received By" />
+                        <TextField fx:id="tfReceivedBy" prefWidth="300.0" promptText="Received By" styleClass="form-field" />
                      </children>
                   </HBox>
                </children>
                <padding>
-                  <Insets bottom="16.0" left="16.0" right="16.0" />
+                  <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
                </padding>
             </VBox>
          </content>
