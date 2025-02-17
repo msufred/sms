@@ -24,15 +24,15 @@ import java.time.LocalDate;
 
 public class AcceptPaymentWindow extends AbstractWindow {
 
-    @FXML private DatePicker dpPaymentDate;
     @FXML private TextField tfPaymentNo;
-    @FXML private Label lblErrPaymentNo;
+    @FXML private Label lblErrPaymentNo; // if OR is not available
+    @FXML private Label lblOkPaymentNo; // if OR is available
     @FXML private ComboBox<String> cbModes;
     @FXML private HBox refGroup;
     @FXML private Label lblRef;
     @FXML private TextField tfRef;
-    @FXML private Button btnUpload;
-    @FXML private Label lblAttachment;
+    @FXML private DatePicker dpPaymentDate;
+    @FXML private Label lblErrPaymentDate;
 
     @FXML private TextField tfFee;
     @FXML private TextField tfPrevBalance;
@@ -40,16 +40,16 @@ public class AcceptPaymentWindow extends AbstractWindow {
     @FXML private TextField tfPenalty;
     @FXML private TextField tfVat;
 
-    @FXML private Label lblFee;
-    @FXML private Label lblPrevBalance;
-    @FXML private Label lblDiscount;
-    @FXML private Label lblPenalty;
-    @FXML private Label lblVat;
     @FXML private Label lblTotalDue;
     @FXML private Label lblChange;
     @FXML private Label lblBalance; // balance after payment
     @FXML private TextField tfAmount;
+    @FXML private Label lblErrAmount;
     @FXML private TextField tfCashier;
+
+    @FXML private Button btnUpload;
+    @FXML private Label lblAttachment;
+
     @FXML private ProgressBar progressBar;
     @FXML private Button btnConfirm;    // save and print
     @FXML private Button btnExport;     // save and export
@@ -112,6 +112,8 @@ public class AcceptPaymentWindow extends AbstractWindow {
 
     @Override
     protected void onFxmlLoaded() {
+        setupIcons();
+
         ViewUtils.setAsNumericalTextField(tfFee, tfPrevBalance, tfDiscount, tfPenalty, tfVat, tfAmount);
         btnUpload.setGraphic(new PaperClipIcon(14));
 
@@ -133,33 +135,23 @@ public class AcceptPaymentWindow extends AbstractWindow {
             uploadFile();
         });
 
-        tfDiscount.textProperty().addListener((o, oldVal, newVal) -> {
-            double dscnt = 0;
-            if (newVal != null && !newVal.isBlank()) dscnt = Double.parseDouble(newVal.trim());
-            discount = dscnt;
-            calculate();
-        });
-
-        tfPenalty.textProperty().addListener((o, oldVal, newVal) -> {
-            double pnlty = 0;
-            if (newVal != null && !newVal.isBlank()) pnlty = Double.parseDouble(newVal.trim());
-            penalty = pnlty;
-            calculate();
-        });
-
-        tfVat.textProperty().addListener((o, oldVal, newVal) -> {
-            double vt = 0;
-            if (newVal != null && !newVal.isBlank()) vt = Double.parseDouble(newVal.trim());
-            vat = vt;
-            calculate();
-        });
-
+        tfDiscount.textProperty().addListener((o, oldVal, newVal) -> calculate());
+        tfPenalty.textProperty().addListener((o, oldVal, newVal) -> calculate());
+        tfVat.textProperty().addListener((o, oldVal, newVal) -> calculate());
         tfAmount.textProperty().addListener((o, oldVal, newVal) -> calculate());
+
         btnConfirm.setOnAction(evt -> validateAndSave(this::saveAndPrint));
         btnExport.setOnAction(evt -> validateAndSave(this::saveAndExport));
         btnCancel.setOnAction(evt -> close());
 
         tfCashier.setText(user.getFullname());
+    }
+
+    private void setupIcons() {
+        lblErrPaymentNo.setGraphic(new XCircleIcon(14));
+        lblOkPaymentNo.setGraphic(new CheckCircleIcon(14));
+        lblErrPaymentDate.setGraphic(new XCircleIcon(14));
+        lblErrAmount.setGraphic(new XCircleIcon(14));
     }
 
     public void showAndWait(String billingNo) {
@@ -195,42 +187,67 @@ public class AcceptPaymentWindow extends AbstractWindow {
     }
 
     private void calculate() {
-        String paidStr = tfAmount.getText();
-        amountPaid = paidStr.isBlank() ? 0 : Double.parseDouble(paidStr.trim());
+        // reset values
+        discount = 0;
+        penalty = 0;
+        vat = 0;
+        amountPaid = 0;
+
+        // parse text fields
+        discount = tfDiscount.getText().isBlank() ? 0 : Double.parseDouble(tfDiscount.getText().trim());
+        penalty = tfPaymentNo.getText().isBlank() ? 0 : Double.parseDouble(tfPenalty.getText().trim());
+        vat = tfVat.getText().isBlank() ? 0 : Double.parseDouble(tfVat.getText().trim());
+        amountPaid = tfAmount.getText().isBlank() ? 0 : Double.parseDouble(tfAmount.getText());
+
+        // calculate total amount due and balance
         totalAmount = amountToPay + prevBalance + penalty + vat - discount;
-        lblTotalDue.setText(String.format("%.2f", totalAmount));
         balance = totalAmount - amountPaid;
+
+        // display values
+        lblTotalDue.setText(String.format("%.2f", totalAmount));
         lblBalance.setText(String.format("%.2f", balance));
     }
 
     private void validateAndSave(Runnable onValidated) {
-        lblErrPaymentNo.getStyleClass().removeAll("label-error", "label-success");
-        lblErrPaymentNo.setGraphic(null);
+        // reset error/ok labels
+        lblErrPaymentNo.setVisible(false);
+        lblOkPaymentNo.setVisible(false);
+        lblErrPaymentDate.setVisible(false);
+        lblErrAmount.setVisible(false);
 
-        boolean mValid = true;
-        if (tfPaymentNo.getText().isBlank() || tfPaymentNo.getText().equals("0.00")) {
-            lblErrPaymentNo.getStyleClass().add("label-error");
-            lblErrPaymentNo.setGraphic(xCircleIcon);
-            mValid = false;
+        // first, check payment date and amount entered
+        boolean hasDate = dpPaymentDate.getValue() != null;
+        boolean hasAmount = !tfAmount.getText().isBlank() && !tfAmount.getText().equals("0.00");
+        lblErrPaymentDate.setVisible(!hasDate);
+        lblErrAmount.setVisible(!hasAmount);
+
+        // check if user entered payment no.
+        boolean hasPaymentNo = !tfPaymentNo.getText().isBlank();
+        lblErrPaymentNo.setVisible(!hasPaymentNo);
+
+        if (!hasPaymentNo || !hasDate || !hasAmount) {
+            showWarningDialog("Invalid", "Please check required fields and try again.");
+            return;
         }
 
-        // check if Payment No. exist
-        if (mValid) {
-            progressBar.setVisible(true);
-            disposables.add(Single.fromCallable(() -> paymentController.hasPayment(ViewUtils.normalize(tfPaymentNo.getText())))
-                    .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(hasPayment -> {
-                        progressBar.setVisible(false);
-                        lblErrPaymentNo.getStyleClass().add(hasPayment ? "label-error" : "label-success");
-                        lblErrPaymentNo.setGraphic(hasPayment ? xCircleIcon : checkCircleIcon);
+        // at this point, user entered the payment number, payment date, and amount
+        // we will now check if payment number already exists...
+        progressBar.setVisible(true);
+        disposables.add(Single.fromCallable(() -> paymentController.hasPayment(ViewUtils.normalize(tfPaymentNo.getText())))
+                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(hasPayment -> {
+                    progressBar.setVisible(false);
+                    lblErrPaymentNo.setVisible(hasPayment);
+                    lblOkPaymentNo.setVisible(!hasPayment);
 
-                        if (!hasPayment) onValidated.run();
-                    }, err -> {
-                        progressBar.setVisible(false);
-                        showErrorDialog("Database Error", "Error while querying database.\n" + err);
-                    }));
-        } else {
-            showInfoDialog("Invalid Action", "Please enter payment amount.");
-        }
+                    if (!hasPayment) {
+                        onValidated.run();
+                    } else {
+                        showWarningDialog("Invalid Payment No", "Payment No. already exists. Try again.");
+                    }
+                }, err -> {
+                    progressBar.setVisible(false);
+                    showErrorDialog("Database Error", "Error while querying database.\n" + err);
+                }));
     }
 
     private void saveAndPrint() {
@@ -340,12 +357,6 @@ public class AcceptPaymentWindow extends AbstractWindow {
         vat = mBillingStatement.getVat();
         totalAmount = mBillingStatement.getTotal();
 
-        lblFee.setText(String.format("%.2f", amountToPay));
-        lblPrevBalance.setText(String.format("%.2f", prevBalance));
-        lblDiscount.setText(String.format("%.2f", discount));
-        lblPenalty.setText(String.format("%.2f", penalty));
-        lblVat.setText(String.format("%.2f", vat));
-
         tfFee.setText(String.format("%.2f", amountToPay));
         tfPrevBalance.setText(String.format("%.2f", prevBalance));
         tfDiscount.setText(String.format("%.2f", discount));
@@ -385,15 +396,13 @@ public class AcceptPaymentWindow extends AbstractWindow {
     }
 
     private void clearFields() {
-        lblErrPaymentNo.setGraphic(null);
+        lblErrPaymentNo.setVisible(false);
+        lblErrPaymentDate.setVisible(false);
+        lblOkPaymentNo.setVisible(false);
+        lblErrAmount.setVisible(false);
         cbModes.setValue("Cash");
         refGroup.setDisable(true);
         lblAttachment.setText("No File Attached");
-        lblFee.setText("0.00");
-        lblPrevBalance.setText("0.00");
-        lblDiscount.setText("0.00");
-        lblPenalty.setText("0.00");
-        lblVat.setText("0.00");
         lblTotalDue.setText("0.00");
         lblChange.setText("0.00");
         lblBalance.setText("0.00");
