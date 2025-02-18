@@ -16,6 +16,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.gemseeker.sms.data.*;
 import org.gemseeker.sms.data.controllers.*;
+import org.gemseeker.sms.views.forms.SalesReceiptForm;
 import org.gemseeker.sms.views.forms.ServiceReceiptForm;
 import org.gemseeker.sms.views.forms.StatementForm;
 import org.gemseeker.sms.views.forms.TermsConditionsForm;
@@ -54,9 +55,10 @@ public class PrintWindow extends AbstractWindow {
 
     private final ObservableList<Printer> printers = FXCollections.observableArrayList();
 
-    private StatementForm statementForm;
-    private ServiceReceiptForm billingReceiptForm;
-    private TermsConditionsForm termsConditionsForm;
+    private StatementForm statementForm;                // for Billing statement
+    private ServiceReceiptForm serviceReceiptForm;      // for Billing payments
+    private SalesReceiptForm salesReceiptForm;          // for Service and Product payments
+    private TermsConditionsForm termsConditionsForm;    // terms and conditions
 
     private Type mType;
     private String mBillingNo;
@@ -145,11 +147,11 @@ public class PrintWindow extends AbstractWindow {
         if (!isForServiceOrPurchase) {
             switch (mType) {
                 case STATEMENT -> loadBillingStatementForm();
-                case RECEIPT -> loadBillingReceiptForm();
+                case RECEIPT -> loadServiceReceiptForm();
                 default -> loadTermsAndConditions();
             }
         } else {
-            loadPaymentReceiptForm(mPaymentNo);
+            loadSalesReceiptForm(mPaymentNo);
         }
     }
 
@@ -170,14 +172,14 @@ public class PrintWindow extends AbstractWindow {
                     subscription = sub;
                     if (statementForm == null) statementForm = new StatementForm();
                     mForm = statementForm;
-                    fillStatementForm();
+                    fillBillingStatementForm();
                 }, err -> {
                     progress.setVisible(false);
                     showErrorDialog("Database Error", err.getMessage());
                 }));
     }
 
-    private void fillStatementForm() {
+    private void fillBillingStatementForm() {
         mContent = statementForm.getView();
         contentPane.getChildren().clear();
         contentPane.getChildren().add(mContent);
@@ -185,7 +187,7 @@ public class PrintWindow extends AbstractWindow {
         statementForm.onResume();
     }
 
-    private void loadBillingReceiptForm() {
+    private void loadServiceReceiptForm() {
         progress.setVisible(true);
         disposables.add(Single.fromCallable(() -> billingStatementController.getByBillingNo(mBillingNo))
                 .flatMap(bStatement -> {
@@ -200,25 +202,25 @@ public class PrintWindow extends AbstractWindow {
                 }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(p -> {
                     progress.setVisible(false);
                     payment = p;
-                    if (billingReceiptForm == null) billingReceiptForm = new ServiceReceiptForm();
-                    mForm = billingReceiptForm;
-                    fillBillingReceiptForm();
+                    if (serviceReceiptForm == null) serviceReceiptForm = new ServiceReceiptForm();
+                    mForm = serviceReceiptForm;
+                    fillServiceReceiptForm();
                 }));
     }
 
-    private void fillBillingReceiptForm() {
-        mContent = billingReceiptForm.getView();
+    private void fillServiceReceiptForm() {
+        mContent = serviceReceiptForm.getView();
         contentPane.getChildren().clear();
         contentPane.getChildren().add(mContent);
-        billingReceiptForm.setData(user, account, payment);
-        billingReceiptForm.onResume();
+        serviceReceiptForm.setData(user, account, payment);
+        serviceReceiptForm.onResume();
     }
 
     /**
      * Used only for Service or Purchase payments.
      * @param paymentNo
      */
-    private void loadPaymentReceiptForm(String paymentNo) {
+    private void loadSalesReceiptForm(String paymentNo) {
         progress.setVisible(true);
         disposables.add(Single.fromCallable(() -> paymentController.getByPaymentNo(paymentNo))
                 .flatMap(p -> Single.fromCallable(() -> {
@@ -227,21 +229,21 @@ public class PrintWindow extends AbstractWindow {
                 })).observeOn(JavaFxScheduler.platform()).subscribeOn(Schedulers.io()).subscribe(items -> {
                     progress.setVisible(false);
                     paymentItems = items;
-                    if (billingReceiptForm == null) billingReceiptForm = new ServiceReceiptForm();
-                    mForm = billingReceiptForm;
-                    fillPaymentReceiptForm();
+                    if (salesReceiptForm == null) salesReceiptForm = new SalesReceiptForm();
+                    mForm = salesReceiptForm;
+                    fillSalesReceiptForm();
                 }, err -> {
                     progress.setVisible(false);
                     showErrorDialog("Database Error", "Error while ");
                 }));
     }
 
-    private void fillPaymentReceiptForm() {
-        mContent = billingReceiptForm.getView();
+    private void fillSalesReceiptForm() {
+        mContent = serviceReceiptForm.getView();
         contentPane.getChildren().clear();
         contentPane.getChildren().add(mContent);
-        billingReceiptForm.setData(user, payment, paymentItems);
-        billingReceiptForm.onResume();
+        serviceReceiptForm.setData(user, payment, paymentItems);
+        serviceReceiptForm.onResume();
     }
 
     private void loadTermsAndConditions() {
@@ -257,7 +259,7 @@ public class PrintWindow extends AbstractWindow {
         contentPane.getTransforms().clear();
 
         if (mForm != null && mForm == statementForm) ((StatementForm) mForm).showTempBg(false);
-        if (mForm != null && mForm == billingReceiptForm) ((ServiceReceiptForm) mForm).showTempBg(false);
+        if (mForm != null && mForm == serviceReceiptForm) ((ServiceReceiptForm) mForm).showTempBg(false);
 
         Printer printer = cbPrinters.getValue() == null ? Printer.getDefaultPrinter() : cbPrinters.getValue();
         PrinterJob printerJob = PrinterJob.createPrinterJob(printer);
@@ -303,7 +305,8 @@ public class PrintWindow extends AbstractWindow {
 
     public void dispose() {
         if (statementForm != null) statementForm.onDispose();
-        if (billingReceiptForm != null) billingReceiptForm.onDispose();
+        if (serviceReceiptForm != null) serviceReceiptForm.onDispose();
+        if (salesReceiptForm != null) salesReceiptForm.onDispose();
         disposables.dispose();
     }
 }
