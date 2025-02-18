@@ -10,12 +10,10 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import org.gemseeker.sms.data.Account;
 import org.gemseeker.sms.data.DataPlan;
 import org.gemseeker.sms.data.Database;
 import org.gemseeker.sms.data.controllers.AccountController;
 import org.gemseeker.sms.data.controllers.DataPlanController;
-import org.gemseeker.sms.data.controllers.SubscriptionController;
 import org.gemseeker.sms.data.controllers.TowerController;
 import org.gemseeker.sms.data.controllers.models.AccountSubscription;
 import org.gemseeker.sms.views.*;
@@ -23,7 +21,6 @@ import org.gemseeker.sms.views.cells.*;
 import org.gemseeker.sms.views.icons.*;
 
 import java.time.LocalDate;
-import java.util.LinkedHashMap;
 import java.util.Optional;
 
 public class AccountsPanel extends AbstractPanel {
@@ -32,6 +29,7 @@ public class AccountsPanel extends AbstractPanel {
     @FXML private Tab tabAccounts;
     @FXML private Tab tabPlans;
 
+    // Accounts Tab
     @FXML private Button btnAdd;
     @FXML private MenuButton mEdit;
     @FXML private MenuItem mEditAccount;
@@ -58,30 +56,30 @@ public class AccountsPanel extends AbstractPanel {
     @FXML private TableColumn<AccountSubscription, String> colTower;
     @FXML private TableColumn<AccountSubscription, String> colParentTower;
 
-    // DataPlan
+    // DataPlans Tab
     @FXML private Button btnAddPlan;
     @FXML private Button btnEditPlan;
     @FXML private Button btnDeletePlan;
+    @FXML private Button btnRefreshDataPlans;
+    @FXML private Label lblSearch2;
+    @FXML private TextField tfSearchDataPlan;
     @FXML private TableView<DataPlan> dataPlansTable;
     @FXML private TableColumn<DataPlan, String> colPlanTag;
     @FXML private TableColumn<DataPlan, String> colPlanName;
     @FXML private TableColumn<DataPlan, Integer> colPlanSpeed;
     @FXML private TableColumn<DataPlan, Double> colPlanFee;
 
-    // Tag Icons
-    private final LinkedHashMap<String, SVGIcon> tags = ViewUtils.getTags();
-
+    // Accounts FilteredList & SimpleObjectProperty
     private FilteredList<AccountSubscription> filteredList;
     private final SimpleObjectProperty<AccountSubscription> selectedItem = new SimpleObjectProperty<>();
+
+    // DataPlans FilteredList & SimpleObjectProperty
     private FilteredList<DataPlan> dataPlanList;
     private final SimpleObjectProperty<DataPlan> selectedPlan = new SimpleObjectProperty<>();
-    private FilteredList<Account> deletedAccountsList;
-    private final SimpleObjectProperty<Account> selectedAccount = new SimpleObjectProperty<>();
 
     private final MainWindow mainWindow;
     private final Database database;
     private final AccountController accountController;
-    private final SubscriptionController subscriptionController;
     private final DataPlanController dataPlanController;
     private final TowerController towerController;
     private final CompositeDisposable disposables;
@@ -100,7 +98,6 @@ public class AccountsPanel extends AbstractPanel {
         this.mainWindow = mainWindow;
         this.database = database;
         accountController = new AccountController(database);
-        subscriptionController = new SubscriptionController(database);
         dataPlanController = new DataPlanController(database);
         towerController = new TowerController(database);
         disposables = new CompositeDisposable();
@@ -114,7 +111,7 @@ public class AccountsPanel extends AbstractPanel {
 
         tabPane.getSelectionModel().selectedIndexProperty().addListener((o, oldVal, newVal) -> {
             if (newVal.intValue() == 1) {
-                refreshPlans();
+                refreshDataPlans();
             } else {
                 refresh();
             }
@@ -151,12 +148,20 @@ public class AccountsPanel extends AbstractPanel {
         btnAddPlan.setOnAction(evt -> addPlan());
         btnEditPlan.setOnAction(evt -> editPlan());
         btnDeletePlan.setOnAction(evt -> deletePlan());
+        btnRefreshDataPlans.setOnAction(evt -> refreshDataPlans());
+
+        tfSearchDataPlan.textProperty().addListener((o, oldVal, newVal) -> {
+            if (dataPlanList != null) {
+                if (newVal.isBlank()) dataPlanList.setPredicate(p -> true);
+                else dataPlanList.setPredicate(dp -> dp.getName().toLowerCase().contains(newVal.toLowerCase()));
+            }
+        });
     }
 
     @Override
     public void onResume() {
         switch (tabPane.getSelectionModel().selectedItemProperty().getName()) {
-            case "Data Plans" -> refreshPlans();
+            case "Data Plans" -> refreshDataPlans();
             default -> refresh();
         }
     }
@@ -179,7 +184,7 @@ public class AccountsPanel extends AbstractPanel {
                 }));
     }
 
-    private void refreshPlans() {
+    private void refreshDataPlans() {
         showProgress("Retrieving Data Plan entries...");
         disposables.add(Single.fromCallable(dataPlanController::getAll)
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
@@ -212,21 +217,9 @@ public class AccountsPanel extends AbstractPanel {
         if (selectedItem.get() == null) {
             showWarningDialog("Invalid", "No selected Account. Try again.");
         } else {
-            showProgress("Checking subscription...");
-            disposables.add(Single.fromCallable(() -> subscriptionController.hasSubscription(selectedItem.get().getAccountNo()))
-                    .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(hasSub -> {
-                        hideProgress();
-                        if (hasSub) {
-                            if (editSubscriptionWindow == null) editSubscriptionWindow = new EditSubscriptionWindow(database, mainWindow.getStage());
-                            editSubscriptionWindow.showAndWait(selectedItem.get().getAccountNo());
-                            refresh();
-                        } else {
-                            showInfoDialog("Invalid Action", "Subscription for this account does not exist.");
-                        }
-                    }, err -> {
-                        hideProgress();
-                        showErrorDialog("Database Error", "Error while checking Subscription.\n" + err);
-                    }));
+            if (editSubscriptionWindow == null) editSubscriptionWindow = new EditSubscriptionWindow(database, mainWindow.getStage());
+            editSubscriptionWindow.showAndWait(selectedItem.get().getAccountNo());
+            refresh();
         }
     }
 
@@ -311,7 +304,7 @@ public class AccountsPanel extends AbstractPanel {
     private void addPlan() {
         if (addDataPlanWindow == null) addDataPlanWindow = new AddDataPlanWindow(database, mainWindow.getStage());
         addDataPlanWindow.showAndWait();
-        refreshPlans();
+        refreshDataPlans();
     }
 
     private void editPlan() {
@@ -320,7 +313,7 @@ public class AccountsPanel extends AbstractPanel {
         } else {
             if (editDataPlanWindow == null) editDataPlanWindow = new EditDataPlanWindow(database, mainWindow.getStage());
             editDataPlanWindow.showAndWait(selectedPlan.get());
-            refreshPlans();
+            refreshDataPlans();
         }
     }
 
@@ -341,7 +334,7 @@ public class AccountsPanel extends AbstractPanel {
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
                     hideProgress();
                     if (!success) showWarningDialog("Failed", "Failed to delete Data Plan entry.");
-                    refreshPlans();
+                    refreshDataPlans();
                 }, err -> {
                     hideProgress();
                     showErrorDialog("Database Error", "Error while deleting Data Plan entry.\n" + err);
@@ -357,7 +350,7 @@ public class AccountsPanel extends AbstractPanel {
                     .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
                         hideProgress();
                         if (!success) showWarningDialog("Failed", "Failed to update Data Plan entry.");
-                        refreshPlans();
+                        refreshDataPlans();
                     }, err -> {
                         hideProgress();
                         showErrorDialog("Database Error", "Error while updating Data Plan entry.\n" + err);
@@ -382,6 +375,8 @@ public class AccountsPanel extends AbstractPanel {
         btnAddPlan.setGraphic(new PlusIcon(14));
         btnEditPlan.setGraphic(new Edit2Icon(14));
         btnDeletePlan.setGraphic(new TrashIcon(14));
+        btnRefreshDataPlans.setGraphic(new RefreshCwIcon(14));
+        lblSearch2.setGraphic(new SearchIcon(14));
     }
 
     private void setupTable() {
@@ -463,10 +458,11 @@ public class AccountsPanel extends AbstractPanel {
         });
 
         MenuItem mDelete = new MenuItem("Delete");
+        mDelete.getStyleClass().add("menu-item-alert");
         mDelete.setGraphic(new TrashIcon(12));
         mDelete.setOnAction(evt -> deleteSelected());
 
-        ContextMenu cm = new ContextMenu(mAdd, mEdit, mDelete, mChangeStatus, mChangeTag);
+        ContextMenu cm = new ContextMenu(mAdd, mEdit, mChangeStatus, mChangeTag, new SeparatorMenuItem(), mDelete);
         accountsTable.setContextMenu(cm);
 
         selectedItem.bind(accountsTable.getSelectionModel().selectedItemProperty());
@@ -489,6 +485,7 @@ public class AccountsPanel extends AbstractPanel {
         mEdit.setOnAction(evt -> editPlan());
 
         MenuItem mDelete = new MenuItem("Delete");
+        mDelete.getStyleClass().add("menu-item-alert");
         mDelete.setGraphic(new TrashIcon(12));
         mDelete.setOnAction(evt -> deletePlan());
 
@@ -501,7 +498,7 @@ public class AccountsPanel extends AbstractPanel {
             mTag.getItems().add(item);
         });
 
-        ContextMenu cm = new ContextMenu(mAdd, mEdit, mDelete, mTag);
+        ContextMenu cm = new ContextMenu(mAdd, mEdit, mTag, new SeparatorMenuItem(), mDelete);
         dataPlansTable.setContextMenu(cm);
         selectedPlan.bind(dataPlansTable.getSelectionModel().selectedItemProperty());
     }
