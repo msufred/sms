@@ -58,9 +58,20 @@ public class EditSubscriptionWindow extends AbstractWindow {
         ViewUtils.setAsIntegerTextField(tfBandwidth);
         ViewUtils.setAsNumericalTextField(tfAmount);
 
-        btnSave.setOnAction(evt -> {
-            if (validated()) saveAndClose();
+        cbDataPlans.valueProperty().addListener((o, oldVal, newVal) -> {
+            if (newVal != null) {
+                tfBandwidth.setText(newVal.getSpeed() + "");
+                tfAmount.setText(String.format("%.2f", newVal.getMonthlyFee()));
+            }
         });
+
+        btnSave.setOnAction(evt -> {
+            if (validated()) {
+                if (mSubscription != null) updateAndClose();
+                else saveAndClose();
+            }
+        });
+
         btnCancel.setOnAction(evt -> close());
     }
 
@@ -84,16 +95,27 @@ public class EditSubscriptionWindow extends AbstractWindow {
                 }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(subscription -> {
                     progressBar.setVisible(false);
                     mSubscription = subscription;
-                    fillupFields();
+                    fillUpFields();
                 }, err -> {
                     progressBar.setVisible(false);
-                    showErrorDialog("Database Error", "Error or no Subscription found:\n" + err);
+                    mSubscription = null;
+                    fillUpFields();
+
+                    // no subscription found for account
+                    if (err.toString().contains("NullPointerException")) {
+                        System.err.println("No Subscription found for Account: " + mAccountNo);
+                    } else {
+                        showErrorDialog("Database Error", "Error while retrieving Subscription entry for account: " + mAccountNo + "\n" + err);
+                        close();
+                    }
                 }));
     }
 
-    private void fillupFields() {
-        if (mPlans != null && mSubscription != null) {
-            cbDataPlans.setItems(mPlans);
+    private void fillUpFields() {
+        cbDataPlans.setItems(mPlans);
+
+        // fill up fields (if subscription is not null)
+        if (mSubscription != null) {
             DataPlan plan = null;
             for (DataPlan p : mPlans) {
                 if (p.getName().equals(mSubscription.getPlanType())) {
@@ -102,7 +124,6 @@ public class EditSubscriptionWindow extends AbstractWindow {
                 }
             }
             cbDataPlans.setValue(plan);
-
             tfBandwidth.setText(mSubscription.getSpeed() + "");
             tfAmount.setText(mSubscription.getMonthlyFee() + "");
             tfIpAddress.setText(mSubscription.getIpAddress());
@@ -122,6 +143,30 @@ public class EditSubscriptionWindow extends AbstractWindow {
     }
 
     private void saveAndClose() {
+        progressBar.setVisible(true);
+        disposables.add(Single.fromCallable(() -> {
+            Subscription subscription = new Subscription();
+            subscription.setAccountNo(mAccountNo);
+            subscription.setPlanType(cbDataPlans.getValue().getName());
+            String speedStr = tfBandwidth.getText().trim();
+            subscription.setSpeed(speedStr.isBlank() ? 0 : Integer.parseInt(speedStr));
+            String amountStr = tfAmount.getText().trim();
+            subscription.setMonthlyFee(amountStr.isBlank() ? 0.0 : Double.parseDouble(amountStr));
+            subscription.setIpAddress(ViewUtils.normalize(tfIpAddress.getText()));
+            subscription.setStartDate(dpStart.getValue());
+            subscription.setEndDate(dpEnd.getValue());
+            return subscriptionController.insert(subscription);
+        }).subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(success -> {
+            progressBar.setVisible(false);
+            if (!success) showWarningDialog("Failed", "Failed to save Subscription entry.");
+            close();
+        }, err -> {
+            progressBar.setVisible(false);
+            showErrorDialog("Database Error", "Error while saving Subscription entry.\n" + err);
+        }));
+    }
+
+    private void updateAndClose() {
         progressBar.setVisible(true);
         disposables.add(Single.fromCallable(() -> {
             mSubscription.setPlanType(cbDataPlans.getValue().getName());
