@@ -155,12 +155,10 @@ public class AccountsPanel extends AbstractPanel {
 
     @Override
     public void onResume() {
-        if (tabPane.getSelectionModel().getSelectedIndex() == 1) {
-            refreshPlans();
-        } else {
-            refresh();
+        switch (tabPane.getSelectionModel().selectedItemProperty().getName()) {
+            case "Data Plans" -> refreshPlans();
+            default -> refresh();
         }
-
     }
 
     @Override
@@ -174,7 +172,6 @@ public class AccountsPanel extends AbstractPanel {
                 .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
                     hideProgress();
                     filteredList = new FilteredList<>(list);
-                    // TODO clear filters
                     accountsTable.setItems(filteredList);
                 }, err -> {
                     hideProgress();

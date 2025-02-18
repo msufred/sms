@@ -9,7 +9,7 @@ public final class Utils {
     public static final String USER_HOME = System.getProperty("user.home");
     public static final String FILE_SEPARATOR = FileSystems.getDefault().getSeparator();
 
-    public static final String APP_FOLDER = USER_HOME + FILE_SEPARATOR + "sms_app";
+    public static final String APP_FOLDER = USER_HOME + FILE_SEPARATOR + "sms_app_v2";
     public static final String LOG_FOLDER = APP_FOLDER + FILE_SEPARATOR + "logs";
     public static final String DATA_FOLDER = APP_FOLDER + FILE_SEPARATOR + "data";
     public static final String IMAGE_FOLDER = APP_FOLDER + FILE_SEPARATOR + "images";

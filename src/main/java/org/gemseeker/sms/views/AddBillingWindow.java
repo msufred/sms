@@ -372,6 +372,7 @@ public class AddBillingWindow extends AbstractWindow {
 
     private void clearFields() {
         cbAccounts.setItems(null);
+        cbAccounts.setPromptText("Select Account");
         lblName.setText("");
         lblDuration.setText("");
         lblPlanType.setText("");

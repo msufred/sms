@@ -28,18 +28,7 @@ public final class DBTables {
 
     public static String[] updatesSql() {
         return new String[] {
-                updateTowersTable(),
-                updateTowersTable_050224(),
-                updatePaymentsTable_112524(),
-                updateRevenuesTable_112724(),
-                updateUsersTable_112724(),
-                updateAccountsTable_112724(),
-                updateExpensesTable_112824(),
-                updateCashTransactionsTable_120124(),
-                updateDailySummariesTable_120224(),
-                updatePaymentsTable_010125(),
-                updatePaymentItemsTable_010125(),
-                updatePaymentItemsTable_010225()
+                // empty for now...
         };
     }
 
@@ -48,6 +37,8 @@ public final class DBTables {
                 "id INT NOT NULL AUTO_INCREMENT, " +
                 "username VARCHAR(255) NOT NULL, " +
                 "password VARCHAR(255) NOT NULL, " +
+                "fullname VARCHAR(255) DEFAULT '', " +
+                "designation VARCHAR(255) DEFAULT 'Employee', " +
                 "role VARCHAR(8) DEFAULT 'guest', " +
                 "tag VARCHAR(16) DEFAULT 'normal', " +
                 "date_created TIMESTAMP, " +
@@ -122,6 +113,8 @@ public final class DBTables {
                 "address VARCHAR(255), " +
                 "phone VARCHAR(15), " +
                 "email VARCHAR(255), " +
+                "bank_account_name VARCHAR(255) DEFAULT '', " +
+                "bank_account_no VARCHAR(255) DEFAULT '', " +
                 "status VARCHAR(16) DEFAULT 'Active', " +
                 "tag VARCHAR(16) DEFAULT 'normal', " +
                 "date_created TIMESTAMP, " +
@@ -155,12 +148,14 @@ public final class DBTables {
                 "id INT NOT NULL AUTO_INCREMENT, " +
                 "account_no VARCHAR(32) NOT NULL, " +
                 "type VARCHAR(24) DEFAULT 'Default', " +
+                "name VARCHAR(255) DEFAULT '', " +
                 "latitude FLOAT DEFAULT '0.0', " +
                 "longitude FLOAT DEFAULT '0.0', " +
                 "elevation FLOAT DEFAULT '0.0', " +
                 "tower_height DOUBLE DEFAULT '0.0', " +
                 "ip_address VARCHAR(24), " +
                 "parent_tower_id INT DEFAULT '-1', " +
+                "parent_name VARCHAR(255) DEFAULT '', " +
                 "status VARCHAR(16) DEFAULT 'Active', " +
                 "tag VARCHAR(16) DEFAULT 'normal', " +
                 "date_created TIMESTAMP, " +
@@ -238,6 +233,8 @@ public final class DBTables {
                 "id INT NOT NULL AUTO_INCREMENT, " +
                 "payment_no VARCHAR(10) NOT NULL, " +
                 "name VARCHAR(255) NOT NULL, " +
+                "address VARCHAR(255) DEFAULT '', " +
+                "contact VARCHAR(12) DEFAULT '', " +
                 "payment_for VARCHAR(16) DEFAULT 'Billing', " +
                 "extra_info VARCHAR(16), " +
                 "prev_balance DOUBLE DEFAULT '0.0', " +
@@ -249,6 +246,8 @@ public final class DBTables {
                 "amount_paid DOUBLE DEFAULT '0.0', " +
                 "balance DOUBLE DEFAULT '0.0', " +
                 "payment_date DATE NOT NULL, " +
+                "mode VARCHAR(255) DEFAULT 'Cash', " +
+                "ref VARCHAR(255) DEFAULT '', " +
                 "prepared_by VARCHAR(255), " +
                 "status VARCHAR(16) DEFAULT 'valid', " +
                 "tag VARCHAR(16) DEFAULT 'normal', " +
@@ -267,6 +266,8 @@ public final class DBTables {
                 "item_name VARCHAR(255), " +
                 "serial VARCHAR(255), " +
                 "amount DOUBLE DEFAULT '0.0', " +
+                "price DOUBLE DEFAULT '0.0', " +
+                "quantity INTEGER DEFAULT '1', " +
                 "tag VARCHAR(16) DEFAULT 'normal', " +
                 "date_created TIMESTAMP, " +
                 "date_updated TIMESTAMP, " +
@@ -293,10 +294,14 @@ public final class DBTables {
     private static String createExpensesTable() {
         return "CREATE TABLE IF NOT EXISTS expenses (" +
                 "id INT NOT NULL AUTO_INCREMENT, " +
+                "category VARCHAR(255) DEFAULT 'Operational', " +
                 "type VARCHAR(255) DEFAULT 'Others', " +
                 "description VARCHAR(255) DEFAULT '', " +
                 "amount DOUBLE DEFAULT '0.0', " +
+                "mode VARCHAR(255) DEFAULT 'Cash', " +
+                "ref VARCHAR(255) DEFAULT '', " +
                 "date DATE NOT NULL, " +
+                "attachment VARCHAR(255) DEFAULT '', " +
                 "tag VARCHAR(16) DEFAULT 'normal', " +
                 "date_created TIMESTAMP, " +
                 "date_updated TIMESTAMP, " +
@@ -311,7 +316,10 @@ public final class DBTables {
                 "type VARCHAR(255) DEFAULT 'Others', " +
                 "description VARCHAR(255) DEFAULT '', " +
                 "amount DOUBLE DEFAULT '0.0', " +
+                "mode VARCHAR(255) DEFAULT 'Cash', " +
+                "ref VARCHAR(255) DEFAULT '', " +
                 "date DATE NOT NULL, " +
+                "attachment VARCHAR(255) DEFAULT '', " +
                 "tag VARCHAR(16) DEFAULT 'normal', " +
                 "date_created TIMESTAMP, " +
                 "date_updated TIMESTAMP, " +
@@ -329,6 +337,7 @@ public final class DBTables {
                 "mode VARCHAR(255) DEFAULT 'Cash', " +
                 "ref VARCHAR(255) DEFAULT '', " +
                 "date DATE NOT NULL, " +
+                "attachment VARCHAR(255) DEFAULT '', " +
                 "tag VARCHAR(16) DEFAULT 'normal', " +
                 "date_created TIMESTAMP, " +
                 "date_updated TIMESTAMP, " +
@@ -344,6 +353,8 @@ public final class DBTables {
                 "forwarded DOUBLE DEFAULT '0.0', " +
                 "revenues DOUBLE DEFAULT '0.0', " +
                 "expenses DOUBLE DEFAULT '0.0', " +
+                "cash_in DOUBLE DEFAULT '0.0', " +
+                "cash_out DOUBLE DEFAULT '0.0', " +
                 "balance DOUBLE DEFAULT '0.0', " +
                 "tag VARCHAR(16) DEFAULT 'normal', " +
                 "date_created TIMESTAMP, " +
@@ -366,65 +377,5 @@ public final class DBTables {
                 "date_deleted TIMESTAMP, " +
                 "PRIMARY KEY (id)" +
                 ")";
-    }
-
-    // Updates
-
-    private static String updateTowersTable() {
-        return "ALTER TABLE towers ADD COLUMN IF NOT EXISTS name VARCHAR(255) DEFAULT '' AFTER type";
-    }
-
-    private static String updateTowersTable_050224() {
-        return "ALTER TABLE towers ADD COLUMN IF NOT EXISTS parent_name VARCHAR(255) DEFAULT '' AFTER parent_tower_id";
-    }
-
-    private static String updatePaymentsTable_112524() {
-        return "ALTER TABLE payments ADD COLUMN IF NOT EXISTS mode VARCHAR(255) DEFAULT 'Cash' AFTER payment_date; " +
-                "ALTER TABLE payments ADD COLUMN IF NOT EXISTS ref VARCHAR(255) DEFAULT '' AFTER mode;";
-    }
-
-    private static String updateRevenuesTable_112724() {
-        return "ALTER TABLE revenues ADD COLUMN IF NOT EXISTS mode VARCHAR(255) DEFAULT 'Cash' AFTER amount; " +
-                "ALTER TABLE revenues ADD COLUMN IF NOT EXISTS ref VARCHAR(255) DEFAULT '' AFTER mode; " +
-                "ALTER TABLE revenues ADD COLUMN IF NOT EXISTS attachment VARCHAR(255) DEFAULT '' AFTER date;";
-    }
-
-    private static String updateUsersTable_112724() {
-        return "ALTER TABLE users ADD COLUMN IF NOT EXISTS fullname VARCHAR(255) DEFAULT '' AFTER password; " +
-                "ALTER TABLE users ADD COLUMN IF NOT EXISTS designation VARCHAR(255) DEFAULT 'Employee' AFTER fullname;";
-    }
-
-    private static String updateAccountsTable_112724() {
-        return "ALTER TABLE accounts ADD COLUMN IF NOT EXISTS bank_account_name VARCHAR(255) DEFAULT '' AFTER email; " +
-                "ALTER TABLE accounts ADD COLUMN IF NOT EXISTS bank_account_no VARCHAR(255) DEFAULT '' AFTER bank_account_name;";
-    }
-
-    private static String updateExpensesTable_112824() {
-        return "ALTER TABLE expenses ADD COLUMN IF NOT EXISTS mode VARCHAR(255) DEFAULT 'Cash' AFTER amount; " +
-                "ALTER TABLE expenses ADD COLUMN IF NOT EXISTS ref VARCHAR(255) DEFAULT '' AFTER mode; " +
-                "ALTER TABLE expenses ADD COLUMN IF NOT EXISTS category VARCHAR(255) DEFAULT 'Operational' AFTER id; " +
-                "ALTER TABLE expenses ADD COLUMN IF NOT EXISTS attachment VARCHAR(255) DEFAULT '' AFTER date;";
-    }
-
-    private static String updateCashTransactionsTable_120124() {
-        return "ALTER TABLE cash_transactions ADD COLUMN IF NOT EXISTS attachment VARCHAR(255) DEFAULT '' AFTER date";
-    }
-
-    private static String updateDailySummariesTable_120224() {
-        return "ALTER TABLE daily_summaries ADD COLUMN IF NOT EXISTS cash_in DOUBLE DEFAULT '0.0' AFTER expenses; " +
-                "ALTER TABLE daily_summaries ADD COLUMN IF NOT EXISTS cash_out DOUBLE DEFAULT '0.0' AFTER cash_in;";
-    }
-
-    private static String updatePaymentsTable_010125() {
-        return "ALTER TABLE payments ADD COLUMN IF NOT EXISTS address VARCHAR(255) DEFAULT '' AFTER name; " +
-                "ALTER TABLE payments ADD COLUMN IF NOT EXISTS contact VARCHAR(12) DEFAULT '' AFTER address;";
-    }
-
-    private static String updatePaymentItemsTable_010125() {
-        return "ALTER TABLE payment_items ADD COLUMN IF NOT EXISTS quantity INTEGER DEFAULT '1' AFTER amount;";
-    }
-
-    private static String updatePaymentItemsTable_010225() {
-        return "ALTER TABLE payment_items ADD COLUMN IF NOT EXISTS price DOUBLE DEFAULT '0.0' AFTER amount;";
     }
 }

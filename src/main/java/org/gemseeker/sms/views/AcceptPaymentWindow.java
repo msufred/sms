@@ -165,6 +165,7 @@ public class AcceptPaymentWindow extends AbstractWindow {
 
     @Override
     protected void onShow() {
+        clearFields();
         progressBar.setVisible(true);
         disposables.add(Single.fromCallable(() -> billingController.getByBillingNo(mBillingNo))
                 .flatMap(billing -> {

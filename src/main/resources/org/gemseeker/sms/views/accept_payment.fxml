@@ -211,7 +211,7 @@
                   <HBox alignment="CENTER_LEFT" spacing="8.0">
                      <children>
                         <Label minWidth="90.0" styleClass="form-label" text="Received by" />
-                        <TextField fx:id="tfCashier" editable="false" promptText="Cashier/Owner Name" styleClass="form-field" HBox.hgrow="ALWAYS" />
+                        <TextField fx:id="tfCashier" promptText="Cashier/Owner Name" styleClass="form-field" HBox.hgrow="ALWAYS" />
                      </children>
                      <VBox.margin>
                         <Insets top="16.0" />

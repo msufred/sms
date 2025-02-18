@@ -17,8 +17,9 @@ import org.gemseeker.sms.data.controllers.DataPlanController;
 import org.gemseeker.sms.data.controllers.SubscriptionController;
 import org.gemseeker.sms.data.controllers.TowerController;
 import org.gemseeker.sms.views.icons.CheckCircleIcon;
-import org.gemseeker.sms.views.icons.PlusIcon;
 import org.gemseeker.sms.views.icons.XCircleIcon;
+
+import javax.swing.text.View;
 
 public class AddAccountWindow extends AbstractWindow {
 
@@ -38,7 +39,6 @@ public class AddAccountWindow extends AbstractWindow {
     // subscription group
     @FXML private CheckBox cbAddSubscription;
     @FXML private ComboBox<DataPlan> cbDataPlans;
-    @FXML private Button btnAdd;
     @FXML private TextField tfBandwidth;
     @FXML private TextField tfIpAddress;
     @FXML private TextField tfAmount;
@@ -73,11 +73,10 @@ public class AddAccountWindow extends AbstractWindow {
     private final TowerController towerController;
     private final CompositeDisposable disposables;
 
-    private AddDataPlanWindow addDataPlanWindow;
-
     // accountNo validation icons
     private final XCircleIcon xCircleIcon = new XCircleIcon(14);
     private final CheckCircleIcon checkCircleIcon = new CheckCircleIcon(14);
+
 
     public AddAccountWindow(Database database, Stage owner) {
         super("Add Account", AddAccountWindow.class.getResource("add_account.fxml"), null, owner);
@@ -122,12 +121,6 @@ public class AddAccountWindow extends AbstractWindow {
         ));
         cbTowerTypes.setValue(Tower.TYPE_DEFAULT);
 
-        btnAdd.setOnAction(evt -> {
-            if (addDataPlanWindow == null) addDataPlanWindow = new AddDataPlanWindow(database, getStage());
-            addDataPlanWindow.showAndWait();
-            refreshDataPlans();
-        });
-
         btnSave.setOnAction(evt -> validateAndSave());
         btnCancel.setOnAction(evt -> close());
     }
@@ -150,18 +143,6 @@ public class AddAccountWindow extends AbstractWindow {
                 }, err -> {
                     progressBar.setVisible(false);
                     showErrorDialog("Database Error", "Error while retrieving Data Plan and Tower list.\n" + err);
-                }));
-    }
-
-    private void refreshDataPlans() {
-        progressBar.setVisible(true);
-        disposables.add(Single.fromCallable(dataPlanController::getAll)
-                .subscribeOn(Schedulers.io()).observeOn(JavaFxScheduler.platform()).subscribe(list -> {
-                    progressBar.setVisible(false);
-                    cbDataPlans.setItems(list);
-                }, err -> {
-                    progressBar.setVisible(false);
-                    showErrorDialog("Database Error", "Error while retrieving DataPlan entries.\n" + err);
                 }));
     }
 
@@ -279,6 +260,8 @@ public class AddAccountWindow extends AbstractWindow {
 
     private Tower getTowerInfo() {
         Tower tower = new Tower();
+        tower.setAccountNo(ViewUtils.normalize(tfAccountNo.getText()));
+        tower.setName(ViewUtils.normalize(tfName.getText()));
         tower.setType(cbTowerTypes.getValue());
         String latStr = tfLatitude.getText();
         tower.setLatitude(latStr.isBlank() ? 0.0f : Float.parseFloat(latStr.trim()));
@@ -303,7 +286,6 @@ public class AddAccountWindow extends AbstractWindow {
     }
 
     private void setupIcons() {
-        btnAdd.setGraphic(new PlusIcon(14));
         lblErrName.setGraphic(new XCircleIcon(14));
         lblErrAddress.setGraphic(new XCircleIcon(14));
         lblErrPlanType.setGraphic(new XCircleIcon(14));
@@ -343,7 +325,6 @@ public class AddAccountWindow extends AbstractWindow {
     }
 
     public void dispose() {
-        if (addDataPlanWindow != null) addDataPlanWindow.dispose();
         disposables.dispose();
     }
 }

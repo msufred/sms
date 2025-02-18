@@ -10,12 +10,12 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefWidth="450.0" spacing="8.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefWidth="450.0" spacing="8.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox alignment="CENTER_LEFT" spacing="8.0">
          <children>
             <Label alignment="CENTER_RIGHT" minWidth="110.0" styleClass="form-label" text="Account" />
-            <ComboBox fx:id="cbAccounts" promptText="Select Account" styleClass="form-combobox" />
+            <ComboBox fx:id="cbAccounts" minWidth="250.0" promptText="Select Account" styleClass="form-combobox" />
             <Label fx:id="lblErrAccount" styleClass="label-error" />
          </children>
       </HBox>
@@ -29,7 +29,7 @@
       <HBox alignment="CENTER_LEFT" spacing="8.0">
          <children>
             <Label alignment="CENTER_RIGHT" minWidth="110.0" styleClass="form-label" text="Type" />
-            <ComboBox fx:id="cbTowerTypes" promptText="Select Tower Type" styleClass="form-combobox" />
+            <ComboBox fx:id="cbTowerTypes" minWidth="250.0" promptText="Select Tower Type" styleClass="form-combobox" />
             <Label fx:id="lblErrTowerType" styleClass="label-error" />
          </children>
       </HBox>
@@ -60,7 +60,7 @@
       <HBox alignment="CENTER_LEFT" spacing="8.0">
          <children>
             <Label alignment="CENTER_RIGHT" minWidth="110.0" styleClass="form-label" text="Parent Tower" />
-            <ComboBox fx:id="cbParentTower" promptText="Select Parent Tower" styleClass="form-combobox" />
+            <ComboBox fx:id="cbParentTower" minWidth="250.0" promptText="Select Parent Tower" styleClass="form-combobox" />
          </children>
       </HBox>
       <HBox alignment="CENTER_RIGHT" spacing="8.0">

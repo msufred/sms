@@ -83,17 +83,17 @@ public abstract class AbstractWindow {
     protected abstract void onFxmlLoaded();
 
     public void show() {
-        Platform.runLater(() -> getStage().show());
+        getStage().show();
     }
 
     protected abstract void onShow();
 
     public void showAndWait() {
-        Platform.runLater(() -> getStage().showAndWait());
+        getStage().showAndWait();
     }
 
     public void close() {
-        Platform.runLater(() -> getStage().close());
+        getStage().close();
     }
 
     protected abstract void onClose();
