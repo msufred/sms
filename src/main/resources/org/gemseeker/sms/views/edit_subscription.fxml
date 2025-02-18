@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="300.0" prefWidth="450.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="350.0" prefWidth="450.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ScrollPane fitToWidth="true" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
          <content>
@@ -21,7 +21,7 @@
                   <HBox alignment="CENTER_LEFT" spacing="8.0">
                      <children>
                         <Label alignment="CENTER_RIGHT" minWidth="90.0" styleClass="form-label" text="Plan Type" />
-                        <ComboBox fx:id="cbDataPlans" prefHeight="30.0" promptText="Select Plan" styleClass="form-combobox" />
+                        <ComboBox fx:id="cbDataPlans" prefHeight="30.0" prefWidth="250.0" promptText="Select Plan" styleClass="form-combobox" />
                         <Label fx:id="lblErrPlanType" styleClass="label-error" />
                      </children>
                   </HBox>
@@ -46,14 +46,14 @@
                   <HBox alignment="CENTER_LEFT" spacing="8.0">
                      <children>
                         <Label alignment="CENTER_RIGHT" minWidth="90.0" styleClass="form-label" text="Date Start" />
-                        <DatePicker fx:id="dpStart" promptText="Date Start (Required)" styleClass="form-datepicker" />
+                        <DatePicker fx:id="dpStart" prefWidth="250.0" promptText="Date Start (Required)" styleClass="form-datepicker" />
                         <Label fx:id="lblErrStartDate" styleClass="label-error" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" spacing="8.0">
                      <children>
                         <Label alignment="CENTER_RIGHT" minWidth="90.0" styleClass="form-label" text="Date End" />
-                        <DatePicker fx:id="dpEnd" promptText="Date End (Required)" styleClass="form-datepicker" />
+                        <DatePicker fx:id="dpEnd" prefWidth="250.0" promptText="Date End (Required)" styleClass="form-datepicker" />
                         <Label fx:id="lblErrEndDate" styleClass="label-error" />
                      </children>
                   </HBox>
